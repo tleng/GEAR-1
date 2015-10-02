@@ -1,4 +1,4 @@
-package com.mattmellor.gear_urop;
+package com.mattmellor.gear;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
