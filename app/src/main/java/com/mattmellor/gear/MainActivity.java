@@ -1,26 +1,44 @@
 package com.mattmellor.gear;
 
+import android.content.res.AssetManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
-public class MainActivity extends AppCompatActivity {
+public class  MainActivity extends AppCompatActivity {
+    private static String LOG_APP_TAG = "tag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String story = "hi";
+        String story = "";
+        try {
+            story = readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(story);
+
+
+        story = story.replaceAll("war","<font color='red'>"+ "war" +"</font>");
+        //Html.fromHtml(story);
+
         TextView articleView = (TextView) findViewById(R.id.articleView);
-        articleView.setText(story);
-        
+        articleView.setText(Html.fromHtml(story));
 
     }
 
@@ -32,30 +50,54 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public String readFile(String filename) throws IOException {
-        String content = null;
-        File file = new File(filename); //for ex foo.txt
-        FileReader reader = null;
+    public String readFile() throws IOException {
+        InputStream inputStream = getResources().openRawResource(R.raw.thebrementownmusicians);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        int i;
         try {
-            reader = new FileReader(file);
-            char[] chars = new char[(int) file.length()];
-            reader.read(chars);
-            content = new String(chars);
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                reader.close();
+            i = inputStream.read();
+            while (i != -1)
+            {
+                byteArrayOutputStream.write(i);
+                i = inputStream.read();
             }
+            inputStream.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        return content;
+
+        return byteArrayOutputStream.toString();
     }
 
 
+    public String readFileByName(String fileName) {
+        String stringOne = "";
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(getAssets().open(fileName)));
 
+            // do reading, usually loop until end of file reading
+            String mLine = reader.readLine();
+            while (mLine != null) {
+                mLine = reader.readLine();
+                stringOne += mLine;
+            }
+        } catch (IOException e) {
+            //log the exception
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    //log the exception
+                }
+            }
 
-
+        }
+        return stringOne;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

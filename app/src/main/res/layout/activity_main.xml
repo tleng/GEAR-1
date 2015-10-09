@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/hello_world"
+        android:text="@string/story"
         android:id="@+id/articleView"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -41,8 +41,5 @@
         android:background="#CCCCCC"
         android:layout_weight = "1"
         />
-
-
-
 
 </LinearLayout>
