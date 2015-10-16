@@ -7,4 +7,5 @@
     <string name="story">Story loading...</string>
     <string name="title_activity_start">start</string>
     <string name="title_activity_startscreen">startscreen</string>
+    <string name="title_activity_stories_selection">StoriesSelection</string>
 </resources>
