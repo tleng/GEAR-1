@@ -30,6 +30,11 @@ public class start extends AppCompatActivity {
         startActivity(new Intent(start.this, MainActivity.class));
     }
 
+    public void goToStoriesSelectionOnClick(View view){
+        startActivity(new Intent(start.this, StoriesSelection.class));
+    }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
