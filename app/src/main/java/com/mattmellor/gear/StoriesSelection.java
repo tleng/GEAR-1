@@ -1,9 +1,11 @@
 package com.mattmellor.gear;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class StoriesSelection extends AppCompatActivity {
 
@@ -33,5 +35,9 @@ public class StoriesSelection extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void openStory(View view){
+        startActivity(new Intent(StoriesSelection.this, MainActivity.class));
     }
 }
