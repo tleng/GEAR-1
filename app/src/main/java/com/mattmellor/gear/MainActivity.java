@@ -49,9 +49,11 @@ public class  MainActivity extends AppCompatActivity {
         return true;
     }
 
-
+    //In order to modularize this method
+    //We are currently thinking about making a reader Class file that will contain only this method and
+    //have a boat load of switch statements to chose between R.raw.filenames
     public String readFile() throws IOException {
-        InputStream inputStream = getResources().openRawResource(R.raw.thebrementownmusicians);
+        InputStream inputStream = getResources().openRawResource(R.raw.imsosleepy);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         int i;
         try {
