@@ -1,19 +1,14 @@
 package com.mattmellor.gear;
 
-import android.content.res.AssetManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,7 +22,7 @@ public class  MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         String story = "";
         try {
-            story = readFile();
+            story = readFile(R.raw.aschenputtel);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -52,8 +47,8 @@ public class  MainActivity extends AppCompatActivity {
     //In order to modularize this method
     //We are currently thinking about making a reader Class file that will contain only this method and
     //have a boat load of switch statements to chose between R.raw.filenames
-    public String readFile() throws IOException {
-        InputStream inputStream = getResources().openRawResource(R.raw.imsosleepy);
+    public String readFile(Integer story) throws IOException {
+        InputStream inputStream = getResources().openRawResource(story);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         int i;
         try {
