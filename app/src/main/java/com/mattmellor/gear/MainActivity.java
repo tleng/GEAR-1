@@ -3,16 +3,20 @@ package com.mattmellor.gear;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.style.BackgroundColorSpan;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -51,29 +55,18 @@ public class  MainActivity extends AppCompatActivity {
                 String copy = text.substring(selection_start, selection_end);
 
 
-                //File path = new File(getcontext().getFilesDir(), "userVocabularyWords");
-//
-//
-//
-//                FileOutputStream stream = new FileOutputStream(file);
-
-//                String filename = "userVocab.txt";
-//
-//                FileOutputStream outputStream;
-//
-//                try {
-//                    outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-//                    outputStream.write(copy.getBytes());
-//                    outputStream.close();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-
-
-                //Include thing to get definition.
-
                 String definitionWords = dictionaryOutput(copy);
                 definition.setText(definitionWords);
+
+                Context context = getApplicationContext();
+                CharSequence message = copy + " ausgewählt.";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, message, duration);
+                toast.setGravity(Gravity.TOP,0,0);
+                toast.show();
+                definition.setText(copy);
+
                 return false;
             }
         };
@@ -115,63 +108,7 @@ public class  MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
-//    //In order to modularize this method
-//    //We are currently thinking about making a reader Class file that will contain only this method and
-//    //have a boat load of switch statements to chose between R.raw.filenames
-//    public String readFile(String story) throws IOException {
-//        StringBuffer text = new StringBuffer();
-//        try {
-//            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open(story)));
-//            String line = null;
-//            try {
-//                while ((line = br.readLine()) != null) {
-//                    line = br.readLine();
-//                    text.append(line);
-//                    text.append("\n");
-//                }
-//            } catch (IOException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            } finally {
-//                br.close();
-//            }
-//        } catch (FileNotFoundException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//        return text.toString();
-//    }
-
-
-
-//    public String readFileByName(String fileName) {
-//        String stringOne = "";
-//        BufferedReader reader = null;
-//        try {
-//            reader = new BufferedReader(
-//                    new InputStreamReader(getAssets().open(fileName)));
-//
-//            // do reading, usually loop until end of file reading
-//            String mLine = reader.readLine();
-//            while (mLine != null) {
-//                mLine = reader.readLine();
-//                stringOne += mLine;
-//            }
-//        } catch (IOException e) {
-//            //log the exception
-//        } finally {
-//            if (reader != null) {
-//                try {
-//                    reader.close();
-//                } catch (IOException e) {
-//                    //log the exception
-//                }
-//            }
-//
-//        }
-//        return stringOne;
-//    }
+    
 
     public void toggleDictionary(View view){
         TextView dictionaryText = (TextView) findViewById(R.id.definition_box);
