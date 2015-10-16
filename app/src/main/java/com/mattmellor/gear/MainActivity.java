@@ -4,9 +4,16 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.style.BackgroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -24,7 +31,28 @@ public class  MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        TextView txtContent = (TextView) findViewById(R.id.articleView);
+        //TextView txtContent = (TextView) findViewById(R.id.articleView);
+        final EditText txtContent = (EditText) findViewById(R.id.articleView);
+        final TextView definition = (TextView) findViewById(R.id.definition_box);
+
+        View.OnLongClickListener lc = new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int selection_start = txtContent.getSelectionStart();
+                int selection_end = txtContent.getSelectionEnd();
+
+                Spannable str = txtContent.getText();
+                str.setSpan(new BackgroundColorSpan(0xFFFF),selection_start,selection_end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+
+                String text = txtContent.getText().toString();
+                String copy = text.substring(selection_start,selection_end);
+                
+                definition.setText(copy);
+                return false;
+            }
+        };
+
+        txtContent.setOnLongClickListener(lc);
 
         AssetManager assetManager = getAssets();
 
@@ -161,6 +189,20 @@ public class  MainActivity extends AppCompatActivity {
 
         }
         return stringOne;
+    }
+
+    public void toggleDictionary(View view){
+        TextView dictionaryText = (TextView) findViewById(R.id.definition_box);
+        dictionaryText.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
+        RadioButton radioButton = (RadioButton) findViewById(R.id.show_dictionary);
+        radioButton.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
+    }
+
+    public void showDictionary(View view) {
+        TextView dictionaryText = (TextView) findViewById(R.id.definition_box);
+        dictionaryText.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
+        RadioButton radioButton = (RadioButton) findViewById(R.id.show_dictionary);
+        radioButton.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
     }
 
     @Override
