@@ -1,45 +1,23 @@
 package com.mattmellor.gear;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
-public class start extends AppCompatActivity {
+public class userSettings extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+        setContentView(R.layout.activity_user_settings);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_start, menu);
+        getMenuInflater().inflate(R.menu.menu_user_settings, menu);
         return true;
-    }
-
-
-    public void getStartedClick(View view){
-        //Go the the second page
-        startActivity(new Intent(start.this, MainActivity.class));
-    }
-
-    public void goToStoriesSelectionOnClick(View view){
-        startActivity(new Intent(start.this, StoriesSelection.class));
-    }
-
-    public void goToOverallUserVocabOnClick(View view){
-        startActivity(new Intent(start.this, overallUserVocab.class));
-    }
-
-    public void goToUserSettingsOnClick(View view){
-        startActivity(new Intent(start.this, userSettings.class));
     }
 
     @Override
