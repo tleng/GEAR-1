@@ -4,7 +4,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.mattmellor.gear.start">
+    tools:context="com.mattmellor.gear.start"
+    android:background="#FFFFFF">
 
 
     <Button
@@ -12,10 +13,36 @@
         android:layout_height="wrap_content"
         android:text="Get Started!"
         android:id="@+id/StartedButton"
+        android:layout_marginTop="42dp"
+        android:clickable="true"
+        android:onClick="getStartedClick"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="122dp"
+        android:background="#FFFFFF"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageButton"
+        android:text="@string/vocabList"
+        android:drawableTop="@mipmap/ic_vocablist"
+        android:layout_alignTop="@+id/imageButton2"
+        android:layout_toLeftOf="@+id/StartedButton"
+        android:layout_toStartOf="@+id/StartedButton"
+        android:background="#FFFFFF"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageButton2"
+        android:text="@string/stories"
+        android:drawableTop="@mipmap/ic_stories"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/StartedButton"
+        android:layout_toEndOf="@+id/StartedButton"
         android:clickable="true"
-        android:onClick="getStartedClick" />
+        android:background="#FFFFFF"/>
+
+
 
 </RelativeLayout>

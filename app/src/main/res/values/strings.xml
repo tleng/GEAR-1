@@ -8,4 +8,6 @@
     <string name="title_activity_start">start</string>
     <string name="title_activity_startscreen">startscreen</string>
     <string name="title_activity_stories_selection">StoriesSelection</string>
+    <string name="vocabList">Vocab</string>
+    <string name="stories">Stories</string>
 </resources>
