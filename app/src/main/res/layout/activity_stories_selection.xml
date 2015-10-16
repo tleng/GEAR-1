@@ -1,12 +1,93 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.mattmellor.gear.StoriesSelection">
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <LinearLayout
 
-</RelativeLayout>
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/Aschenputtel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="Aschenputtel"
+            android:clickable="true"
+            android:onClick="openStory">
+        </Button>
+        <Button
+            android:id="@+id/Daumesdick"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Daumesdick">
+        </Button>
+        <Button
+            android:id="@+id/Dornröschen"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Dornröschen">
+        </Button>
+
+        <Button
+            android:id="@+id/Froschkönig"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Froschkönig">
+        </Button>
+
+        <Button
+            android:id="@+id/Rapunzel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Rapunzel">
+        </Button>
+
+        <Button
+            android:id="@+id/Rotkäppchen"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Rotkäppchen">
+        </Button>
+
+        <Button
+            android:id="@+id/Rumpelstilzchen"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Rumpelstilzchen">
+        </Button>
+
+        <Button
+            android:id="@+id/Schneewittchen"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Schneewittchen">
+        </Button>
+
+        <Button
+            android:id="@+id/brüderchenundschwesterchen"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Brüderchen und Schwesterchen">
+        </Button>
+
+        <Button
+            android:id="@+id/Cinderella"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cinderella">
+        </Button>
+
+    </LinearLayout>
+
+</ScrollView>
