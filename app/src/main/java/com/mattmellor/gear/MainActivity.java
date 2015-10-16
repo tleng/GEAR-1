@@ -1,5 +1,6 @@
 package com.mattmellor.gear;
 
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
@@ -9,6 +10,8 @@ import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,21 +22,36 @@ public class  MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
-        String story = "";
+        TextView txtContent = (TextView) findViewById(R.id.articleView);
+
+        AssetManager assetManager = getAssets();
+
+        String story = getIntent().getExtras().getString("story");
+        // To load text file
+        InputStream input;
+        String text = story;
         try {
-            story = readFile(R.raw.aschenputtel);
+            input = assetManager.open(story);
+            int size = input.available();
+            byte[] buffer = new byte[size];
+            input.read(buffer);
+            input.close();
+
+            // byte buffer into a string
+            text = new String(buffer);
+            System.out.println(text);
+
+            txtContent.setText(text);
         } catch (IOException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
+            text = "Error Occurred";
         }
-        System.out.println(story);
-
-
-        story = story.replaceAll("war","<font color='red'>"+ "war" +"</font>");
+        //story = story.replaceAll("war","<font color='red'>"+ "war" +"</font>");
         //Html.fromHtml(story);
-
-        TextView articleView = (TextView) findViewById(R.id.articleView);
-        articleView.setText(Html.fromHtml(story));
+        //txtContent.setText(Html.fromHtml(text));
 
     }
 
@@ -47,25 +65,74 @@ public class  MainActivity extends AppCompatActivity {
     //In order to modularize this method
     //We are currently thinking about making a reader Class file that will contain only this method and
     //have a boat load of switch statements to chose between R.raw.filenames
-    public String readFile(Integer story) throws IOException {
-        InputStream inputStream = getResources().openRawResource(story);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        int i;
+    public String readFile(String story) throws IOException {
+        StringBuffer text = new StringBuffer();
         try {
-            i = inputStream.read();
-            while (i != -1)
-            {
-                byteArrayOutputStream.write(i);
-                i = inputStream.read();
+            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open(story)));
+            String line = null;
+            try {
+                while ((line = br.readLine()) != null) {
+                    line = br.readLine();
+                    text.append(line);
+                    text.append("\n");
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } finally {
+                br.close();
             }
-            inputStream.close();
-        } catch (IOException e) {
+        } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-        return byteArrayOutputStream.toString();
+        return text.toString();
     }
+//        BufferedReader reader = null;
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        try {
+//            reader = new BufferedReader(
+//                    new InputStreamReader(getAssets().open(story)));
+//
+//            // do reading, usually loop until end of file reading
+//            String mLine = reader.readLine();
+//            while (mLine != null) {
+//                //process line
+//                byteArrayOutputStream.write(mLine);
+//                mLine = reader.readLine();
+//            }
+//        } catch (IOException e) {
+//            //log the exception
+//        } finally {
+//            if (reader != null) {
+//                try {
+//                    reader.close();
+//                } catch (IOException e) {
+//                    //log the exception
+//                }
+//            }
+//        }
+//        return
+//    }
+//        AssetManager am = getAssets();
+//        InputStream inputStream = am.open(story);
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        int i;
+//        try {
+//            i = inputStream.read();
+//            while (i != -1)
+//            {
+//                byteArrayOutputStream.write(i);
+//                i = inputStream.read();
+//            }
+//            inputStream.close();
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//
+//        return byteArrayOutputStream.toString();
+//    }
 
 
     public String readFileByName(String fileName) {

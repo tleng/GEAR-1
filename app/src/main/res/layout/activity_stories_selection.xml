@@ -10,7 +10,8 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/Aschenputtel"
+            android:id="@+id/aschenputtel"
+            android:tag="aschenputtel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1" android:text="Aschenputtel"
@@ -18,74 +19,85 @@
             android:onClick="openStory">
         </Button>
         <Button
-            android:id="@+id/Daumesdick"
+            android:id="@+id/daumesdick"
+            android:tag="daumesdick"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Daumesdick">
+            android:text="Daumesdick"
+            android:onClick="openStory">
         </Button>
         <Button
-            android:id="@+id/Dornröschen"
+            android:id="@+id/dornroeschen"
+            android:tag="dornroeschen"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Dornröschen">
-        </Button>
-
-        <Button
-            android:id="@+id/Froschkönig"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Froschkönig">
+            android:text="Dornröschen"
+            android:onClick="openStory">
         </Button>
 
         <Button
-            android:id="@+id/Rapunzel"
+            android:id="@+id/froschkoenig"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Rapunzel">
+            android:text="Froschkönig"
+            android:onClick="openStory">
         </Button>
 
         <Button
-            android:id="@+id/Rotkäppchen"
+            android:id="@+id/rapunzel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Rotkäppchen">
+            android:text="Rapunzel"
+            android:onClick="openStory">
         </Button>
 
         <Button
-            android:id="@+id/Rumpelstilzchen"
+            android:id="@+id/rotkaeppchen"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Rumpelstilzchen">
+            android:text="Rotkäppchen"
+            android:onClick="openStory">
         </Button>
 
         <Button
-            android:id="@+id/Schneewittchen"
+            android:id="@+id/rumpelstilzchen"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Schneewittchen">
+            android:text="Rumpelstilzchen"
+            android:onClick="openStory">
         </Button>
 
         <Button
-            android:id="@+id/brüderchenundschwesterchen"
+            android:id="@+id/schneewittchen"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Brüderchen und Schwesterchen">
+            android:text="Schneewittchen"
+            android:onClick="openStory">
         </Button>
 
         <Button
-            android:id="@+id/Cinderella"
+            android:id="@+id/bruederchen_und_schwesterchen"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Cinderella">
+            android:text="Brüderchen und Schwesterchen"
+            android:onClick="openStory">
+        </Button>
+
+        <Button
+            android:id="@+id/cinderella"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cinderella"
+            android:onClick="openStory">
         </Button>
 
     </LinearLayout>
