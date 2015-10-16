@@ -27,8 +27,7 @@ public class  MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         System.out.println(story);
-
-
+        
         story = story.replaceAll("war","<font color='red'>"+ "war" +"</font>");
         //Html.fromHtml(story);
 
