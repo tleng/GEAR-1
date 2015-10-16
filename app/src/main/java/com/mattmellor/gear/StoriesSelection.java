@@ -38,6 +38,9 @@ public class StoriesSelection extends AppCompatActivity {
     }
 
     public void openStory(View view){
-        startActivity(new Intent(StoriesSelection.this, MainActivity.class));
+        Intent intent = new Intent(StoriesSelection.this, MainActivity.class);
+        intent.putExtra("story",(String)view.getTag());
+        startActivity(intent);
+        finish();
     }
 }
