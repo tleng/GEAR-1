@@ -10,27 +10,19 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get Started!"
-        android:id="@+id/StartedButton"
-        android:layout_marginTop="42dp"
-        android:clickable="true"
-        android:onClick="getStartedClick"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:background="#FFFFFF"
-        style="?android:attr/borderlessButtonStyle"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/imageButton"
         android:text="@string/vocabList"
         android:drawableTop="@mipmap/ic_vocablist"
-        android:layout_alignTop="@+id/imageButton2"
-        android:layout_toLeftOf="@+id/StartedButton"
-        android:layout_toStartOf="@+id/StartedButton"
         android:background="#FFFFFF"
-        style="?android:attr/borderlessButtonStyle"/>
+        style="?android:attr/borderlessButtonStyle"
+
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="60dp"
+        android:layout_marginEnd="60dp"
+        android:layout_marginTop="71dp" />
+    <!--android:layout_alignRight="@+id/imageButton2"-->
 
     <Button
         android:layout_width="wrap_content"
@@ -38,13 +30,15 @@
         android:id="@+id/imageButton2"
         android:text="@string/stories"
         android:drawableTop="@mipmap/ic_stories"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/StartedButton"
-        android:layout_toEndOf="@+id/StartedButton"
         android:clickable="true"
         android:background="#FFFFFF"
         android:onClick="goToStoriesSelectionOnClick"
-        style="?android:attr/borderlessButtonStyle"/>
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_alignTop="@+id/imageButton"
+        android:layout_toLeftOf="@+id/imageButton"
+        android:layout_toStartOf="@+id/imageButton"
+        android:layout_marginRight="55dp"
+        android:layout_marginEnd="55dp" />
 
 
 
