@@ -71,7 +71,7 @@
         android:layout_height="wrap_content"
         android:text="User Settings"
         android:id="@+id/button"
-        android:drawableTop="@mipmap/ic_userSettings"
+        android:drawableTop="@mipmap/ic_user_settings"
         style="?android:attr/borderlessButtonStyle"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
