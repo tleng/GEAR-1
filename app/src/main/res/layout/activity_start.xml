@@ -17,7 +17,8 @@
         android:onClick="getStartedClick"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="#FFFFFF"/>
+        android:background="#FFFFFF"
+        style="?android:attr/borderlessButtonStyle"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -28,7 +29,8 @@
         android:layout_alignTop="@+id/imageButton2"
         android:layout_toLeftOf="@+id/StartedButton"
         android:layout_toStartOf="@+id/StartedButton"
-        android:background="#FFFFFF"/>
+        android:background="#FFFFFF"
+        style="?android:attr/borderlessButtonStyle"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -41,7 +43,8 @@
         android:layout_toEndOf="@+id/StartedButton"
         android:clickable="true"
         android:background="#FFFFFF"
-        android:onClick="goToStoriesSelectionOnClick" />
+        android:onClick="goToStoriesSelectionOnClick"
+        style="?android:attr/borderlessButtonStyle"/>
 
 
 
