@@ -18,6 +18,11 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.basistech.rosette.api.RosetteAPI;
+import com.basistech.rosette.api.RosetteAPIException;
+import com.basistech.rosette.apimodel.Lemma;
+import com.basistech.rosette.apimodel.MorphologyResponse;
+
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
@@ -29,6 +34,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
 public class  MainActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "tag";
@@ -126,9 +132,19 @@ public class  MainActivity extends AppCompatActivity {
 
     }
 
-    public String dictionaryOutput(String word){
+    public String dictionaryOutput(String word) {
 
-        String start = "Definition: " + word + " \n";
+        String start = "Selected Word: " + word + " \n";
+        RosetteAPI rosetteAPI = new RosetteAPI("982437a36146ddbfe79ccac334eb92a8");
+        try {
+            MorphologyResponse response = rosetteAPI.getMorphology(RosetteAPI.MorphologicalFeature.LEMMAS, word, null, null);
+            List<Lemma> lemmas = response.getLemmas();
+            start += "Lemma: " + lemmas;
+        } catch (RosetteAPIException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return start;
 
