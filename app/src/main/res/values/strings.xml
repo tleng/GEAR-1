@@ -10,4 +10,6 @@
     <string name="title_activity_stories_selection">StoriesSelection</string>
     <string name="vocabList">Vocab</string>
     <string name="stories">Stories</string>
+    <string name="title_activity_overall_user_vocab">overallUserVocab</string>
+    <string name="title_activity_user_settings">userSettings</string>
 </resources>

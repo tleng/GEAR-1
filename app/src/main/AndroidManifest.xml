@@ -24,6 +24,14 @@
             android:name=".StoriesSelection"
             android:label="@string/app_name" >
         </activity>
+        <activity
+            android:name=".overallUserVocab"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".userSettings"
+            android:label="@string/app_name" >
+        </activity>
     </application>
 
 </manifest>
