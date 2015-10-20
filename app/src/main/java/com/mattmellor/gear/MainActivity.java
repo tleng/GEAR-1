@@ -119,6 +119,11 @@ public class  MainActivity extends AppCompatActivity {
         dictionaryText.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
         RadioButton radioButton = (RadioButton) findViewById(R.id.show_dictionary);
         radioButton.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
+        //RosetteAPI newthing = new RosetteAPI
+        //RosetteAPI neee = new RosetteAPI();
+        
+
+
     }
 
     public String dictionaryOutput(String word){
