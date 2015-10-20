@@ -48,9 +48,6 @@ public class  MainActivity extends AppCompatActivity {
                 int selection_start = txtContent.getSelectionStart();
                 int selection_end = txtContent.getSelectionEnd();
 
-                Spannable str = txtContent.getText();
-                str.setSpan(new BackgroundColorSpan(0xFFFF),selection_start,selection_end, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-
                 String text = txtContent.getText().toString();
                 String copy = text.substring(selection_start, selection_end);
 
