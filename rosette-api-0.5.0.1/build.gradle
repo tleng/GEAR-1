@@ -1,2 +1,0 @@
-configurations.create("default")
-artifacts.add("default", file('rosette-api-0.5.0.1.jar'))

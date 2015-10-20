@@ -108,7 +108,7 @@ public class  MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-    
+
 
     public void toggleDictionary(View view){
         TextView dictionaryText = (TextView) findViewById(R.id.definition_box);
