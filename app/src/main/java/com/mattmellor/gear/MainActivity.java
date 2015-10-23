@@ -121,7 +121,7 @@ public class  MainActivity extends AppCompatActivity {
         radioButton.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
         //RosetteAPI newthing = new RosetteAPI
         //RosetteAPI neee = new RosetteAPI();
-        
+
 
 
     }
