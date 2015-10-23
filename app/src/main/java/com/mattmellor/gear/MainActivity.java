@@ -1,6 +1,7 @@
 package com.mattmellor.gear;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -22,6 +23,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.basistech.rosette.api.RosetteAPI;
 import com.basistech.rosette.api.RosetteAPIException;
@@ -47,14 +49,22 @@ import java.text.BreakIterator;
 import java.util.List;
 import java.util.Locale;
 
+import static com.mattmellor.gear.R.id.app_article_bar;
+
 public class  MainActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "tag";
+    private android.support.v7.widget.Toolbar toolbar;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        toolbar= (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
+        setSupportActionBar(toolbar);
+
         //TextView txtContent = (TextView) findViewById(R.id.articleView);
         final TextView txtContent = (TextView) findViewById(R.id.articleView);
         final TextView definition = (TextView) findViewById(R.id.definition_box);
@@ -82,18 +92,18 @@ public class  MainActivity extends AppCompatActivity {
 
         txtContent.setMovementMethod(LinkMovementMethod.getInstance());
         txtContent.setText(text, TextView.BufferType.SPANNABLE);
-        Spannable spans = (Spannable) txtContent.getText();
-        BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
-        iterator.setText(text);
-        int start = iterator.first();
-        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
-                .next()) {
-            String possibleWord = text.substring(start, end);
-            if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
-                ClickableSpan clickSpan = getClickableSpan(possibleWord);
-                spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-        }
+//        Spannable spans = (Spannable) txtContent.getText();
+//        BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
+//        iterator.setText(text);
+//        int start = iterator.first();
+//        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
+//                .next()) {
+//            String possibleWord = text.substring(start, end);
+//            if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
+//                ClickableSpan clickSpan = getClickableSpan(possibleWord);
+//                spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            }
+//        }
     }
 
 
@@ -104,36 +114,36 @@ public class  MainActivity extends AppCompatActivity {
         return true;
     }
 
-    //Mike's extra stuff to be tested
-    private ClickableSpan getClickableSpan(final String word) {
-        return new ClickableSpan() {
-            final String mWord;
-            {
-                mWord = word;
-            }
-
-            @Override
-            public void onClick(View widget) {
-                Log.d("tapped on:", mWord);
-                Context context = getApplicationContext();
-                CharSequence message = mWord + " ausgewählt.";
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, message, duration);
-                toast.setGravity(Gravity.TOP, 0, 0);
-                toast.show();
-
-                overallUserVocab.addWordToUserDictionary(mWord);
-
-                final TextView definition = (TextView) findViewById(R.id.definition_box);
-                definition.setText(dictionaryOutput(mWord));
-            }
-
-            public void updateDrawState(TextPaint ds) {
-                ds.setUnderlineText(false);
-            }
-        };
-    }
+//    //Mike's extra stuff to be tested
+//    private ClickableSpan getClickableSpan(final String word) {
+//        return new ClickableSpan() {
+//            final String mWord;
+//            {
+//                mWord = word;
+//            }
+//
+//            @Override
+//            public void onClick(View widget) {
+//                Log.d("tapped on:", mWord);
+//                Context context = getApplicationContext();
+//                CharSequence message = mWord + " ausgewählt.";
+//                int duration = Toast.LENGTH_SHORT;
+//
+//                Toast toast = Toast.makeText(context, message, duration);
+//                toast.setGravity(Gravity.TOP, 0, 0);
+//                toast.show();
+//
+//                overallUserVocab.addWordToUserDictionary(mWord);
+//
+//                final TextView definition = (TextView) findViewById(R.id.definition_box);
+//                definition.setText(dictionaryOutput(mWord));
+//            }
+//
+//            public void updateDrawState(TextPaint ds) {
+//                ds.setUnderlineText(false);
+//            }
+//        };
+//    }
     //end Mike's extra stuff to be tested
 
     public void toggleDictionary(View view){
@@ -188,6 +198,13 @@ public class  MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    public void onClickUpPopWindow(View view){
+        startActivity(new Intent(MainActivity.this, popUpRateArticle.class));
+    }
+
+
 
     private Dictionary getDictionary() {
         OpenDictionaryAPI openDictionaryAPI = new OpenDictionaryAPI(getApplicationContext());

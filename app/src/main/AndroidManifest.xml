@@ -32,6 +32,13 @@
             android:name=".userSettings"
             android:label="@string/app_name" >
         </activity>
+
+        <activity
+            android:name=".popUpRateArticle"
+            android:theme="@style/AppTheme.CustomTheme">
+        </activity>
+
+
     </application>
 
 </manifest>

@@ -9,7 +9,13 @@
     <string name="title_activity_startscreen">startscreen</string>
     <string name="title_activity_stories_selection">StoriesSelection</string>
     <string name="vocabList">Vocab</string>
-    <string name="stories">Stories</string>
+    <string name="stories">All Stories</string>
     <string name="title_activity_overall_user_vocab">overallUserVocab</string>
     <string name="title_activity_user_settings">userSettings</string>
+    <string name="title_activity_stories_suggestion_and_selection">StoriesSuggestionAndSelection
+    </string>
+    <string name="rateThisArticle">Article Difficulty</string>
+    <string name="rateThisArticleTwo">How much did you enjoy the article?</string>
+
+
 </resources>
