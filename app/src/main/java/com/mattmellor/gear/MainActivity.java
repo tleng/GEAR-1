@@ -27,6 +27,10 @@ import com.basistech.rosette.api.RosetteAPI;
 import com.basistech.rosette.api.RosetteAPIException;
 import com.basistech.rosette.apimodel.Lemma;
 import com.basistech.rosette.apimodel.MorphologyResponse;
+import com.paragon.open.dictionary.api.Dictionary;
+import com.paragon.open.dictionary.api.Direction;
+import com.paragon.open.dictionary.api.Language;
+import com.paragon.open.dictionary.api.OpenDictionaryAPI;
 
 import org.w3c.dom.Text;
 
@@ -119,6 +123,8 @@ public class  MainActivity extends AppCompatActivity {
                 toast.setGravity(Gravity.TOP, 0, 0);
                 toast.show();
 
+                overallUserVocab.addWordToUserDictionary(mWord);
+
                 final TextView definition = (TextView) findViewById(R.id.definition_box);
                 definition.setText(dictionaryOutput(mWord));
             }
@@ -145,7 +151,24 @@ public class  MainActivity extends AppCompatActivity {
     }
 
     public String dictionaryOutput(String word) {
-        
+        //Dictionary dictionary = getDictionary();
+        //dictionary.showTranslation(word);
+
+//        RosetteAPI rosetteApi = null;
+//        try {
+//            rosetteApi = new RosetteAPI("982437a36146ddbfe79ccac334eb92a8");
+//            Log.d("got rosetteAPI:", rosetteApi.toString());
+//            MorphologyResponse response = rosetteApi.getMorphology(RosetteAPI.MorphologicalFeature.LEMMAS,
+//                    word, null, null);
+//            Log.d("got response:", response.toString());
+//             word = response.getLemmas().get(0).toString();
+//            Log.d("got lemma:",word);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (RosetteAPIException e) {
+//            e.printStackTrace();
+//        }
+
         return word;
     }
 
@@ -164,5 +187,13 @@ public class  MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private Dictionary getDictionary() {
+        OpenDictionaryAPI openDictionaryAPI = new OpenDictionaryAPI(getApplicationContext());
+        Log.d("got dictionaryAPI", openDictionaryAPI.toString());
+        Dictionary dictionary = openDictionaryAPI.getDictionaries(new Direction(Language.German, Language.English)).iterator().next();
+        Log.d("got dictionary", dictionary.toString());
+        return dictionary;
     }
 }

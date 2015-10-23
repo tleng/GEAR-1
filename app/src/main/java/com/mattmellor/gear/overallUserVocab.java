@@ -4,13 +4,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class overallUserVocab extends AppCompatActivity {
+    private static HashMap<String, Integer> userDictionary = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overall_user_vocab);
+        TextView vocabView = (TextView) findViewById(R.id.textView4);
+        String vocabString = "";
+        for (String key:userDictionary.keySet()) {
+            vocabString += key + ": " + Integer.toString(userDictionary.get(key)) + "\n";
+        }
+        if (userDictionary.isEmpty()) {
+            vocabString = "No vocabulary words looked up yet.\n";
+        }
+        vocabView.setText(vocabString);
+
     }
 
     @Override
@@ -32,5 +47,13 @@ public class overallUserVocab extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static void addWordToUserDictionary(String word) {
+        if (!userDictionary.containsKey(word)) {
+            userDictionary.put(word, 1);
+        } else {
+            userDictionary.put(word,userDictionary.get(word)+1);
+        }
     }
 }
