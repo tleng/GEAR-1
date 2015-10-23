@@ -7,7 +7,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spannable;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
 import android.text.style.BackgroundColorSpan;
+import android.text.style.ClickableSpan;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,7 +39,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.BreakIterator;
 import java.util.List;
+import java.util.Locale;
 
 public class  MainActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "tag";
@@ -45,36 +52,8 @@ public class  MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         //TextView txtContent = (TextView) findViewById(R.id.articleView);
-        final EditText txtContent = (EditText) findViewById(R.id.articleView);
+        final TextView txtContent = (TextView) findViewById(R.id.articleView);
         final TextView definition = (TextView) findViewById(R.id.definition_box);
-
-        View.OnLongClickListener lc = new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                int selection_start = txtContent.getSelectionStart();
-                int selection_end = txtContent.getSelectionEnd();
-
-                String text = txtContent.getText().toString();
-                String copy = text.substring(selection_start, selection_end);
-
-
-                String definitionWords = dictionaryOutput(copy);
-                definition.setText(definitionWords);
-
-                Context context = getApplicationContext();
-                CharSequence message = copy + " ausgewählt.";
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, message, duration);
-                toast.setGravity(Gravity.TOP,0,0);
-                toast.show();
-                definition.setText(copy);
-
-                return false;
-            }
-        };
-
-        txtContent.setOnLongClickListener(lc);
 
         AssetManager assetManager = getAssets();
 
@@ -90,20 +69,29 @@ public class  MainActivity extends AppCompatActivity {
             input.close();
 
             // byte buffer into a string
-            text = new String(buffer);
-            System.out.println(text);
-
-            txtContent.setText(text);
+            text = new String(buffer).trim();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             text = "Error Occurred";
         }
 
-        System.out.println(story);
-
-
+        txtContent.setMovementMethod(LinkMovementMethod.getInstance());
+        txtContent.setText(text, TextView.BufferType.SPANNABLE);
+        Spannable spans = (Spannable) txtContent.getText();
+        BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
+        iterator.setText(text);
+        int start = iterator.first();
+        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
+                .next()) {
+            String possibleWord = text.substring(start, end);
+            if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
+                ClickableSpan clickSpan = getClickableSpan(possibleWord);
+                spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -112,6 +100,35 @@ public class  MainActivity extends AppCompatActivity {
         return true;
     }
 
+    //Mike's extra stuff to be tested
+    private ClickableSpan getClickableSpan(final String word) {
+        return new ClickableSpan() {
+            final String mWord;
+            {
+                mWord = word;
+            }
+
+            @Override
+            public void onClick(View widget) {
+                Log.d("tapped on:", mWord);
+                Context context = getApplicationContext();
+                CharSequence message = mWord + " ausgewählt.";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, message, duration);
+                toast.setGravity(Gravity.TOP, 0, 0);
+                toast.show();
+
+                final TextView definition = (TextView) findViewById(R.id.definition_box);
+                definition.setText(dictionaryOutput(mWord));
+            }
+
+            public void updateDrawState(TextPaint ds) {
+                ds.setUnderlineText(false);
+            }
+        };
+    }
+    //end Mike's extra stuff to be tested
 
     public void toggleDictionary(View view){
         TextView dictionaryText = (TextView) findViewById(R.id.definition_box);
@@ -125,29 +142,11 @@ public class  MainActivity extends AppCompatActivity {
         dictionaryText.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
         RadioButton radioButton = (RadioButton) findViewById(R.id.show_dictionary);
         radioButton.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
-        //RosetteAPI newthing = new RosetteAPI
-        //RosetteAPI neee = new RosetteAPI();
-
-
-
     }
 
     public String dictionaryOutput(String word) {
-
-        String start = "Selected Word: " + word + " \n";
-        RosetteAPI rosetteAPI = new RosetteAPI("982437a36146ddbfe79ccac334eb92a8");
-        try {
-            MorphologyResponse response = rosetteAPI.getMorphology(RosetteAPI.MorphologicalFeature.LEMMAS, word, null, null);
-            List<Lemma> lemmas = response.getLemmas();
-            start += "Lemma: " + lemmas;
-        } catch (RosetteAPIException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return start;
-
+        
+        return word;
     }
 
 
