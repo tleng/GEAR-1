@@ -92,18 +92,18 @@ public class  MainActivity extends AppCompatActivity {
 
         txtContent.setMovementMethod(LinkMovementMethod.getInstance());
         txtContent.setText(text, TextView.BufferType.SPANNABLE);
-//        Spannable spans = (Spannable) txtContent.getText();
-//        BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
-//        iterator.setText(text);
-//        int start = iterator.first();
-//        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
-//                .next()) {
-//            String possibleWord = text.substring(start, end);
-//            if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
-//                ClickableSpan clickSpan = getClickableSpan(possibleWord);
-//                spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//            }
-//        }
+        Spannable spans = (Spannable) txtContent.getText();
+        BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
+        iterator.setText(text);
+        int start = iterator.first();
+        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
+                .next()) {
+            String possibleWord = text.substring(start, end);
+            if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
+                ClickableSpan clickSpan = getClickableSpan(possibleWord);
+                spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
     }
 
 
@@ -115,35 +115,35 @@ public class  MainActivity extends AppCompatActivity {
     }
 
 //    //Mike's extra stuff to be tested
-//    private ClickableSpan getClickableSpan(final String word) {
-//        return new ClickableSpan() {
-//            final String mWord;
-//            {
-//                mWord = word;
-//            }
-//
-//            @Override
-//            public void onClick(View widget) {
-//                Log.d("tapped on:", mWord);
-//                Context context = getApplicationContext();
-//                CharSequence message = mWord + " ausgewählt.";
-//                int duration = Toast.LENGTH_SHORT;
-//
-//                Toast toast = Toast.makeText(context, message, duration);
-//                toast.setGravity(Gravity.TOP, 0, 0);
-//                toast.show();
-//
-//                overallUserVocab.addWordToUserDictionary(mWord);
-//
-//                final TextView definition = (TextView) findViewById(R.id.definition_box);
-//                definition.setText(dictionaryOutput(mWord));
-//            }
-//
-//            public void updateDrawState(TextPaint ds) {
-//                ds.setUnderlineText(false);
-//            }
-//        };
-//    }
+    private ClickableSpan getClickableSpan(final String word) {
+        return new ClickableSpan() {
+            final String mWord;
+            {
+                mWord = word;
+            }
+
+            @Override
+            public void onClick(View widget) {
+                Log.d("tapped on:", mWord);
+                Context context = getApplicationContext();
+                CharSequence message = mWord + " ausgewählt.";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, message, duration);
+                toast.setGravity(Gravity.TOP, 0, 0);
+                toast.show();
+
+                overallUserVocab.addWordToUserDictionary(mWord);
+
+                final TextView definition = (TextView) findViewById(R.id.definition_box);
+                definition.setText(dictionaryOutput(mWord));
+            }
+
+            public void updateDrawState(TextPaint ds) {
+                ds.setUnderlineText(false);
+            }
+        };
+    }
     //end Mike's extra stuff to be tested
 
     public void toggleDictionary(View view){
