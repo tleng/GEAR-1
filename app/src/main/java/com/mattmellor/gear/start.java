@@ -34,6 +34,10 @@ public class start extends AppCompatActivity {
         startActivity(new Intent(start.this, StoriesSelection.class));
     }
 
+    public void goToSuggestedStories(View view) {
+        startActivity(new Intent(start.this, SuggestedStories.class));
+    }
+
     public void goToOverallUserVocabOnClick(View view){
         startActivity(new Intent(start.this, overallUserVocab.class));
     }

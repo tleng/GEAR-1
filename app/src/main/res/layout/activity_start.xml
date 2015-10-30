@@ -61,7 +61,7 @@
         android:drawableTop="@mipmap/ic_stories"
         style="?android:attr/borderlessButtonStyle"
         android:background="#FFFFFF"
-        android:onClick="goToStoriesSelectionOnClick"
+        android:onClick="goToSuggestedStories"
         android:clickable="true"
         android:layout_alignTop="@+id/imageButton2"
         android:layout_toLeftOf="@+id/textView"
