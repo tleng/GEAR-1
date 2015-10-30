@@ -51,20 +51,20 @@ public class SuggestedStories extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        List<Button> buttonList = new ArrayList<Button>();
-        recommendKArticles(5);
+        List<String> articlesList = recommendKArticles(5);
 
+        LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        ll.setOrientation(LinearLayout.HORIZONTAL);
         //StackOverflow
+        for (String article:articlesList) {
+            Button myButton = new Button(this);
+            myButton.setText(article);
+            Log.d("button added:", myButton.toString());
 
-        Button myButton = new Button(this);
-        myButton.setText("Push Me");
-
-        buttonList.add(myButton);
-        Log.d("button added:",myButton.toString());
-
-        LinearLayout ll = (LinearLayout)findViewById(R.id.suggestedStoriesLinearLayout);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        ll.addView(myButton, lp);
+            ll.addView(myButton, lp);
+            Log.d("number of buttons:", Integer.toString(ll.getChildCount()));
+        }
     }
 
     /**
