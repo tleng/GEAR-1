@@ -2,19 +2,29 @@ package com.mattmellor.gear;
 
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.GridLayout;
+import android.widget.GridView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 public class SuggestedStories extends AppCompatActivity {
 
@@ -35,8 +45,19 @@ public class SuggestedStories extends AppCompatActivity {
         });
 
         recommendArticles();
+        List<Button> buttonList = new ArrayList<Button>();
 
+        //StackOverflow
 
+        Button myButton = new Button(this);
+        myButton.setText("Push Me");
+
+        buttonList.add(myButton);
+        Log.d("button added:",myButton.toString());
+
+        LinearLayout ll = (LinearLayout)findViewById(R.id.suggestedStoriesLinearLayout);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        ll.addView(myButton, lp);
     }
 
 

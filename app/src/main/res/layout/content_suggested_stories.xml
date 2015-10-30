@@ -10,15 +10,10 @@
     tools:showIn="@layout/activity_suggested_stories"
     tools:context="com.mattmellor.gear.SuggestedStories">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/suggestedStoriesTextView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true" />
+    <LinearLayout
+        android:id="@+id/suggestedStoriesLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </LinearLayout>
 </RelativeLayout>
