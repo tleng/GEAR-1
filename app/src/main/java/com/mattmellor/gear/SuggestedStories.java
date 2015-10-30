@@ -1,5 +1,6 @@
 package com.mattmellor.gear;
 
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -60,7 +61,10 @@ public class SuggestedStories extends AppCompatActivity {
         for (String article:articlesList) {
             Button myButton = new Button(this);
             myButton.setText(article);
+            myButton.setContentDescription(article);
+
             Log.d("button added:", myButton.toString());
+            myButton.setOnClickListener(getOnClickSetStory(myButton));
 
             ll.addView(myButton, lp);
             Log.d("number of buttons:", Integer.toString(ll.getChildCount()));
@@ -155,8 +159,16 @@ public class SuggestedStories extends AppCompatActivity {
 
     }
 
-
-
+    View.OnClickListener getOnClickSetStory(final Button button)  {
+        return new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(SuggestedStories.this, MainActivity.class);
+                intent.putExtra("story",button.getContentDescription());
+                startActivity(intent);
+                finish();
+            }
+        };
+    }
 //    private int calculateDotProduct(String article1, String article2) {
 //
 //
