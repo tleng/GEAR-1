@@ -56,7 +56,7 @@ public class SuggestedStories extends AppCompatActivity {
 
         LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        ll.setOrientation(LinearLayout.HORIZONTAL);
+        ll.setOrientation(LinearLayout.VERTICAL);
         //StackOverflow
         for (String article:articlesList) {
             Button myButton = new Button(this);
@@ -79,7 +79,7 @@ public class SuggestedStories extends AppCompatActivity {
     private List<String> recommendKArticles(int k) {
         Map<String,Double> allFractionMappings = new HashMap<>();
         try {
-            String[] listOfArticleAssets = listAllArticles();
+            ArrayList<String> listOfArticleAssets = listAllArticles();
             for(String article: listOfArticleAssets){
                 Double fraction = getFractionOfWords(article);
                 allFractionMappings.put(article,fraction);
@@ -111,10 +111,15 @@ public class SuggestedStories extends AppCompatActivity {
         return new ArrayList<String>();
 
     }
-    private String[] listAllArticles() throws IOException {
+
+    private ArrayList<String> listAllArticles() throws IOException {
         AssetManager assetManager = getResources().getAssets();
         String assets[] = assetManager.list("");
-        return assets;
+        ArrayList<String> assetsAsString = new ArrayList<String>();
+        Collections.addAll(assetsAsString,assets);
+        assetsAsString.remove("sounds");
+        assetsAsString.remove("webkit");
+        return assetsAsString;
     }
 
 

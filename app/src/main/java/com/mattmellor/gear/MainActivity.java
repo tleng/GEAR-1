@@ -54,12 +54,16 @@ import static com.mattmellor.gear.R.id.app_article_bar;
 public class  MainActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "tag";
     private android.support.v7.widget.Toolbar toolbar;
+    private User currentUser;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        User user = new User();
+        currentUser = user;
 
         setContentView(R.layout.activity_main);
         toolbar= (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
@@ -134,6 +138,7 @@ public class  MainActivity extends AppCompatActivity {
                 toast.show();
 
                 overallUserVocab.addWordToUserDictionary(mWord);
+                currentUser.addToDictionary(mWord);
 
                 final TextView definition = (TextView) findViewById(R.id.definition_box);
                 definition.setText(dictionaryOutput(mWord));
