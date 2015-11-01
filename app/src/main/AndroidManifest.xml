@@ -37,8 +37,10 @@
             android:theme="@style/AppTheme.CustomTheme" >
         </activity>
         <activity
-            android:name=".Main2Activity"
-            android:label="@string/title_activity_main2" >
+            android:name=".SuggestedStories"
+            android:label="@string/title_activity_suggested_stories"
+            android:theme="@style/AppTheme" >
+
         </activity>
     </application>
 

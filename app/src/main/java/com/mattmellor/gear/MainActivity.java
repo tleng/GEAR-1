@@ -54,12 +54,16 @@ import static com.mattmellor.gear.R.id.app_article_bar;
 public class  MainActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "tag";
     private android.support.v7.widget.Toolbar toolbar;
+    private User currentUser;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        User user = new User();
+        currentUser = user;
 
         setContentView(R.layout.activity_main);
         toolbar= (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
@@ -115,6 +119,7 @@ public class  MainActivity extends AppCompatActivity {
     }
 
 //    //Mike's extra stuff to be tested
+<<<<<<< HEAD
 //    private ClickableSpan getClickableSpan(final String word) {
 //        return new ClickableSpan() {
 //            final String mWord;
@@ -144,6 +149,38 @@ public class  MainActivity extends AppCompatActivity {
 //            }
 //        };
 //    }
+=======
+    private ClickableSpan getClickableSpan(final String word) {
+        return new ClickableSpan() {
+            final String mWord;
+            {
+                mWord = word;
+            }
+
+            @Override
+            public void onClick(View widget) {
+                Log.d("tapped on:", mWord);
+                Context context = getApplicationContext();
+                CharSequence message = mWord + " ausgewählt.";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, message, duration);
+                toast.setGravity(Gravity.TOP, 0, 0);
+                toast.show();
+
+                overallUserVocab.addWordToUserDictionary(mWord);
+                currentUser.addToDictionary(mWord);
+
+                final TextView definition = (TextView) findViewById(R.id.definition_box);
+                definition.setText(dictionaryOutput(mWord));
+            }
+
+            public void updateDrawState(TextPaint ds) {
+                ds.setUnderlineText(false);
+            }
+        };
+    }
+>>>>>>> c10c3e408c252eba1ea1f9eaa3c046cde7c4f90d
     //end Mike's extra stuff to be tested
 
     public void toggleDictionary(View view){

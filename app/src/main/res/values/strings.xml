@@ -16,7 +16,11 @@
     </string>
     <string name="rateThisArticle">Article Difficulty</string>
     <string name="rateThisArticleTwo">How much did you enjoy the article?</string>
+<<<<<<< HEAD
     <string name="title_activity_main2">Main2Activity</string>
+=======
+    <string name="title_activity_suggested_stories">SuggestedStories</string>
+>>>>>>> c10c3e408c252eba1ea1f9eaa3c046cde7c4f90d
 
 
 </resources>

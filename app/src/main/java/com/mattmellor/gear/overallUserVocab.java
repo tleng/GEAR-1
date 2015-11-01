@@ -50,10 +50,19 @@ public class overallUserVocab extends AppCompatActivity {
     }
 
     public static void addWordToUserDictionary(String word) {
-        if (!userDictionary.containsKey(word)) {
-            userDictionary.put(word, 1);
+        String lowerCaseWord = word.toLowerCase();
+        if (!userDictionary.containsKey(lowerCaseWord)) {
+            userDictionary.put(lowerCaseWord, 1);
         } else {
-            userDictionary.put(word,userDictionary.get(word)+1);
+            userDictionary.put(lowerCaseWord,userDictionary.get(lowerCaseWord)+1);
         }
+    }
+
+    public static HashMap<String, Integer> getUserDictionary() {
+        HashMap<String, Integer> copyOfDictionary = new HashMap<String, Integer>();
+        for (String word : userDictionary.keySet()) {
+            copyOfDictionary.put(word, userDictionary.get(word));
+        }
+        return copyOfDictionary;
     }
 }
