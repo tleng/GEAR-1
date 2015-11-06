@@ -44,4 +44,6 @@
         </activity>
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />0
+
 </manifest>

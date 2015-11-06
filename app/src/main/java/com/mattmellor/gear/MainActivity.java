@@ -3,51 +3,28 @@ package com.mattmellor.gear;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
-import android.text.Spannable;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.ClickableSpan;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
-import com.basistech.rosette.api.RosetteAPI;
-import com.basistech.rosette.api.RosetteAPIException;
-import com.basistech.rosette.apimodel.Lemma;
-import com.basistech.rosette.apimodel.MorphologyResponse;
-import com.paragon.open.dictionary.api.Dictionary;
-import com.paragon.open.dictionary.api.Direction;
-import com.paragon.open.dictionary.api.Language;
-import com.paragon.open.dictionary.api.OpenDictionaryAPI;
+import com.appspot.gearbackend.helloworld.Helloworld;
+import com.appspot.gearbackend.helloworld.model.HelloGreeting;
 
-import org.w3c.dom.Text;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.BreakIterator;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
 
@@ -55,7 +32,6 @@ public class  MainActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "tag";
     private android.support.v7.widget.Toolbar toolbar;
     private User currentUser;
-
 
 
     @Override
@@ -96,18 +72,50 @@ public class  MainActivity extends AppCompatActivity {
 
         txtContent.setMovementMethod(LinkMovementMethod.getInstance());
         txtContent.setText(text, TextView.BufferType.SPANNABLE);
-//        Spannable spans = (Spannable) txtContent.getText();
-//        BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
-//        iterator.setText(text);
-//        int start = iterator.first();
-//        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
-//                .next()) {
-//            String possibleWord = text.substring(start, end);
-//            if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
-//                ClickableSpan clickSpan = getClickableSpan(possibleWord);
-//                spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//            }
-//        }
+        //Mike's server stuff
+        // Use of an anonymous class is done for sample code simplicity. {@code AsyncTasks} should be
+        // static-inner or top-level classes to prevent memory leak issues.
+        // @see http://goo.gl/fN1fuE @26:00 for a great explanation.
+        AsyncTask<Integer, Void, HelloGreeting> getAndDisplayGreeting =
+                new AsyncTask<Integer, Void, HelloGreeting> () {
+                    @Override
+                    protected HelloGreeting doInBackground(Integer... integers) {
+                        // Retrieve service handle.
+                        Helloworld apiServiceHandle = AppConstants.getApiServiceHandle();
+
+                        try {
+                            Helloworld.Greetings.GetGreeting getGreetingCommand = apiServiceHandle.greetings().getGreeting(integers[0]);
+                            HelloGreeting greeting = getGreetingCommand.execute();
+                            return greeting;
+                        } catch (IOException e) {
+                            Log.e("Uh Oh", "Exception during API call", e);
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(HelloGreeting greeting) {
+                        if (greeting!=null) {
+                            displayGreetings(greeting);
+                        } else {
+                            Log.e("Uh Oh", "No greetings were returned by the API.");
+                        }
+                    }
+                };
+
+        getAndDisplayGreeting.execute(1);
+    }
+
+    private void displayGreetings(HelloGreeting... greetings) {
+        String msg;
+        if (greetings==null || greetings.length < 1) {
+            msg = "Greeting was not present";
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+        } else {
+            Log.d("Display", "Displaying " + greetings.length + " greetings.");
+            List<HelloGreeting> greetingsList = Arrays.asList(greetings);
+            Toast.makeText(this, greetingsList.get(0).toString(), Toast.LENGTH_LONG).show();
+        }
     }
 
 
@@ -118,38 +126,6 @@ public class  MainActivity extends AppCompatActivity {
         return true;
     }
 
-//    //Mike's extra stuff to be tested
-<<<<<<< HEAD
-//    private ClickableSpan getClickableSpan(final String word) {
-//        return new ClickableSpan() {
-//            final String mWord;
-//            {
-//                mWord = word;
-//            }
-//
-//            @Override
-//            public void onClick(View widget) {
-//                Log.d("tapped on:", mWord);
-//                Context context = getApplicationContext();
-//                CharSequence message = mWord + " ausgewählt.";
-//                int duration = Toast.LENGTH_SHORT;
-//
-//                Toast toast = Toast.makeText(context, message, duration);
-//                toast.setGravity(Gravity.TOP, 0, 0);
-//                toast.show();
-//
-//                overallUserVocab.addWordToUserDictionary(mWord);
-//
-//                final TextView definition = (TextView) findViewById(R.id.definition_box);
-//                definition.setText(dictionaryOutput(mWord));
-//            }
-//
-//            public void updateDrawState(TextPaint ds) {
-//                ds.setUnderlineText(false);
-//            }
-//        };
-//    }
-=======
     private ClickableSpan getClickableSpan(final String word) {
         return new ClickableSpan() {
             final String mWord;
@@ -180,7 +156,6 @@ public class  MainActivity extends AppCompatActivity {
             }
         };
     }
->>>>>>> c10c3e408c252eba1ea1f9eaa3c046cde7c4f90d
     //end Mike's extra stuff to be tested
 
     public void toggleDictionary(View view){
@@ -198,24 +173,6 @@ public class  MainActivity extends AppCompatActivity {
     }
 
     public String dictionaryOutput(String word) {
-        //Dictionary dictionary = getDictionary();
-        //dictionary.showTranslation(word);
-
-//        RosetteAPI rosetteApi = null;
-//        try {
-//            rosetteApi = new RosetteAPI("982437a36146ddbfe79ccac334eb92a8");
-//            Log.d("got rosetteAPI:", rosetteApi.toString());
-//            MorphologyResponse response = rosetteApi.getMorphology(RosetteAPI.MorphologicalFeature.LEMMAS,
-//                    word, null, null);
-//            Log.d("got response:", response.toString());
-//             word = response.getLemmas().get(0).toString();
-//            Log.d("got lemma:",word);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (RosetteAPIException e) {
-//            e.printStackTrace();
-//        }
-
         return word;
     }
 
@@ -239,15 +196,5 @@ public class  MainActivity extends AppCompatActivity {
 
     public void onClickUpPopWindow(View view){
         startActivity(new Intent(MainActivity.this, popUpRateArticle.class));
-    }
-
-
-
-    private Dictionary getDictionary() {
-        OpenDictionaryAPI openDictionaryAPI = new OpenDictionaryAPI(getApplicationContext());
-        Log.d("got dictionaryAPI", openDictionaryAPI.toString());
-        Dictionary dictionary = openDictionaryAPI.getDictionaries(new Direction(Language.German, Language.English)).iterator().next();
-        Log.d("got dictionary", dictionary.toString());
-        return dictionary;
     }
 }
