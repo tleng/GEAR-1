@@ -6,6 +6,7 @@ import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Spannable;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
@@ -23,8 +24,10 @@ import com.appspot.gearbackend.helloworld.model.HelloGreeting;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.BreakIterator;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
 
@@ -72,6 +75,18 @@ public class  MainActivity extends AppCompatActivity {
 
         txtContent.setMovementMethod(LinkMovementMethod.getInstance());
         txtContent.setText(text, TextView.BufferType.SPANNABLE);
+        Spannable spans = (Spannable) txtContent.getText();
+        BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
+        iterator.setText(text);
+        int start = iterator.first();
+        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
+                .next()) {
+            String possibleWord = text.substring(start, end);
+            if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
+                ClickableSpan clickSpan = getClickableSpan(possibleWord);
+                spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
         //Mike's server stuff
         // Use of an anonymous class is done for sample code simplicity. {@code AsyncTasks} should be
         // static-inner or top-level classes to prevent memory leak issues.
@@ -156,7 +171,6 @@ public class  MainActivity extends AppCompatActivity {
             }
         };
     }
-    //end Mike's extra stuff to be tested
 
     public void toggleDictionary(View view){
         TextView dictionaryText = (TextView) findViewById(R.id.definition_box);
