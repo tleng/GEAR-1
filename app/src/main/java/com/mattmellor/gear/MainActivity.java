@@ -161,7 +161,7 @@ public class  MainActivity extends AppCompatActivity {
                                     currentDefinition = definition.getMessage();
                                     readingDictionary.setText(currentDefinition);
                                 } else {
-                                    Log.e("Uh Oh", "No greetings were returned by the API.");
+                                    Log.e("Uh Oh", "No definitions were returned by the API.");
                                 }
                             }
                         };

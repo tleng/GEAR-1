@@ -21,18 +21,6 @@ android {
     sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/assets'] } }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('libs/apis/rosette-api-0.7.0.jar')
