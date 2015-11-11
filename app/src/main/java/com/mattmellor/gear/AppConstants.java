@@ -1,6 +1,6 @@
 package com.mattmellor.gear;
 
-import com.appspot.gearbackend.helloworld.Helloworld;
+import com.appspot.backendgear_1121.gear.Gear;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.http.HttpTransport;
@@ -22,9 +22,9 @@ public class AppConstants {
     /**
      * Retrieves a Helloworld api service handle to access the API.
      */
-    public static Helloworld getApiServiceHandle() {
+    public static Gear getApiServiceHandle() {
         // Use a builder to help formulate the API request.
-        Helloworld.Builder helloWorld = new Helloworld.Builder(AppConstants.HTTP_TRANSPORT,
+        Gear.Builder helloWorld = new Gear.Builder(AppConstants.HTTP_TRANSPORT,
                 AppConstants.JSON_FACTORY, null);
         helloWorld.setApplicationName("GEAR");
         return helloWorld.build();

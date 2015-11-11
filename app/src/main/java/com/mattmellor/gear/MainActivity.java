@@ -19,8 +19,8 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.appspot.gearbackend.helloworld.Helloworld;
-import com.appspot.gearbackend.helloworld.model.HelloGreeting;
+import com.appspot.backendgear_1121.gear.Gear;
+import com.appspot.backendgear_1121.gear.model.GearBackendDefinition;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +35,7 @@ public class  MainActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "tag";
     private android.support.v7.widget.Toolbar toolbar;
     private User currentUser;
+    private String currentDefinition = "No definition";
 
 
     @Override
@@ -88,7 +89,7 @@ public class  MainActivity extends AppCompatActivity {
                 spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
-        
+
         //Mike's server stuff
         // Use of an anonymous class is done for sample code simplicity. {@code AsyncTasks} should be
         // static-inner or top-level classes to prevent memory leak issues.
@@ -121,17 +122,18 @@ public class  MainActivity extends AppCompatActivity {
                 };
 
         getAndDisplayGreeting.execute(1);
+
     }
 
-    private void displayGreetings(HelloGreeting... greetings) {
+    private void displayDefinition(GearBackendDefinition... definitions) {
         String msg;
-        if (greetings==null || greetings.length < 1) {
-            msg = "Greeting was not present";
+        if (definitions==null || definitions.length < 1) {
+            msg = "Definition was not present";
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
         } else {
-            Log.d("Display", "Displaying " + greetings.length + " greetings.");
-            List<HelloGreeting> greetingsList = Arrays.asList(greetings);
-            Toast.makeText(this, greetingsList.get(0).toString(), Toast.LENGTH_LONG).show();
+            Log.d("Display", "Displaying " + definitions.length + " definition.");
+            List<GearBackendDefinition> definitionsList = Arrays.asList(definitions);
+            Toast.makeText(this, definitionsList.get(0).toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -161,11 +163,47 @@ public class  MainActivity extends AppCompatActivity {
                 toast.setGravity(Gravity.TOP, 0, 0);
                 toast.show();
 
+                //Mike's server stuff
+                // Use of an anonymous class is done for sample code simplicity. {@code AsyncTasks} should be
+                // static-inner or top-level classes to prevent memory leak issues.
+                // @see http://goo.gl/fN1fuE @26:00 for a great explanation.
+                AsyncTask<String, Void, GearBackendDefinition> getAndDisplayDefinition =
+                        new AsyncTask<String, Void, GearBackendDefinition> () {
+                            @Override
+                            protected GearBackendDefinition doInBackground(String... words) {
+                                // Retrieve service handle.
+                                Gear apiServiceHandle = AppConstants.getApiServiceHandle();
+                                GearBackendDefinition definition = new GearBackendDefinition().setMessage(words[0]);
+
+                                try {
+                                    Gear.Gearapi.Define getDefinition = apiServiceHandle.gearapi().define(definition);
+                                    GearBackendDefinition gearDefinition = getDefinition.execute();
+                                    return gearDefinition;
+                                } catch (IOException e) {
+                                    Log.e("Uh Oh", "Exception during API call", e);
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(GearBackendDefinition definition) {
+                                if (definition!=null) {
+                                    final TextView readingDictionary = (TextView) findViewById(R.id.definition_box);
+                                    currentDefinition = definition.getMessage();
+                                    readingDictionary.setText(currentDefinition);
+                                } else {
+                                    Log.e("Uh Oh", "No greetings were returned by the API.");
+                                }
+                            }
+                        };
+
+                getAndDisplayDefinition.execute(mWord);
+
                 overallUserVocab.addWordToUserDictionary(mWord);
                 currentUser.addToDictionary(mWord);
 
-                final TextView definition = (TextView) findViewById(R.id.definition_box);
-                definition.setText(dictionaryOutput(mWord));
+//                final TextView definition = (TextView) findViewById(R.id.definition_box);
+//                definition.setText(currentDefinition);
             }
 
             public void updateDrawState(TextPaint ds) {
