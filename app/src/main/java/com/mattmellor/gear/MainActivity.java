@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +37,7 @@ public class  MainActivity extends AppCompatActivity {
     private android.support.v7.widget.Toolbar toolbar;
     private User currentUser;
     private String currentDefinition = "No definition";
+    private Integer currentPosition = 0;
 
 
     @Override
@@ -215,5 +217,24 @@ public class  MainActivity extends AppCompatActivity {
 
     public void onClickUpPopWindow(View view){
         startActivity(new Intent(MainActivity.this, popUpRateArticle.class));
+    }
+
+    @Override
+    protected void onPause () {
+        super.onPause();
+        ScrollView articleView = (ScrollView) findViewById(R.id.SCROLLER_ID);
+        int position = articleView.getBottom() - (articleView.getHeight() + articleView.getScrollY());
+        int percentage = (int)((articleView.getHeight()+articleView.getScrollY())/articleView.getBottom());
+        Log.d("Position", Integer.toString(position));
+        Log.d("Bottom", Integer.toString(articleView.getBottom()));
+        Log.d("Height", Integer.toString(articleView.getHeight()));
+        Log.d("Scroll Y", Integer.toString(articleView.getScrollY()));
+        currentPosition = articleView.getScrollY();
+    }
+
+    protected void OnResume() {
+        super.onResume();
+        ScrollView articleView = (ScrollView) findViewById(R.id.articleView);
+        articleView.scrollTo(0,currentPosition);
     }
 }
