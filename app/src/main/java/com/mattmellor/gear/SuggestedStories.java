@@ -3,7 +3,6 @@ package com.mattmellor.gear;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,21 +10,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridLayout;
-import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -174,14 +163,7 @@ public class SuggestedStories extends AppCompatActivity {
             }
         };
     }
-//    private int calculateDotProduct(String article1, String article2) {
-//
-//
-//    }
-//
-//    private String[] constructWordVector(String article) {
-//
-//    }
+
 
 }
 
