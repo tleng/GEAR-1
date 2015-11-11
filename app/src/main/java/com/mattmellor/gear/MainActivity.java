@@ -170,7 +170,7 @@ public class  MainActivity extends AppCompatActivity {
 
                 overallUserVocab.addWordToUserDictionary(mWord);
                 currentUser.addToDictionary(mWord);
-
+//
 //                final TextView definition = (TextView) findViewById(R.id.definition_box);
 //                definition.setText(currentDefinition);
             }
