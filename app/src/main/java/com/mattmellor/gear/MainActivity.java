@@ -92,39 +92,6 @@ public class  MainActivity extends AppCompatActivity {
             }
         }
 
-        //Mike's server stuff
-        // Use of an anonymous class is done for sample code simplicity. {@code AsyncTasks} should be
-        // static-inner or top-level classes to prevent memory leak issues.
-        // @see http://goo.gl/fN1fuE @26:00 for a great explanation.
-        AsyncTask<Integer, Void, HelloGreeting> getAndDisplayGreeting =
-                new AsyncTask<Integer, Void, HelloGreeting> () {
-                    @Override
-                    protected HelloGreeting doInBackground(Integer... integers) {
-                        // Retrieve service handle.
-                        Helloworld apiServiceHandle = AppConstants.getApiServiceHandle();
-
-                        try {
-                            Helloworld.Greetings.GetGreeting getGreetingCommand = apiServiceHandle.greetings().getGreeting(integers[0]);
-                            HelloGreeting greeting = getGreetingCommand.execute();
-                            return greeting;
-                        } catch (IOException e) {
-                            Log.e("Uh Oh", "Exception during API call", e);
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(HelloGreeting greeting) {
-                        if (greeting!=null) {
-                            displayGreetings(greeting);
-                        } else {
-                            Log.e("Uh Oh", "No greetings were returned by the API.");
-                        }
-                    }
-                };
-
-        getAndDisplayGreeting.execute(1);
-
     }
 
     private void displayDefinition(GearBackendDefinition... definitions) {
