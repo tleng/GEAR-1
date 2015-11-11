@@ -78,6 +78,7 @@ public class  MainActivity extends AppCompatActivity {
         Spannable spans = (Spannable) txtContent.getText();
         BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
         iterator.setText(text);
+
         int start = iterator.first();
         for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
                 .next()) {
@@ -87,6 +88,7 @@ public class  MainActivity extends AppCompatActivity {
                 spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
+        
         //Mike's server stuff
         // Use of an anonymous class is done for sample code simplicity. {@code AsyncTasks} should be
         // static-inner or top-level classes to prevent memory leak issues.

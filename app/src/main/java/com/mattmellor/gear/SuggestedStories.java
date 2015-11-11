@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +27,8 @@ import java.util.Set;
 
 public class SuggestedStories extends AppCompatActivity {
 
+    private final Map<String, Double> articlesWithRatings = new HashMap<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,15 +44,18 @@ public class SuggestedStories extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        List<String> articlesList = recommendKArticles(5);
+        List<String> articles = recommendKArticles(5);
 
         LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         ll.setOrientation(LinearLayout.VERTICAL);
         //StackOverflow
-        for (String article:articlesList) {
+        for (String article:articles) {
             Button myButton = new Button(this);
-            myButton.setText(article);
+            Double rating = articlesWithRatings.get(article) * 100;
+            int suggestNumber = rating.intValue();
+            String ratingString = "<b> " + suggestNumber + "%" + " </b>";
+            myButton.setText(Html.fromHtml(article + "   " + ratingString));
             myButton.setContentDescription(article);
 
             Log.d("button added:", myButton.toString());
@@ -67,6 +73,8 @@ public class SuggestedStories extends AppCompatActivity {
      */
     private List<String> recommendKArticles(int k) {
         Map<String,Double> allFractionMappings = new HashMap<>();
+        //Map<String,Double> setNumberOfArticlesWithFractions  = new HashMap<>();
+
         try {
             ArrayList<String> listOfArticleAssets = listAllArticles();
             for(String article: listOfArticleAssets){
@@ -76,14 +84,16 @@ public class SuggestedStories extends AppCompatActivity {
             allFractionMappings = MapUtil.sortByValue(allFractionMappings);
             Set<String> sortedArticles = allFractionMappings.keySet();
             List<String> sortedArticleList = new ArrayList<>();
+            this.articlesWithRatings.putAll(allFractionMappings);
             for(String article: sortedArticles){
                 sortedArticleList.add(article);
-
+                //This just returns the keyset as a list???
             }
             int n = sortedArticles.size();
             List<String> recommendedArticles = new ArrayList<>();
             for(int i=n-1;i>=n-k-1;i--){
                 recommendedArticles.add(sortedArticleList.get(i));
+                //setNumberOfArticlesWithFractions.put(sortedArticleList.get(i),allFractionMappings.get(sortedArticleList.get(i)));
                 Log.d("article", sortedArticleList.get(i));
                 Log.d("fraction", allFractionMappings.get(sortedArticleList.get(i)).toString());
             }
@@ -97,7 +107,7 @@ public class SuggestedStories extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new ArrayList<String>();
+        return new ArrayList<>();
 
     }
 
