@@ -249,6 +249,15 @@ public class  MainActivity extends AppCompatActivity {
         Log.d("Height", Integer.toString(articleView.getHeight()));
         Log.d("Scroll Y", Integer.toString(articleView.getScrollY()));
         currentPosition = articleView.getScrollY();
+        Long time = System.currentTimeMillis();
+        this.currentUserData.setExitTime(time);
+
+        try {
+            UserDataCollection.writeToFile("testing.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     protected void OnResume() {
