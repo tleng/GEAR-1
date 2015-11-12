@@ -25,5 +25,4 @@ repositories {
 }
 
 dependencies {
-    compile ([group: 'com.google.api-client', name: 'google-api-client', version: '1.20.0'])
 }

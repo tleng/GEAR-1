@@ -50,6 +50,16 @@ public class popUpRateArticle extends Activity {
 
     }
 
+    /*
+    public String onClickRate(View view){
+        Button rate = (Button) view;
+        String rating = rate.getText().toString();
+        return rating;
+    }
+    */
+
+
+
     public void rateArticle(View view) {
         finish();
     }
