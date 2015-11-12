@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.TextPaint;
@@ -24,6 +25,7 @@ import com.appspot.gearbackend.helloworld.model.HelloGreeting;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.text.BreakIterator;
 import java.util.Arrays;
 import java.util.List;
@@ -34,15 +36,13 @@ import static com.mattmellor.gear.R.id.app_article_bar;
 public class  MainActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "tag";
     private android.support.v7.widget.Toolbar toolbar;
-    private User currentUser;
+    private UserData currentUserData;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        User user = new User();
-        currentUser = user;
 
         setContentView(R.layout.activity_main);
         toolbar= (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
@@ -72,6 +72,13 @@ public class  MainActivity extends AppCompatActivity {
             e.printStackTrace();
             text = "Error Occurred";
         }
+
+        // making user data object for this article - user pair
+        UserData userData = new UserData(start.currentUser.id(),story);
+        this.currentUserData = userData;
+        Long time = System.currentTimeMillis();
+        this.currentUserData.setStartTime(time);
+        UserDataCollection.addUserDataToAllUserData(userData);
 
         txtContent.setMovementMethod(LinkMovementMethod.getInstance());
         txtContent.setText(text, TextView.BufferType.SPANNABLE);
@@ -160,7 +167,8 @@ public class  MainActivity extends AppCompatActivity {
                 toast.show();
 
                 overallUserVocab.addWordToUserDictionary(mWord);
-                currentUser.addToDictionary(mWord);
+                start.currentUser.addToDictionary(mWord);
+                currentUserData.addWord(mWord);
 
                 final TextView definition = (TextView) findViewById(R.id.definition_box);
                 definition.setText(dictionaryOutput(mWord));
@@ -209,6 +217,9 @@ public class  MainActivity extends AppCompatActivity {
 
 
     public void onClickUpPopWindow(View view){
-        startActivity(new Intent(MainActivity.this, popUpRateArticle.class));
+        Intent intent = new Intent(MainActivity.this, popUpRateArticle.class);
+        startActivity(intent);
+        intent.putExtra("currentArticle", (String) currentUserData.getArticle());
+        intent.putExtra("currentUserId", (String) currentUserData.getUserId());
     }
 }
