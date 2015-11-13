@@ -25,18 +25,20 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="One"/>
+            android:text="One"
+            android:id="@+id/One" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Two" />
+            android:text="Two"
+            android:id="@+id/Two" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Three"
-            />
+            android:id="@+id/Three" />
 
     </LinearLayout>
 
