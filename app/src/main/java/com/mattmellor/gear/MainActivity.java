@@ -15,7 +15,6 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RadioButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -188,20 +187,6 @@ public class  MainActivity extends AppCompatActivity {
                 ds.setUnderlineText(false);
             }
         };
-    }
-
-    public void toggleDictionary(View view){
-        TextView dictionaryText = (TextView) findViewById(R.id.definition_box);
-        dictionaryText.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
-        RadioButton radioButton = (RadioButton) findViewById(R.id.show_dictionary);
-        radioButton.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
-    }
-
-    public void showDictionary(View view) {
-        TextView dictionaryText = (TextView) findViewById(R.id.definition_box);
-        dictionaryText.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
-        RadioButton radioButton = (RadioButton) findViewById(R.id.show_dictionary);
-        radioButton.setVisibility(dictionaryText.isShown() ? View.GONE : View.VISIBLE);
     }
 
     public String dictionaryOutput(String word) {

@@ -48,20 +48,9 @@
         android:layout_above="@id/articleView"
         android:background="#CCCCCC"
         android:layout_weight = "1"
-        android:clickable="true"
-        android:onClick="toggleDictionary"
         android:paddingLeft="20dp"
         android:paddingRight="20dp" />
 
-    <RadioButton
-        android:layout_width="85dp"
-        android:layout_height="wrap_content"
-        android:text="Dictionary"
-        android:id="@+id/show_dictionary"
-        android:layout_gravity="center_horizontal"
-        android:background="#ca2727"
-        android:onClick="showDictionary"
-        android:visibility="gone" />
 
 
 </LinearLayout>
