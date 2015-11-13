@@ -9,12 +9,19 @@ import android.view.View;
 
 public class start extends AppCompatActivity {
 
+    public static  User currentUser; //TODO make this final, and add a constructor?
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+
         //Getting rid of the title in the action bar
         //getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        User user = new User(1);// there should be an input that actually puts an id here
+        currentUser =  user;
+
     }
 
     @Override
