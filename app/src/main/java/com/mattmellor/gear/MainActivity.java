@@ -233,6 +233,7 @@ public class  MainActivity extends AppCompatActivity {
         intent.putExtra("currentUserId", (String) currentUserData.getUserId());
     }
 
+
     @Override
     protected void onPause () {
         super.onPause();
@@ -253,7 +254,6 @@ public class  MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
 
     protected void OnResume() {
         super.onResume();
