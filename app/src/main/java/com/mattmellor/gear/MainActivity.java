@@ -217,7 +217,7 @@ public class  MainActivity extends AppCompatActivity {
         intent.putExtra("currentArticle", (String) currentUserData.getArticle());
         intent.putExtra("currentUserId", (String) currentUserData.getUserId());
     }
-
+    
 
     @Override
     protected void onPause () {
@@ -238,25 +238,6 @@ public class  MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    protected void OnResume() {
-        super.onResume();
-        ScrollView articleView = (ScrollView) findViewById(R.id.SCROLLER_ID);
-        articleView.scrollTo(0,currentPosition);
-    }
-
-    @Override
-    protected void onPause () {
-        super.onPause();
-        ScrollView articleView = (ScrollView) findViewById(R.id.SCROLLER_ID);
-        int position = articleView.getBottom() - (articleView.getHeight() + articleView.getScrollY());
-        int percentage = (int)((articleView.getHeight()+articleView.getScrollY())/articleView.getBottom());
-        Log.d("Position", Integer.toString(position));
-        Log.d("Bottom", Integer.toString(articleView.getBottom()));
-        Log.d("Height", Integer.toString(articleView.getHeight()));
-        Log.d("Scroll Y", Integer.toString(articleView.getScrollY()));
-        currentPosition = articleView.getScrollY();
     }
 
     protected void OnResume() {
