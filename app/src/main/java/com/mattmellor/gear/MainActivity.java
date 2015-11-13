@@ -46,9 +46,13 @@ public class  MainActivity extends AppCompatActivity {
         User user = new User();
         currentUser = user;
 
+        //Setting a custom action bar
         setContentView(R.layout.activity_main);
         toolbar= (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
         setSupportActionBar(toolbar);
+
+        //Getting rid of title for the action bar
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         //TextView txtContent = (TextView) findViewById(R.id.articleView);
         final TextView txtContent = (TextView) findViewById(R.id.articleView);

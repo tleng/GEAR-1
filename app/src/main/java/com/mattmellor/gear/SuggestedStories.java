@@ -3,10 +3,7 @@ package com.mattmellor.gear;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -33,17 +30,10 @@ public class SuggestedStories extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_suggested_stories);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
         List<String> articles = recommendKArticles(5);
 
         LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
@@ -57,6 +47,7 @@ public class SuggestedStories extends AppCompatActivity {
             String ratingString = "<b> " + suggestNumber + "%" + " </b>";
             myButton.setText(Html.fromHtml(article + "   " + ratingString));
             myButton.setContentDescription(article);
+            myButton.setHeight(30);
 
             Log.d("button added:", myButton.toString());
             myButton.setOnClickListener(getOnClickSetStory(myButton));

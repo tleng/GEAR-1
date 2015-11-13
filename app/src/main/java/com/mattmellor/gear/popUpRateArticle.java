@@ -24,7 +24,9 @@ public class popUpRateArticle extends Activity {
         int width = dm.widthPixels;
         int height = dm.heightPixels;
 
-        getWindow().setLayout((int) (width*0.5) , (int) (height* 0.5));
+        //sets this activity to be a pop up
+        //Following lines set the size of the activity
+        getWindow().setLayout((int) (width*0.5) , (int) (height* 0.2));
 
 
     }

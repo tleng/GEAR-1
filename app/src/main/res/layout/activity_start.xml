@@ -60,11 +60,10 @@
         android:id="@+id/suggestedReadingsButton"
         android:drawableTop="@mipmap/stories"
         style="?android:attr/borderlessButtonStyle"
-
+        android:gravity="center"
         android:onClick="goToSuggestedStories"
         android:clickable="true"
-        android:layout_marginBottom="55dp"
-        android:layout_above="@+id/imageButton2"
+        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
 
@@ -78,10 +77,10 @@
 
         android:onClick="goToStoriesSelectionOnClick"
         style="?android:attr/borderlessButtonStyle"
+        android:paddingLeft="30dp"
         android:layout_alignTop="@+id/imageButton"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:paddingLeft="30dp" />
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -93,11 +92,12 @@
         style="?android:attr/borderlessButtonStyle"
         android:clickable="true"
         android:onClick="goToOverallUserVocabOnClick"
-        android:layout_alignParentBottom="true"
+        android:paddingRight="30dp"
+        android:paddingBottom="20dp"
+        android:layout_below="@+id/suggestedReadingsButton"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:paddingRight="30dp"
-        android:paddingBottom="20dp" />
+        android:layout_marginTop="60dp" />
     <!--android:layout_alignRight="@+id/imageButton2"-->
 
 </RelativeLayout>

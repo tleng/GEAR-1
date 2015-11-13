@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="#CCC">
+    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+    android:background="#bfbfbf">
 
 <Button
     android:layout_width="wrap_content"
