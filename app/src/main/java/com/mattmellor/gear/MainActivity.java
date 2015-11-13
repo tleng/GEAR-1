@@ -162,12 +162,13 @@ public class  MainActivity extends AppCompatActivity {
 
                             @Override
                             protected void onPostExecute(GearBackendDefinition definition) {
+                                final TextView readingDictionary = (TextView) findViewById(R.id.definition_box);
                                 if (definition!=null) {
-                                    final TextView readingDictionary = (TextView) findViewById(R.id.definition_box);
                                     currentDefinition = definition.getMessage();
                                     readingDictionary.setText(currentDefinition);
                                 } else {
-                                    Log.e("Uh Oh", "No greetings were returned by the API.");
+                                    readingDictionary.setText("");
+                                    Log.e("Uh Oh", "No definitions were returned by the API.");
                                 }
                             }
                         };
@@ -180,6 +181,7 @@ public class  MainActivity extends AppCompatActivity {
 //
 //                final TextView definition = (TextView) findViewById(R.id.definition_box);
 //                definition.setText(currentDefinition);
+
             }
 
             public void updateDrawState(TextPaint ds) {
@@ -242,6 +244,7 @@ public class  MainActivity extends AppCompatActivity {
         Log.d("Height", Integer.toString(articleView.getHeight()));
         Log.d("Scroll Y", Integer.toString(articleView.getScrollY()));
         currentPosition = articleView.getScrollY();
+
         Long time = System.currentTimeMillis();
         this.currentUserData.setExitTime(time);
         try {
@@ -250,10 +253,12 @@ public class  MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-//
-//    protected void OnResume() {
-//        super.onResume();
-//        ScrollView articleView = (ScrollView) findViewById(R.id.articleView);
-//        articleView.scrollTo(0,currentPosition);
-//    }
+
+
+    protected void OnResume() {
+        super.onResume();
+        ScrollView articleView = (ScrollView) findViewById(R.id.SCROLLER_ID);
+        articleView.scrollTo(0,currentPosition);
+    }
+
 }
