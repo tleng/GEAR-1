@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,17 +35,16 @@ import static com.mattmellor.gear.R.id.app_article_bar;
 public class  MainActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "tag";
     private android.support.v7.widget.Toolbar toolbar;
-    private User currentUser;
+    private UserData currentUserData;
     private String currentDefinition = "No definition";
     private Integer currentPosition = 0;
+
+    private UserDataCollection allUserData;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        User user = new User();
-        currentUser = user;
 
         setContentView(R.layout.activity_main);
         toolbar= (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
@@ -74,6 +74,13 @@ public class  MainActivity extends AppCompatActivity {
             e.printStackTrace();
             text = "Error Occurred";
         }
+
+        allUserData = new UserDataCollection(getApplicationContext());
+        UserData userData = new UserData(start.currentUser.id(),story);
+        this.currentUserData = userData;
+        Long time = System.currentTimeMillis();
+        this.currentUserData.setStartTime(time);
+        allUserData.addUserDataToAllUserData(userData);
 
         txtContent.setMovementMethod(LinkMovementMethod.getInstance());
         txtContent.setText(text, TextView.BufferType.SPANNABLE);
@@ -168,7 +175,8 @@ public class  MainActivity extends AppCompatActivity {
                 getAndDisplayDefinition.execute(mWord);
 
                 overallUserVocab.addWordToUserDictionary(mWord);
-                currentUser.addToDictionary(mWord);
+                start.currentUser.addToDictionary(mWord);
+                currentUserData.addWord(mWord);
 //
 //                final TextView definition = (TextView) findViewById(R.id.definition_box);
 //                definition.setText(currentDefinition);
@@ -217,21 +225,31 @@ public class  MainActivity extends AppCompatActivity {
 
 
     public void onClickUpPopWindow(View view){
-        startActivity(new Intent(MainActivity.this, popUpRateArticle.class));
+        Intent intent = new Intent(MainActivity.this, popUpRateArticle.class);
+        startActivity(intent);
+        intent.putExtra("currentArticle", (String) currentUserData.getArticle());
+        intent.putExtra("currentUserId", (String) currentUserData.getUserId());
     }
 
-//    @Override
-//    protected void onPause () {
-//        super.onPause();
-//        ScrollView articleView = (ScrollView) findViewById(R.id.SCROLLER_ID);
-//        int position = articleView.getBottom() - (articleView.getHeight() + articleView.getScrollY());
-//        int percentage = (int)((articleView.getHeight()+articleView.getScrollY())/articleView.getBottom());
-//        Log.d("Position", Integer.toString(position));
-//        Log.d("Bottom", Integer.toString(articleView.getBottom()));
-//        Log.d("Height", Integer.toString(articleView.getHeight()));
-//        Log.d("Scroll Y", Integer.toString(articleView.getScrollY()));
-//        currentPosition = articleView.getScrollY();
-//    }
+    @Override
+    protected void onPause () {
+        super.onPause();
+        ScrollView articleView = (ScrollView) findViewById(R.id.SCROLLER_ID);
+        int position = articleView.getBottom() - (articleView.getHeight() + articleView.getScrollY());
+        int percentage = (int)((articleView.getHeight()+articleView.getScrollY())/articleView.getBottom());
+        Log.d("Position", Integer.toString(position));
+        Log.d("Bottom", Integer.toString(articleView.getBottom()));
+        Log.d("Height", Integer.toString(articleView.getHeight()));
+        Log.d("Scroll Y", Integer.toString(articleView.getScrollY()));
+        currentPosition = articleView.getScrollY();
+        Long time = System.currentTimeMillis();
+        this.currentUserData.setExitTime(time);
+        try {
+            allUserData.writeToFile("testing.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 //
 //    protected void OnResume() {
 //        super.onResume();

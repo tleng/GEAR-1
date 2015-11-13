@@ -28,6 +28,24 @@ public class popUpRateArticle extends Activity {
 
 
     }
+    public void onClick(View view){
+        Button button = (Button) view;
+        String rating = button.getText().toString();
+        int numRating;
+        if(rating.equals("One")){
+            numRating = 1;
+        }
+        else if(rating.equals("Two")){
+            numRating =2;
+        }
+        else{
+            numRating =3;
+        }
+        String articleTitle = getIntent().getExtras().getString("currentArticle");
+        String userId = getIntent().getExtras().getString("currentUserId");
+        UserDataCollection.addRating(userId,articleTitle,numRating);
+        //return rating;
+    }
 
     public String onClickRate(View view){
         Button rate = (Button) view;

@@ -8,8 +8,18 @@ import java.util.List;
  * Created by ktjolsen on 10/29/15.
  */
 public class User {
+
+    private final int id;
     final private List<String> currentSessionDictionary = new ArrayList<String>();
     final private HashMap<Article,Integer> articleRatings = new HashMap<Article,Integer>();
+
+    public User(int id){
+        this.id=id;
+    }
+
+    public int id() {
+        return this.id;
+    }
 
     public void addToDictionary(String word) {
         currentSessionDictionary.add(word);
