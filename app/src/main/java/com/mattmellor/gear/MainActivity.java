@@ -174,7 +174,8 @@ public class  MainActivity extends AppCompatActivity {
                                 final TextView readingDictionary = (TextView) findViewById(R.id.definition_box);
                                 if (definition!=null) {
                                     currentDefinition = definition.getMessage();
-                                    readingDictionary.setText(currentDefinition);
+                                    String definitionResult = "Definition: " + mWord +"\n" + "1. " + currentDefinition;
+                                    readingDictionary.setText(definitionResult);
                                 } else {
                                     readingDictionary.setText("");
                                     Log.e("Uh Oh", "No definitions were returned by the API.");

@@ -12,9 +12,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
         android:src="@mipmap/ic_settings"
+        android:layout_marginTop="61dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="105dp" />
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -25,17 +25,6 @@
         android:layout_below="@+id/imageView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Willkommen"
-        android:id="@+id/textView"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp"
         />
 
     <!--<Button-->
@@ -53,51 +42,52 @@
         <!--android:layout_alignEnd="@+id/suggestedReadingsButton"-->
         <!--android:layout_marginRight="0dp" />-->
 
-    <Button
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Suggested Stories"
         android:id="@+id/suggestedReadingsButton"
-        android:drawableTop="@mipmap/stories"
+        android:src="@mipmap/stories"
         style="?android:attr/borderlessButtonStyle"
         android:gravity="center"
         android:onClick="goToSuggestedStories"
         android:clickable="true"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignRight="@+id/textView2"
+        android:layout_alignEnd="@+id/textView2" />
 
 
-    <Button
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageButton2"
-        android:text="@string/stories"
-        android:drawableTop="@mipmap/allstories"
+
+        android:src="@mipmap/allstories"
         android:clickable="true"
 
         android:onClick="goToStoriesSelectionOnClick"
         style="?android:attr/borderlessButtonStyle"
-        android:paddingLeft="30dp"
-        android:layout_alignTop="@+id/imageButton"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
 
-    <Button
+        android:layout_marginTop="35dp"
+        android:layout_below="@+id/suggestedReadingsButton"
+        android:layout_alignLeft="@+id/suggestedReadingsButton"
+        android:layout_alignStart="@+id/suggestedReadingsButton" />
+
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageButton"
-        android:text="@string/vocabList"
-        android:drawableTop="@mipmap/vocab"
 
+        android:src="@mipmap/vocab"
         style="?android:attr/borderlessButtonStyle"
+
         android:clickable="true"
         android:onClick="goToOverallUserVocabOnClick"
-        android:paddingRight="30dp"
-        android:paddingBottom="20dp"
-        android:layout_below="@+id/suggestedReadingsButton"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="60dp" />
+
+
+        android:layout_below="@+id/imageButton2"
+        android:layout_alignLeft="@+id/imageButton2"
+        android:layout_alignStart="@+id/imageButton2"
+        android:layout_marginTop="34dp" />
     <!--android:layout_alignRight="@+id/imageButton2"-->
 
 </RelativeLayout>
