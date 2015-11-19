@@ -11,6 +11,7 @@
     <include android:id="@+id/app_article_bar"
     layout = "@layout/app_article_bar" />
 
+    <!--Story TextView-->
 
     <ScrollView
         android:id="@+id/SCROLLER_ID"
@@ -35,22 +36,21 @@
         android:textIsSelectable="false"
 
         />
-
     </ScrollView>
 
 
+    <!-- Definition Box TextView -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/definition"
         android:id="@+id/definition_box"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
         android:layout_above="@id/articleView"
-        android:background="#bfbfbf"
+        android:background="@drawable/roundeddefinitionbox"
         android:layout_weight = "1"
         android:paddingLeft="20dp"
-        android:paddingRight="20dp" />
+        android:paddingRight="20dp"
+        />
 
 </LinearLayout>
