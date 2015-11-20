@@ -19,7 +19,7 @@
 package com.appspot.backendgear_1121.gear.model;
 
 /**
- * Recommendation that stores a story
+ * A JSON string containing data to save via email
  *
  * <p> This is the Java data model class that specifies how to parse/serialize into the JSON that is
  * transmitted over HTTP when working with the gear. For a detailed explanation see:
@@ -29,7 +29,7 @@ package com.appspot.backendgear_1121.gear.model;
  * @author Google, Inc.
  */
 @SuppressWarnings("javadoc")
-public final class GearBackendRecommendedStory extends com.google.api.client.json.GenericJson {
+public final class GearBackendJsonData extends com.google.api.client.json.GenericJson {
 
   /**
    * The value may be {@code null}.
@@ -47,19 +47,19 @@ public final class GearBackendRecommendedStory extends com.google.api.client.jso
   /**
    * @param message message or {@code null} for none
    */
-  public GearBackendRecommendedStory setMessage(java.lang.String message) {
+  public GearBackendJsonData setMessage(java.lang.String message) {
     this.message = message;
     return this;
   }
 
   @Override
-  public GearBackendRecommendedStory set(String fieldName, Object value) {
-    return (GearBackendRecommendedStory) super.set(fieldName, value);
+  public GearBackendJsonData set(String fieldName, Object value) {
+    return (GearBackendJsonData) super.set(fieldName, value);
   }
 
   @Override
-  public GearBackendRecommendedStory clone() {
-    return (GearBackendRecommendedStory) super.clone();
+  public GearBackendJsonData clone() {
+    return (GearBackendJsonData) super.clone();
   }
 
 }
