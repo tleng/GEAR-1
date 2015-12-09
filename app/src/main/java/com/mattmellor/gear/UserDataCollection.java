@@ -17,70 +17,74 @@ import java.util.HashSet;
 import java.util.Set;
 
 /*
- * Created by Saya on 11/8/2015.
+ * Class to store data from all users that use the application
+ * TODO: Update later once we have created input of user ID
+ * For now, UserData is made static
  */
 
-public class UserDataCollection{
-
-    private Context context;
-    public UserDataCollection(Context context) {
-        context = context;
-    }
-
-    public static Set<UserData> allUserData = new HashSet<>();
-
-
-
-
-    public static void addUserDataToAllUserData(UserData userData) {
-        if (!allUserData.contains(userData)) {
-            allUserData.add(userData);
-        }
-        // should never get here
-    }
-
-    public static void addRating(String article, String userId, int rating){
-        UserData toTest = new UserData(Integer.parseInt(userId), article);
-        for(UserData data: allUserData){
-
-            if (toTest.equals(data)){
-                data.rate(rating);
-            }
+//public class UserDataCollection{
+//
+//    private Context context;
+//
+//    // Stores data from all different users using the application
+//    public static HashMap<String, UserData> allUserData = new HashMap<String, UserData>();
+//
+//    public UserDataCollection(Context context) {
+//        context = context;
+//    }
+//
+//
+//    public static void addUser(UserData userData) {
+//        allUserData.put(userData.getUserId(), userData);
+//    }
+//
+//    public static UserData getUserData(String userID) {
+//        return allUserData.get(userID);
+//    }
 
 
+//    public static void addRating(String article, String userId, int rating){
+////        UserData toTest = new UserData(Integer.parseInt(userId), article);
+//        for(UserData data: allUserData){
+//
+//            if (toTest.equals(data)){
+//                data.rate(rating);
+//            }
+//
+//
+//
+//        }
+//    }
 
-        }
-    }
-
-    public static Set<UserData> getAllUserData() {
-        Set<UserData> copyOfData = new HashSet<UserData>();
-        for (UserData data : allUserData) {
-            copyOfData.add(data);
-        }
-        return copyOfData;
-    }
+//    public static Set<UserData> getAllUserData() {
+//        Set<UserData> copyOfData = new HashSet<UserData>();
+//        for (UserData data : allUserData) {
+//            copyOfData.add(data);
+//        }
+//        return copyOfData;
+//    }
 
 
 
 
-    public void writeToFile(String filename) throws IOException {
-
-
-        String content = "";
-        for (UserData userData : getAllUserData()) {
-            content += userData.toString() + ", "; // might want to and a new line
-        }
-
-        String string = "Hello world!";
-        FileOutputStream outputStream;
-
-        try {
-            outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-            outputStream.write(content.getBytes());
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//    public void writeToFile(String filename) throws IOException {
+//
+//
+//        String content = "";
+//        for (UserData userData : getAllUserData()) {
+//            content += userData.toString() + ", "; // might want to and a new line
+//        }
+//
+//        String string = "Hello world!";
+//        FileOutputStream outputStream;
+//
+//        try {
+//            outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
+//            outputStream.write(content.getBytes());
+//            outputStream.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 //        Context context = getApplicationContext();
 //
 //        File file = new File(context.getFilesDir(), filename); // need to add some relative path
@@ -97,7 +101,7 @@ public class UserDataCollection{
 //        bw.write(content);
 //        bw.close();
 
-    }
+//    }
 
 
-}
+//}

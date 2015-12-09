@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 /**
- * Created by Matthew on 10/23/2015.
+ *  TODO: Implement and track user ratings of articles
  */
 public class popUpRateArticle extends Activity {
 
@@ -45,7 +45,7 @@ public class popUpRateArticle extends Activity {
         }
         String articleTitle = getIntent().getExtras().getString("currentArticle");
         String userId = getIntent().getExtras().getString("currentUserId");
-        UserDataCollection.addRating(userId,articleTitle,numRating);
+//        UserDataCollection.addRating(userId,articleTitle,numRating);
         //return rating;
     }
 

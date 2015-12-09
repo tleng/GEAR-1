@@ -7,38 +7,64 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.Toolbar;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class SuggestedStories extends AppCompatActivity {
+import static com.mattmellor.gear.R.id.app_article_bar;
+
+/**
+ * Activity where user can browse and select which story to read.
+ * The activity also goes through articles and the words the user has
+ * looked up to recommend articles with most overlap.
+ */
+public class SuggestedStoriesActivity extends AppCompatActivity {
 
     private final Map<String, Double> articlesWithRatings = new HashMap<>();
+    private android.support.v7.widget.Toolbar toolbar;
+
+    private int num_recommended_articles = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_suggested_stories);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+
+        toolbar = (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
+        setSupportActionBar(toolbar);
+
+        // Getting rid of title for the action bar
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
-        List<String> articles = recommendKArticles(5);
+        List<String> articles = recommendKArticles(num_recommended_articles);
 
         LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         ll.setOrientation(LinearLayout.VERTICAL);
+
+        Log.d("tag", "set orientation successfully");
+//        RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT);
+//        p.addRule(RelativeLayout.ABOVE, R.id.app_article_bar);
+//        ll.setLayoutParams(p);
+
+
         //StackOverflow
         for (String article:articles) {
             Button myButton = new Button(this);
@@ -48,6 +74,7 @@ public class SuggestedStories extends AppCompatActivity {
             myButton.setText(Html.fromHtml(article + "   " + ratingString));
             myButton.setContentDescription(article);
             myButton.setHeight(30);
+            myButton.setTransformationMethod(null);
 
             Log.d("button added:", myButton.toString());
             myButton.setOnClickListener(getOnClickSetStory(myButton));
@@ -114,7 +141,7 @@ public class SuggestedStories extends AppCompatActivity {
 
 
     private Double getFractionOfWords(String article) {
-        HashMap<String, Integer> userVocab = overallUserVocab.getUserDictionary();
+        HashMap<String, WordLookup> userVocab = UserData.getWordsLookedUp();
 
         InputStream input;
         String text = article;
@@ -157,35 +184,13 @@ public class SuggestedStories extends AppCompatActivity {
     View.OnClickListener getOnClickSetStory(final Button button)  {
         return new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(SuggestedStories.this, MainActivity.class);
+                Intent intent = new Intent(SuggestedStoriesActivity.this, ReadArticleActivity.class);
                 intent.putExtra("story",button.getContentDescription());
                 startActivity(intent);
                 finish();
             }
         };
     }
-
-
 }
 
-class MapUtil
-{
-    public static <K, V extends Comparable<? super V>> Map<K, V>
-    sortByValue( Map<K, V> map )
-    {
-        List<Map.Entry<K, V>> list =
-                new LinkedList<Map.Entry<K, V>>( map.entrySet() );
-        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
-            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
 
-        Map<K, V> result = new LinkedHashMap<K, V>();
-        for (Map.Entry<K, V> entry : list)
-        {
-            result.put( entry.getKey(), entry.getValue() );
-        }
-        return result;
-    }
-}

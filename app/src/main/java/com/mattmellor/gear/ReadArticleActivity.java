@@ -31,42 +31,32 @@ import java.util.Locale;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
 
-public class  MainActivity extends AppCompatActivity {
-    private static String LOG_APP_TAG = "tag";
+public class ReadArticleActivity extends AppCompatActivity {
+    private static String LOG_APP_TAG = "ReadArticleActivity-tag";
     private android.support.v7.widget.Toolbar toolbar;
-    private UserData currentUserData;
     private String currentDefinition = "No definition";
     private Integer currentPosition = 0;
 
-    private UserDataCollection allUserData;
+    private Long startTime;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-//        User user = new User();
-//        currentUser = user;
-
-        //Setting a custom action bar
-
-
-        setContentView(R.layout.activity_main);
-        toolbar= (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
+        setContentView(R.layout.activity_read_article);
+        toolbar = (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
         setSupportActionBar(toolbar);
 
-        //Getting rid of title for the action bar
+        // Getting rid of title for the action bar
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        //TextView txtContent = (TextView) findViewById(R.id.articleView);
         final TextView txtContent = (TextView) findViewById(R.id.articleView);
         final TextView definition = (TextView) findViewById(R.id.definition_box);
 
         AssetManager assetManager = getAssets();
 
+        // Load the selected story text from file
         String story = getIntent().getExtras().getString("story");
-        // To load text file
         InputStream input;
         String text = story;
         try {
@@ -84,12 +74,9 @@ public class  MainActivity extends AppCompatActivity {
             text = "Error Occurred";
         }
 
-        allUserData = new UserDataCollection(getApplicationContext());
-        UserData userData = new UserData(start.currentUser.id(),story);
-        this.currentUserData = userData;
-        Long time = System.currentTimeMillis();
-        this.currentUserData.setStartTime(time);
-        allUserData.addUserDataToAllUserData(userData);
+
+        startTime = System.currentTimeMillis();
+
 
         txtContent.setMovementMethod(LinkMovementMethod.getInstance());
         txtContent.setText(text, TextView.BufferType.SPANNABLE);
@@ -109,9 +96,14 @@ public class  MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Method that displays the definition retrieved from the back-end.
+     *
+     * @param definitions
+     */
     private void displayDefinition(GearBackendDefinition... definitions) {
         String msg;
-        if (definitions==null || definitions.length < 1) {
+        if (definitions == null || definitions.length < 1) {
             msg = "Definition was not present";
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
         } else {
@@ -129,30 +121,38 @@ public class  MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Method that lets users click on words
+     *
+     * @param word
+     * @return
+     */
     private ClickableSpan getClickableSpan(final String word) {
         return new ClickableSpan() {
-            final String mWord;
-            {
-                mWord = word;
-            }
+            final String mWord = word;
+//            {
+//                mWord = word;
+//            }
 
             @Override
             public void onClick(View widget) {
-                Log.d("tapped on:", mWord);
-                Context context = getApplicationContext();
-                CharSequence message = mWord + " ausgewählt.";
-                int duration = Toast.LENGTH_SHORT;
+//                Log.d("tapped on:", mWord);
+//                Context context = getApplicationContext();
+//                CharSequence message = mWord + " ausgewählt.";
+//                int duration = Toast.LENGTH_SHORT;
+//
+//                Toast toast = Toast.makeText(context, message, duration);
+//                toast.setGravity(Gravity.TOP, 0, 0);
+//                toast.show();
 
-                Toast toast = Toast.makeText(context, message, duration);
-                toast.setGravity(Gravity.TOP, 0, 0);
-                toast.show();
-
-                //Mike's server stuff
+                // Mike's server stuff
                 // Use of an anonymous class is done for sample code simplicity. {@code AsyncTasks} should be
                 // static-inner or top-level classes to prevent memory leak issues.
                 // @see http://goo.gl/fN1fuE @26:00 for a great explanation.
                 AsyncTask<String, Void, GearBackendDefinition> getAndDisplayDefinition =
-                        new AsyncTask<String, Void, GearBackendDefinition> () {
+                        new AsyncTask<String, Void, GearBackendDefinition>() {
+
+                            // Retrieve word definition from the Gear backend
                             @Override
                             protected GearBackendDefinition doInBackground(String... words) {
                                 // Retrieve service handle.
@@ -169,12 +169,13 @@ public class  MainActivity extends AppCompatActivity {
                                 return null;
                             }
 
+                            // Update the definition display with the definition retrieved from backend
                             @Override
                             protected void onPostExecute(GearBackendDefinition definition) {
                                 final TextView readingDictionary = (TextView) findViewById(R.id.definition_box);
-                                if (definition!=null) {
+                                if (definition != null) {
                                     currentDefinition = definition.getMessage();
-                                    String definitionResult = "Definition: " + mWord +"\n" + "1. " + currentDefinition;
+                                    String definitionResult = "Definition: " + mWord + "\n" + "1. " + currentDefinition;
                                     readingDictionary.setText(definitionResult);
                                 } else {
                                     readingDictionary.setText("");
@@ -184,13 +185,17 @@ public class  MainActivity extends AppCompatActivity {
                         };
 
                 getAndDisplayDefinition.execute(mWord);
+                Log.d("lookup", mWord);
+                if (mWord != null) {
+                    UserData.addWord(mWord);
+                }
 
-                overallUserVocab.addWordToUserDictionary(mWord);
-                start.currentUser.addToDictionary(mWord);
-                currentUserData.addWord(mWord);
-//
-//                final TextView definition = (TextView) findViewById(R.id.definition_box);
-//                definition.setText(currentDefinition);
+                // Update data collection structures
+                // TODO: Use only one structure to collect this per user
+//                DisplayVocabularyActivity.addWordToUserDictionary(mWord);
+//                StartActivity.currentUser.addToDictionary(mWord);
+//                currentUserData.addWord(mWord);
+//                UserData.addWord(mWord);
 
             }
 
@@ -198,10 +203,6 @@ public class  MainActivity extends AppCompatActivity {
                 ds.setUnderlineText(false);
             }
         };
-    }
-
-    public String dictionaryOutput(String word) {
-        return word;
     }
 
 
@@ -222,38 +223,35 @@ public class  MainActivity extends AppCompatActivity {
     }
 
 
-    public void onClickUpPopWindow(View view){
-        Intent intent = new Intent(MainActivity.this, popUpRateArticle.class);
+    public void onClickUpPopWindow(View view) {
+        Intent intent = new Intent(ReadArticleActivity.this, popUpRateArticle.class);
         startActivity(intent);
-        intent.putExtra("currentArticle", (String) currentUserData.getArticle());
-        intent.putExtra("currentUserId", (String) currentUserData.getUserId());
+//        intent.putExtra("currentArticle", (String) currentUserData.getArticle());
+//        intent.putExtra("currentUserId", (String) currentUserData.getUserId());
     }
-    
+
 
     @Override
-    protected void onPause () {
+    protected void onPause() {
         super.onPause();
         ScrollView articleView = (ScrollView) findViewById(R.id.SCROLLER_ID);
         int position = articleView.getBottom() - (articleView.getHeight() + articleView.getScrollY());
-        int percentage = (int)((articleView.getHeight()+articleView.getScrollY())/articleView.getBottom());
+        int percentage = (int) ((articleView.getHeight() + articleView.getScrollY()) / articleView.getBottom());
         Log.d("Position", Integer.toString(position));
         Log.d("Bottom", Integer.toString(articleView.getBottom()));
         Log.d("Height", Integer.toString(articleView.getHeight()));
         Log.d("Scroll Y", Integer.toString(articleView.getScrollY()));
         currentPosition = articleView.getScrollY();
 
-        Long time = System.currentTimeMillis();
-        this.currentUserData.setExitTime(time);
-        try {
-            allUserData.writeToFile("testing.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Long endTime = System.currentTimeMillis();
+        Long timeSpent = endTime - startTime;
+        // TODO: Update user data with timeSpent
+
     }
 
     protected void OnResume() {
         super.onResume();
         ScrollView articleView = (ScrollView) findViewById(R.id.SCROLLER_ID);
-        articleView.scrollTo(0,currentPosition);
+        articleView.scrollTo(0, currentPosition);
     }
 }

@@ -9,23 +9,20 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
 
-public class overallUserVocab extends AppCompatActivity {
-    private static HashMap<String, Integer> userDictionary = new HashMap<>();
+/**
+ * Class that displays user vocabulary
+ */
+public class DisplayVocabularyActivity extends AppCompatActivity {
+//    private static HashMap<String, Integer> userDictionary = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_overall_user_vocab);
+        setContentView(R.layout.activity_display_user_vocabulary);
         TextView vocabView = (TextView) findViewById(R.id.textView4);
-        String vocabString = "";
-        for (String key:userDictionary.keySet()) {
-            vocabString += key + ": " + Integer.toString(userDictionary.get(key)) + "\n";
-        }
-        if (userDictionary.isEmpty()) {
-            vocabString = "No vocabulary words looked up yet.\n";
-        }
-        vocabView.setText(vocabString);
 
+
+        vocabView.setText(getVocabularyString());
     }
 
     @Override
@@ -49,20 +46,22 @@ public class overallUserVocab extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static void addWordToUserDictionary(String word) {
-        String lowerCaseWord = word.toLowerCase();
-        if (!userDictionary.containsKey(lowerCaseWord)) {
-            userDictionary.put(lowerCaseWord, 1);
-        } else {
-            userDictionary.put(lowerCaseWord,userDictionary.get(lowerCaseWord)+1);
-        }
-    }
 
-    public static HashMap<String, Integer> getUserDictionary() {
-        HashMap<String, Integer> copyOfDictionary = new HashMap<String, Integer>();
-        for (String word : userDictionary.keySet()) {
-            copyOfDictionary.put(word, userDictionary.get(word));
+    /**
+     * Turns user vocabulary into string representation for display
+     * @return string to display
+     */
+    private String getVocabularyString() {
+        Map<String, WordLookup> vocabulary = UserData.getWordsLookedUp();
+
+        String vocabString = "";
+        if (vocabulary.isEmpty()) {
+            vocabString = "No vocabulary words looked up yet.\n";
         }
-        return copyOfDictionary;
+
+        for (String key:vocabulary.keySet()) {
+            vocabString += key + "\n";
+        }
+        return vocabString;
     }
 }

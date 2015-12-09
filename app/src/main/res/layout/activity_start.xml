@@ -4,90 +4,142 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:background="@drawable/backgroundtwo">
+    android:background="#99bbff">
 
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:id="@+id/imageView"
         android:src="@mipmap/ic_settings"
-        android:layout_marginTop="61dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="41dp"
+        android:layout_gravity="center"
+        />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="G.E.A.R."
         android:id="@+id/textView2"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="50dp"
+        android:text="G.E.A.R."
+
+        android:textStyle="bold"
         android:layout_below="@+id/imageView"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        />
-
-    <!--<Button-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="User Settings"-->
-        <!--android:id="@+id/button"-->
-        <!--android:drawableTop="@mipmap/ic_user_settings"-->
-        <!--style="?android:attr/borderlessButtonStyle"-->
-
-        <!--android:onClick="goToUserSettingsOnClick"-->
-        <!--android:clickable="true"-->
-        <!--android:layout_alignBottom="@+id/imageButton"-->
-        <!--android:layout_alignRight="@+id/suggestedReadingsButton"-->
-        <!--android:layout_alignEnd="@+id/suggestedReadingsButton"-->
-        <!--android:layout_marginRight="0dp" />-->
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/suggestedReadingsButton"
-        android:src="@mipmap/stories"
-        style="?android:attr/borderlessButtonStyle"
-        android:gravity="center"
-        android:onClick="goToSuggestedStories"
-        android:clickable="true"
-        android:layout_centerVertical="true"
-        android:layout_alignRight="@+id/textView2"
-        android:layout_alignEnd="@+id/textView2" />
+        android:paddingBottom="20dp"/>
 
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageButton2"
-
-        android:src="@mipmap/allstories"
-        android:clickable="true"
-
-        android:onClick="goToStoriesSelectionOnClick"
-        style="?android:attr/borderlessButtonStyle"
-
-        android:layout_marginTop="35dp"
-        android:layout_below="@+id/suggestedReadingsButton"
-        android:layout_alignLeft="@+id/suggestedReadingsButton"
-        android:layout_alignStart="@+id/suggestedReadingsButton" />
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageButton"
-
-        android:src="@mipmap/vocab"
-        style="?android:attr/borderlessButtonStyle"
-
-        android:clickable="true"
-        android:onClick="goToOverallUserVocabOnClick"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/textView2">
+    <!--android:padding="10dp">-->
 
 
-        android:layout_below="@+id/imageButton2"
-        android:layout_alignLeft="@+id/imageButton2"
-        android:layout_alignStart="@+id/imageButton2"
-        android:layout_marginTop="34dp" />
-    <!--android:layout_alignRight="@+id/imageButton2"-->
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/suggestedReadingsButton"
+            android:src="@mipmap/stories"
+            style="?android:attr/borderlessButtonStyle"
+            android:gravity="center"
+            android:onClick="goToSuggestedStories"
+            android:clickable="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/imageView"
+            android:layout_toStartOf="@+id/imageView"
+            android:layout_gravity="center_vertical"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get recommendations"
+            android:textAllCaps="false"
+            android:id="@+id/button"
+            android:onClick="goToSuggestedStories"
+            android:layout_centerVertical="true"
+            android:layout_alignLeft="@+id/imageView"
+            android:layout_alignStart="@+id/imageView"
+            android:layout_gravity="center_vertical"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButton2"
+                android:src="@mipmap/allstories"
+                android:clickable="true"
+                android:onClick="goToStoriesSelectionOnClick"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_below="@+id/suggestedReadingsButton"
+                android:layout_alignLeft="@+id/suggestedReadingsButton"
+                android:layout_alignStart="@+id/suggestedReadingsButton"
+                android:layout_gravity="center_vertical"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Browse stories"
+                android:textAllCaps="false"
+                android:id="@+id/button2"
+                android:onClick="goToStoriesSelectionOnClick"
+                android:layout_below="@+id/suggestedReadingsButton"
+                android:layout_alignLeft="@+id/button"
+                android:layout_alignStart="@+id/button"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButton"
+                android:src="@mipmap/vocab"
+                style="?android:attr/borderlessButtonStyle"
+                android:clickable="true"
+                android:onClick="goToOverallUserVocabOnClick"
+                android:layout_below="@+id/imageButton2"
+                android:layout_toLeftOf="@+id/button"
+                android:layout_toStartOf="@+id/button"
+                android:layout_gravity="center_vertical"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Track vocabulary"
+                android:textAllCaps="false"
+                android:id="@+id/button3"
+                android:onClick="goToOverallUserVocabOnClick"
+                android:layout_below="@+id/imageButton2"
+                android:layout_alignLeft="@+id/button2"
+                android:layout_alignStart="@+id/button2"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+    </LinearLayout>
+
 
 </RelativeLayout>

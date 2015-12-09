@@ -4,288 +4,312 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#ffe6cc">
+    android:background="#fff">
+
+    <include android:id="@+id/app_toolbar"
+    layout="@layout/app_toolbar"/>
 
 
+    <TableLayout
+        android:id="@+id/tableLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dip"
+        android:isScrollContainer="true"
+        android:layout_weight = "1">
 
-        <TableLayout
-            android:id="@+id/tableLayout1"
+
+        <TableRow
+            android:id="@+id/tableRow1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="10dip"
-            android:isScrollContainer="true"
-            android:layout_weight = "1">
+            android:layout_weight="1">
 
-            <TableRow
-                android:id="@+id/tableRow1"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/aschenputtel"
+                android:tag="aschenputtel"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="0.3"
+                android:text="Aschenputtel"
+                android:clickable="true"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
 
-                <Button
-                    android:id="@+id/aschenputtel"
-                    android:tag="aschenputtel"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Aschenputtel"
-                    android:clickable="true"
-                    android:onClick="openStory">
-                </Button>
-
-                <Button
-                    android:id="@+id/daumesdick"
-                    android:tag="daumesdick"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Daumesdick"
-                    android:onClick="openStory">
-                </Button>
-                <Button
-                    android:id="@+id/dornroeschen"
-                    android:tag="dornroeschen"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Dornröschen"
-                    android:onClick="openStory">
-                </Button>
-
-
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow2"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/daumesdick"
+                android:tag="daumesdick"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <Button
-                    android:id="@+id/froschkoenig"
-                    android:tag="froschkoenig"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Froschkönig"
-                    android:onClick="openStory">
-                </Button>
-
-                <Button
-                    android:id="@+id/rapunzel"
-                    android:tag="rapunzel"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Rapunzel"
-                    android:onClick="openStory">
-                </Button>
-
-                <Button
-                    android:id="@+id/rotkaeppchen"
-                    android:tag="rotkaeppchen"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Rotkäppchen"
-                    android:onClick="openStory">
-                </Button>
-
-
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow3"
-                android:layout_width="match_parent"
+                android:layout_weight="0.3"
+                android:text="Daumesdick"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+            <Button
+                android:id="@+id/dornroeschen"
+                android:tag="dornroeschen"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <Button
-                    android:id="@+id/rumpelstilzchen"
-                    android:tag="rumpelstilzchen"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Rumpelstilzchen"
-                    android:onClick="openStory">
-                </Button>
-
-                <Button
-                    android:id="@+id/schneewittchen"
-                    android:tag="schneewittchen"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Schneewittchen"
-                    android:onClick="openStory">
-                </Button>
-
-                <Button
-                    android:id="@+id/bruederchen_und_schwesterchen"
-                    android:tag="bruederchen_und_schwesterchen"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Brüderchen und Schwesterchen"
-                    android:onClick="openStory">
-                </Button>
+                android:layout_weight="0.3"
+                android:text="Dornröschen"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
 
 
-            </TableRow>
+        </TableRow>
 
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
 
-            <TableRow
-                android:id="@+id/tableRow4"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/froschkoenig"
+                android:tag="froschkoenig"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="0.3"
+                android:text="Froschkönig"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
 
-                <Button
-                    android:id="@+id/cinderella"
-                    android:tag="cinderella"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Cinderella"
-                    android:onClick="openStory">
-                </Button>
-
-                <Button
-                    android:id="@+id/das_tapfere_schneiderlein"
-                    android:tag="das_tapfere_schneiderlein"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Das Tapfere Schneiderlein"
-                    android:onClick="openStory">
-                </Button>
-
-                <Button
-                    android:id="@+id/die_bremer_stadtmusikanten"
-                    android:tag="die_bremer_stadtmusikanten"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Die Bremer Stadtmusikanten"
-                    android:onClick="openStory">
-                </Button>
-
-
-            </TableRow>
-
-
-            <TableRow
-                android:id="@+id/tableRow5"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/rapunzel"
+                android:tag="rapunzel"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="0.3"
+                android:text="Rapunzel"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
 
-                <Button
-                    android:id="@+id/die_gaensemagd"
-                    android:tag="die_gaensemagd"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Die Gänsemagd"
-                    android:onClick="openStory">
-                </Button>
-
-                <Button
-                    android:id="@+id/die_ruebe"
-                    android:tag="die_ruebe"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Die Rübe"
-                    android:onClick="openStory">
-                </Button>
-
-                <Button
-                    android:id="@+id/haensel_und_gretel"
-                    android:tag="haensel_und_gretel"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Hänsel und Gretel"
-                    android:onClick="openStory">
-                </Button>
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow6"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/rotkaeppchen"
+                android:tag="rotkaeppchen"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="0.3"
+                android:text="Rotkäppchen"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
 
-                <Button
-                    android:id="@+id/hans_im_glueck"
-                    android:tag="hans_im_glueck"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Hans im Glück"
-                    android:onClick="openStory">
-                </Button>
 
-                <Button
-                    android:id="@+id/jorinde_und_joringel"
-                    android:tag="jorinde_und_joringel"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Jorinde und Joringel"
-                    android:onClick="openStory">
-                </Button>
+        </TableRow>
 
-                <Button
-                    android:id="@+id/das_maerchen"
-                    android:tag="das_maerchen"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Das Märchen"
-                    android:onClick="openStory">
-                </Button>
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
 
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow8"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/rumpelstilzchen"
+                android:tag="rumpelstilzchen"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="0.3"
+                android:text="Rumpelstilzchen"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
 
-                <Button
-                    android:id="@+id/der_sandmann"
-                    android:tag="der_sandmann"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Der Sandmann"
-                    android:onClick="openStory">
-                </Button>
+            <Button
+                android:id="@+id/schneewittchen"
+                android:tag="schneewittchen"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Schneewittchen"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
 
-                <Button
-                    android:id="@+id/die_judenbuche"
-                    android:tag="die_judenbuche"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Die Judenbuche"
-                    android:onClick="openStory">
-                </Button>
+            <Button
+                android:id="@+id/bruederchen_und_schwesterchen"
+                android:tag="bruederchen_und_schwesterchen"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Brüderchen und Schwesterchen"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
 
-                <Button
-                    android:id="@+id/das_fraeulein_von_scuderi"
-                    android:tag="das_fraeulein_von_scuderi"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:text="Das Fräulein von Scudéri"
-                    android:onClick="openStory">
-                </Button>
 
-            </TableRow>
-        </TableLayout>
+        </TableRow>
+
+
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/cinderella"
+                android:tag="cinderella"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Cinderella"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+
+            <Button
+                android:id="@+id/das_tapfere_schneiderlein"
+                android:tag="das_tapfere_schneiderlein"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Das Tapfere Schneiderlein"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+
+            <Button
+                android:id="@+id/die_bremer_stadtmusikanten"
+                android:tag="die_bremer_stadtmusikanten"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Die Bremer Stadtmusikanten"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+
+
+        </TableRow>
+
+
+        <TableRow
+            android:id="@+id/tableRow5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/die_gaensemagd"
+                android:tag="die_gaensemagd"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Die Gänsemagd"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+
+            <Button
+                android:id="@+id/die_ruebe"
+                android:tag="die_ruebe"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Die Rübe"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+
+            <Button
+                android:id="@+id/haensel_und_gretel"
+                android:tag="haensel_und_gretel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Hänsel und Gretel"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow6"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/hans_im_glueck"
+                android:tag="hans_im_glueck"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Hans im Glück"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+
+            <Button
+                android:id="@+id/jorinde_und_joringel"
+                android:tag="jorinde_und_joringel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Jorinde und Joringel"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+
+            <Button
+                android:id="@+id/das_maerchen"
+                android:tag="das_maerchen"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Das Märchen"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow8"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/der_sandmann"
+                android:tag="der_sandmann"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Der Sandmann"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+
+            <Button
+                android:id="@+id/die_judenbuche"
+                android:tag="die_judenbuche"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Die Judenbuche"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+
+            <Button
+                android:id="@+id/das_fraeulein_von_scuderi"
+                android:tag="das_fraeulein_von_scuderi"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="Das Fräulein von Scudéri"
+                android:onClick="openStory"
+                android:textAllCaps="false">
+            </Button>
+
+        </TableRow>
+    </TableLayout>
 
 </LinearLayout>

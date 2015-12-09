@@ -7,21 +7,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class start extends AppCompatActivity {
-
-    public static  User currentUser; //TODO make this final, and add a constructor?
+/**
+ * Activity that represents the starting screen of the app
+ */
+public class StartActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        //Getting rid of the title in the action bar
-        //getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        User user = new User(1);// there should be an input that actually puts an id here
-        currentUser =  user;
-
+        // TODO: Add feature to let users 'login', or input his/her username
     }
 
     @Override
@@ -32,26 +28,34 @@ public class start extends AppCompatActivity {
     }
 
 
-    public void getStartedClick(View view){
-        //Go the the second page
-        startActivity(new Intent(start.this, MainActivity.class));
-    }
 
+    /**
+     * Go to overview page to select among all stories
+     * @param view
+     */
     public void goToStoriesSelectionOnClick(View view){
-        startActivity(new Intent(start.this, StoriesSelection.class));
+        startActivity(new Intent(StartActivity.this, StoriesSelectionActivity.class));
     }
 
+    /**
+     * Go to page with suggested stories
+     * @param view
+     */
     public void goToSuggestedStories(View view) {
-        startActivity(new Intent(start.this, SuggestedStories.class));
+        startActivity(new Intent(StartActivity.this, SuggestedStoriesActivity.class));
     }
 
+    /**
+     * Go to page that shows user history with vocabulary / word lookups
+     * @param view
+     */
     public void goToOverallUserVocabOnClick(View view){
-        startActivity(new Intent(start.this, overallUserVocab.class));
+        startActivity(new Intent(StartActivity.this, DisplayVocabularyActivity.class));
     }
 
-    public void goToUserSettingsOnClick(View view){
-        startActivity(new Intent(start.this, userSettings.class));
-    }
+//    public void goToUserSettingsOnClick(View view){
+//        startActivity(new Intent(StartActivity.this, userSettings.class));
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

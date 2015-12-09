@@ -6,6 +6,10 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 
+/**
+ * Class to store key constants to connect to the backend
+ * (So that they only need to be initialized once)
+ */
 public class AppConstants {
 
     /**

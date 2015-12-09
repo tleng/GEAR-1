@@ -5,90 +5,119 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Saya on 11/8/2015.
+ * Class to store data associated with user behavior
  */
 public class UserData {
 
-    private final int userId;
-    private final String articleTitle;
-    private int rating = -1; //unrated
-    private final Map<String,Integer> wordsLookedUp = new HashMap<>();
-    private Long startTime; // change this to timestamp later... this should actually measure time spent
-    private Long exitTime;
+    // Identifies unique users
+    private final String userId;
 
-    public UserData(int userId, String articleTitle){
+    // Store all words looked up by the user along with associated data
+    // Associated data such as when the word is looked up, # times looked up, etc.
+    // is stored in the WordLookup structure
+    private static final HashMap<String, WordLookup> wordsLookedUp = new HashMap<String, WordLookup>();
+
+    // Stores user ratings of different articles
+    private static final HashMap<String, Integer> articleRatings = new HashMap<String, Integer>();
+
+    // Stores total time user spent on each article
+    // TODO: Update this when article is opened and closed
+    private final Map<String, Long> articleTime = new HashMap<String, Long>();
+
+
+    public UserData(String userId) {
         this.userId = userId;
-        this.articleTitle = articleTitle;
 
     }
 
-    public void rate(int rating){
-        this.rating = rating;
+    /**
+     * Acts on user rating an article
+     * @param article name of the article user is rating
+     * @param rating the rating given to the article by the user
+     */
+    public void rateArticle(String article, int rating){
+        articleRatings.put(article, rating);
     }
 
-    public void addWord(String word){ // should I handle lower case?
-        if(this.wordsLookedUp.containsKey(word)){
-            int freq = this.wordsLookedUp.get(word);
-            this.wordsLookedUp.put(word,freq);
+
+    /**
+     * Acts on user lookup of a word
+     * @param word the word the user looked up
+     */
+    public static void addWord(String word){
+        String wordLowerCase = word.toLowerCase();
+        if (wordsLookedUp.containsKey(wordLowerCase)){
+            wordsLookedUp.get(wordLowerCase).update();
         }
-        else{
-            this.wordsLookedUp.put(word,1);
+        else {
+            wordsLookedUp.put(wordLowerCase, new WordLookup(wordLowerCase));
         }
     }
 
-    public void setStartTime(Long startTime){
-        this.startTime =startTime;
-
+    /**
+     * Updates tracking of how long a user spends on a single article
+     * For now assumes that user only interacts with an article once, or
+     * tracks the latest session with the article
+     * @param article name of the article
+     * @param timeSpent total time user spent in session on article
+     */
+    public void setTimeSpentOnArticle(String article, Long timeSpent) {
+        // TODO
     }
-    public void setExitTime(Long exitTime){
-        this.exitTime = exitTime;
 
-    }
-
+    /**
+     * Getter method for the user ID
+     * @return
+     */
     public String getUserId(){
-        return new Integer(this.userId).toString();
+        return userId;
     }
 
-    public String getArticle(){
-        return this.articleTitle;
+    /**
+     * Getter method for wordsLookedUp
+     * @return
+     */
+    public static HashMap<String, WordLookup> getWordsLookedUp() {
+        return wordsLookedUp;
     }
 
-    @Override
-    public boolean equals(Object thatObject){
-        if(thatObject instanceof UserData){
-            return false;
-        }
-
-        else{
-            UserData that = (UserData) thatObject;
-            if(this.userId == that.userId && this.articleTitle.equals(that.articleTitle)){
-                return true;
-            }
-            else{
-                return false;
-            }
-        }
-    }
+//    Not sure if logic of this equals method is correct?
+//    @Override
+//    public boolean equals(Object thatObject){
+//        if(thatObject instanceof UserData){
+//            return false;
+//        }
+//
+//        else{
+//            UserData that = (UserData) thatObject;
+//            if(this.userId == that.userId && this.articleTitle.equals(that.articleTitle)){
+//                return true;
+//            }
+//            else{
+//                return false;
+//            }
+//        }
+//    }
 
     @Override
     public int hashCode(){
-        return this.userId + this.articleTitle.hashCode();
+        return this.userId.hashCode();
     }
 
-    @Override
-    public String toString(){
-        String words = "[";
-        for(String word: wordsLookedUp.keySet()){
-            words += word + " : " +wordsLookedUp.get(word)+",";
-        }
-        words += "]";
-
-        String outputString = "[ USER : " + userId + ", " + "article title : " + articleTitle +", "
-                + "startTime : " + startTime +", " + "exit : " + exitTime + ", "
-                + "words : " + words + " ]";
-
-        return outputString;
-    }
+//    @Override
+//    public String toString(){
+//        String words = "[";
+//        for(String word: wordsLookedUp.keySet()){
+//            words += word + " : " +wordsLookedUp.get(word)+",";
+//        }
+//        words += "]";
+//
+//        String outputString = "[ USER : " + userId + ", " + "article title : " + articleTitle +", "
+//                + "startTime : " + startTime +", " + "exit : " + exitTime + ", "
+//                + "words : " + words + " ]";
+//
+//        return outputString;
+//    }
 
 
 

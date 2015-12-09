@@ -8,12 +8,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_suggested_stories"
-    tools:context="com.mattmellor.gear.SuggestedStories">
+    tools:context="com.mattmellor.gear.SuggestedStoriesActivity">
 
-    <LinearLayout
-        android:id="@+id/suggestedStoriesLinearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-    </LinearLayout>
 </RelativeLayout>

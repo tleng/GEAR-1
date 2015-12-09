@@ -7,7 +7,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class StoriesSelection extends AppCompatActivity {
+/**
+ * Activity where user can browse and select which story to read
+ */
+public class StoriesSelectionActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +32,7 @@ public class StoriesSelection extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        // noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -37,9 +40,13 @@ public class StoriesSelection extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Starts the ReadArticleActivity for the selected story
+     * @param view
+     */
     public void openStory(View view){
-        Intent intent = new Intent(StoriesSelection.this, MainActivity.class);
-        intent.putExtra("story",(String)view.getTag());
+        Intent intent = new Intent(StoriesSelectionActivity.this, ReadArticleActivity.class);
+        intent.putExtra("story", (String) view.getTag());
         startActivity(intent);
         finish();
     }
