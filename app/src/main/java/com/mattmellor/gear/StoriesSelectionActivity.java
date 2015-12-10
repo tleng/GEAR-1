@@ -16,11 +16,15 @@ public class StoriesSelectionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stories_selection);
+        // TODO: Make this dynamically read articles in folder and
+        // create buttons, like in stories selection, instead of hardcoding
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+
+        // TODO: make sure this shows menu
         getMenuInflater().inflate(R.menu.menu_stories_selection, menu);
         return true;
     }

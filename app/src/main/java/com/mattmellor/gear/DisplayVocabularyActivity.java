@@ -13,15 +13,15 @@ import java.util.Map;
  * Class that displays user vocabulary
  */
 public class DisplayVocabularyActivity extends AppCompatActivity {
-//    private static HashMap<String, Integer> userDictionary = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_user_vocabulary);
-        TextView vocabView = (TextView) findViewById(R.id.textView4);
 
-
+        // display current user vocabulary
+        TextView vocabView = (TextView) findViewById(R.id.vocabularyData);
         vocabView.setText(getVocabularyString());
     }
 
@@ -59,6 +59,7 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
             vocabString = "No vocabulary words looked up yet.\n";
         }
 
+        // list vocabulary words
         for (String key:vocabulary.keySet()) {
             vocabString += key + "\n";
         }

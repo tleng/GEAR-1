@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -38,13 +39,8 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.activity_suggested_stories);
-
         toolbar = (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
         setSupportActionBar(toolbar);
 
@@ -52,20 +48,17 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
+        // TODO: Move code to generate buttons for recommendations into separate method for modularity
         List<String> articles = recommendKArticles(num_recommended_articles);
 
+        // adjust linear layout to display articles in
         LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
         ll.setOrientation(LinearLayout.VERTICAL);
 
-        Log.d("tag", "set orientation successfully");
-//        RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT);
-//        p.addRule(RelativeLayout.ABOVE, R.id.app_article_bar);
-//        ll.setLayoutParams(p);
 
-
-        //StackOverflow
+        // StackOverflow suggested code to dynamically create buttons for the articles
         for (String article:articles) {
             Button myButton = new Button(this);
             Double rating = articlesWithRatings.get(article) * 100;
@@ -74,7 +67,7 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
             myButton.setText(Html.fromHtml(article + "   " + ratingString));
             myButton.setContentDescription(article);
             myButton.setHeight(30);
-            myButton.setTransformationMethod(null);
+            myButton.setTransformationMethod(null); // ensures text is lower case
 
             Log.d("button added:", myButton.toString());
             myButton.setOnClickListener(getOnClickSetStory(myButton));
@@ -84,8 +77,21 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+
+        // TODO: make sure this shows menu
+        getMenuInflater().inflate(R.menu.menu_stories_suggestion_and_selection, menu);
+        return true;
+    }
+
+    // TODO: replace with either recommendation from backend (needs
+    // further setup of backend) or more sophisticated inference of user vocabulary
+    // rather than words the user has clicked on
     /**
-     *
+     * Recommends k articles based on fraction of words in the article that are
+     * among words the user looked up
      * @param k is number of articles to recommmend, requires k< number of articles
      * @return k articles with highest fraction of words in userDictionary
      */
@@ -111,24 +117,22 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
             List<String> recommendedArticles = new ArrayList<>();
             for(int i=n-1;i>=n-k-1;i--){
                 recommendedArticles.add(sortedArticleList.get(i));
-                //setNumberOfArticlesWithFractions.put(sortedArticleList.get(i),allFractionMappings.get(sortedArticleList.get(i)));
                 Log.d("article", sortedArticleList.get(i));
                 Log.d("fraction", allFractionMappings.get(sortedArticleList.get(i)).toString());
             }
             return recommendedArticles;
 
-            //Log.d("first article",sortedArticleList.get(0));
-            //Double fractionTest = getFractionOfWords(listOfArticleAssets[0]);
-            //Log.d("fraction",fractionTest.toString());
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
         return new ArrayList<>();
-
     }
 
+    /**
+     * Lists all articles in the article folder
+     * @return
+     * @throws IOException
+     */
     private ArrayList<String> listAllArticles() throws IOException {
         AssetManager assetManager = getResources().getAssets();
         String assets[] = assetManager.list("");
@@ -140,6 +144,12 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Gets fraction of words in the article that are also in the
+     * set of words the user has looked up previously
+     * @param article
+     * @return
+     */
     private Double getFractionOfWords(String article) {
         HashMap<String, WordLookup> userVocab = UserData.getWordsLookedUp();
 
@@ -173,8 +183,6 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
                 counter += 1;
             }
         }
-
-        //for (String word : articleWords) {Log.d("word", word);};
 
         Double fraction = counter/lowerCaseArticleWords.size();
         return fraction;

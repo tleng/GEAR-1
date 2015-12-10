@@ -31,13 +31,18 @@ import java.util.Locale;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
 
+/**
+ * Activity where user reads article
+ */
 public class ReadArticleActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "ReadArticleActivity-tag";
     private android.support.v7.widget.Toolbar toolbar;
+
     private String currentDefinition = "No definition";
     private Integer currentPosition = 0;
 
     private Long startTime;
+    private String currentArticle;
 
 
     @Override
@@ -50,13 +55,20 @@ public class ReadArticleActivity extends AppCompatActivity {
         // Getting rid of title for the action bar
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        // Log start time for when user opened article
+        startTime = System.currentTimeMillis();
+
         final TextView txtContent = (TextView) findViewById(R.id.articleView);
         final TextView definition = (TextView) findViewById(R.id.definition_box);
 
         AssetManager assetManager = getAssets();
 
-        // Load the selected story text from file
+        // Retrieve story user is reading
         String story = getIntent().getExtras().getString("story");
+        currentArticle = story;
+
+        // TODO: load the story text in a separate thread, not on the main UI thread
+        // Load the selected story text from file
         InputStream input;
         String text = story;
         try {
@@ -75,9 +87,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         }
 
 
-        startTime = System.currentTimeMillis();
-
-
+        // TODO: make this use page swiping instead
         txtContent.setMovementMethod(LinkMovementMethod.getInstance());
         txtContent.setText(text, TextView.BufferType.SPANNABLE);
         Spannable spans = (Spannable) txtContent.getText();
@@ -96,22 +106,22 @@ public class ReadArticleActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * Method that displays the definition retrieved from the back-end.
-     *
-     * @param definitions
-     */
-    private void displayDefinition(GearBackendDefinition... definitions) {
-        String msg;
-        if (definitions == null || definitions.length < 1) {
-            msg = "Definition was not present";
-            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-        } else {
-            Log.d("Display", "Displaying " + definitions.length + " definition.");
-            List<GearBackendDefinition> definitionsList = Arrays.asList(definitions);
-            Toast.makeText(this, definitionsList.get(0).toString(), Toast.LENGTH_LONG).show();
-        }
-    }
+//    /**
+//     * Method that displays the definition retrieved from the back-end.
+//     *
+//     * @param definitions returned from the backend
+//     */
+//    private void displayDefinition(GearBackendDefinition... definitions) {
+//        String msg;
+//        if (definitions == null || definitions.length < 1) {
+//            msg = "Definition was not present";
+//            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+//        } else {
+//            Log.d("Display", "Displaying " + definitions.length + " definition.");
+//            List<GearBackendDefinition> definitionsList = Arrays.asList(definitions);
+//            Toast.makeText(this, definitionsList.get(0).toString(), Toast.LENGTH_LONG).show();
+//        }
+//    }
 
 
     @Override
@@ -130,21 +140,9 @@ public class ReadArticleActivity extends AppCompatActivity {
     private ClickableSpan getClickableSpan(final String word) {
         return new ClickableSpan() {
             final String mWord = word;
-//            {
-//                mWord = word;
-//            }
 
             @Override
             public void onClick(View widget) {
-//                Log.d("tapped on:", mWord);
-//                Context context = getApplicationContext();
-//                CharSequence message = mWord + " ausgewählt.";
-//                int duration = Toast.LENGTH_SHORT;
-//
-//                Toast toast = Toast.makeText(context, message, duration);
-//                toast.setGravity(Gravity.TOP, 0, 0);
-//                toast.show();
-
                 // Mike's server stuff
                 // Use of an anonymous class is done for sample code simplicity. {@code AsyncTasks} should be
                 // static-inner or top-level classes to prevent memory leak issues.
@@ -175,7 +173,10 @@ public class ReadArticleActivity extends AppCompatActivity {
                                 final TextView readingDictionary = (TextView) findViewById(R.id.definition_box);
                                 if (definition != null) {
                                     currentDefinition = definition.getMessage();
-                                    String definitionResult = "Definition: " + mWord + "\n" + "1. " + currentDefinition;
+                                    // TODO: Display the word looked up right away,
+                                    // TODO: without waiting for definition from backend to arrive
+                                    String definitionResult = "Word looked up: " + mWord + "\n";
+                                    definitionResult = definitionResult + "English translation: " + currentDefinition;
                                     readingDictionary.setText(definitionResult);
                                 } else {
                                     readingDictionary.setText("");
@@ -186,17 +187,11 @@ public class ReadArticleActivity extends AppCompatActivity {
 
                 getAndDisplayDefinition.execute(mWord);
                 Log.d("lookup", mWord);
+
+                // Update data collection structures
                 if (mWord != null) {
                     UserData.addWord(mWord);
                 }
-
-                // Update data collection structures
-                // TODO: Use only one structure to collect this per user
-//                DisplayVocabularyActivity.addWordToUserDictionary(mWord);
-//                StartActivity.currentUser.addToDictionary(mWord);
-//                currentUserData.addWord(mWord);
-//                UserData.addWord(mWord);
-
             }
 
             public void updateDrawState(TextPaint ds) {
@@ -243,10 +238,10 @@ public class ReadArticleActivity extends AppCompatActivity {
         Log.d("Scroll Y", Integer.toString(articleView.getScrollY()));
         currentPosition = articleView.getScrollY();
 
+        // updates user data with time spent
         Long endTime = System.currentTimeMillis();
         Long timeSpent = endTime - startTime;
-        // TODO: Update user data with timeSpent
-
+        UserData.setTimeSpentOnArticle(currentArticle, timeSpent);
     }
 
     protected void OnResume() {

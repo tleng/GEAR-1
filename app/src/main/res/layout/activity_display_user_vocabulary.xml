@@ -1,31 +1,37 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.mattmellor.gear.DisplayVocabularyActivity">
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#fff"
+    android:weightSum="1">
+
+    <include android:id="@+id/app_toolbar"
+        layout="@layout/app_toolbar"/>
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Vocab"
-        android:id="@+id/textView3"
+        android:text="Words you looked up:"
+        android:id="@+id/vocabularyTitle"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:paddingBottom="10dp" />
+        android:padding="10dp"
+        android:textStyle="bold" />
 
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Loading Personal Vocab..."
-        android:id="@+id/textView4"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentLeft="true"
+        android:text=""
+        android:id="@+id/vocabularyData"
+        android:layout_weight="1.08"
+        android:padding="10dp"/>
 
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="false" />
-</RelativeLayout>
+
+</LinearLayout>
+

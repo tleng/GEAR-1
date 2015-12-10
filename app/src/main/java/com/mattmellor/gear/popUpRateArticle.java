@@ -8,6 +8,7 @@ import android.widget.Button;
 
 /**
  *  TODO: Implement and track user ratings of articles
+ *  TODO: Make as popup at the end of reading an article
  */
 public class popUpRateArticle extends Activity {
 
@@ -56,13 +57,9 @@ public class popUpRateArticle extends Activity {
     }
 
 
-
-
     public void rateArticle(View view) {
         finish();
     }
-
-
 
 
 }

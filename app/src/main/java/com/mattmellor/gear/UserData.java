@@ -6,6 +6,8 @@ import java.util.Map;
 
 /**
  * Class to store data associated with user behavior
+ * TODO: Make this non-static, and make UserDataCollection static,
+ * TODO: but this first requires implementing user login
  */
 public class UserData {
 
@@ -22,8 +24,10 @@ public class UserData {
 
     // Stores total time user spent on each article
     // TODO: Update this when article is opened and closed
-    private final Map<String, Long> articleTime = new HashMap<String, Long>();
+    private static final Map<String, Long> articleTime = new HashMap<String, Long>();
 
+
+    // TODO: Create data structure representing inferred user vocabulary
 
     public UserData(String userId) {
         this.userId = userId;
@@ -46,6 +50,8 @@ public class UserData {
      */
     public static void addWord(String word){
         String wordLowerCase = word.toLowerCase();
+
+        // update WordLookup data if user looks up word a second time
         if (wordsLookedUp.containsKey(wordLowerCase)){
             wordsLookedUp.get(wordLowerCase).update();
         }
@@ -61,8 +67,8 @@ public class UserData {
      * @param article name of the article
      * @param timeSpent total time user spent in session on article
      */
-    public void setTimeSpentOnArticle(String article, Long timeSpent) {
-        // TODO
+    public static void setTimeSpentOnArticle(String article, Long timeSpent) {
+        articleTime.put(article, timeSpent);
     }
 
     /**
