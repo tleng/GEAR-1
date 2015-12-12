@@ -22,9 +22,12 @@ import android.widget.Toast;
 import com.appspot.backendgear_1121.gear.Gear;
 import com.appspot.backendgear_1121.gear.model.GearBackendDefinition;
 
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.BreakIterator;
+import java.util.HashMap;
 import java.util.Locale;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
@@ -196,6 +199,16 @@ public class ReadArticleActivity extends AppCompatActivity {
                 Log.d("lookup", mWord);
                 // Update data collection structures
                 if (mWord != null) {
+                    DataStorage dataStorage = new DataStorage(getApplicationContext());
+                    try {
+                        dataStorage.addToJSONDictionary(mWord);
+                        HashMap<String, Integer> map = dataStorage.loadJSONDictionary();
+                        Log.d("Dictionary",map.toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     UserDataCollection.addWord(mWord);
                 }
             }

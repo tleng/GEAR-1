@@ -19,22 +19,15 @@ android {
         }
     }
     sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/assets'] } }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 dependencies {
+    compile 'com.android.support:multidex:1.0.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.android.support:design:23.1.0'
@@ -44,4 +37,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-identity:8.1.0'
     compile 'com.google.android.gms:play-services-gcm:8.1.0'
     compile project(':gear')
+    compile 'com.google.code.gson:gson:2.2.4'
 }
