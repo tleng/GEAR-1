@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#fff"
-    android:weightSum="1">
+    android:background="#fff">
 
     <include android:id="@+id/app_toolbar"
         layout="@layout/app_toolbar"/>
@@ -23,14 +22,26 @@
         android:padding="10dp"
         android:textStyle="bold" />
 
-    <TextView
+
+    <ScrollView
+        android:id="@+id/SCROLLER_ID"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text=""
-        android:id="@+id/vocabularyData"
-        android:layout_weight="1.08"
-        android:padding="10dp"/>
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:fillViewport="false"
+        android:layout_below="@+id/definition_box"
+        android:layout_margin="10dp"
+        android:background="#fff">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text=""
+            android:id="@+id/vocabularyData"
+            android:padding="10dp"/>
+    </ScrollView>
+    <!--android:textAppearance="?android:attr/textApLinearLayoute"-->
 
 
 </LinearLayout>

@@ -17,7 +17,9 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        // TODO: Add feature to let users 'login', or input his/her username
+        // login with dummy user
+        String defaultUserName = "defaultUser";
+        UserDataCollection.login(defaultUserName);
     }
 
     @Override
@@ -26,8 +28,6 @@ public class StartActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_start, menu);
         return true;
     }
-
-
 
     /**
      * Go to overview page to select among all stories
@@ -53,6 +53,19 @@ public class StartActivity extends AppCompatActivity {
         startActivity(new Intent(StartActivity.this, DisplayVocabularyActivity.class));
     }
 
+
+    /**
+     * TODO: this method of creating a popup is based on how popUpRateArticle was
+     * TODO: written, but not sure if this is the recommended way?
+     * Create login popup
+     * @param view
+     */
+    public void goToLoginOnClick(View view){
+        startActivity(new Intent(StartActivity.this, LoginPopupActivity.class));
+    }
+
+
+//    // In the future, let users specify user settings
 //    public void goToUserSettingsOnClick(View view){
 //        startActivity(new Intent(StartActivity.this, userSettings.class));
 //    }
@@ -72,3 +85,4 @@ public class StartActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
+

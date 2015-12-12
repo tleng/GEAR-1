@@ -1,71 +1,106 @@
 package com.mattmellor.gear;
 
-import android.content.Context;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.TextView;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 /*
  * Class to store data from all users that use the application
- * TODO: Update later once we have created input of user ID
- * For now, UserData is made static
  */
 
-//public class UserDataCollection{
-//
-//    private Context context;
-//
-//    // Stores data from all different users using the application
-//    public static HashMap<String, UserData> allUserData = new HashMap<String, UserData>();
-//
-//    public UserDataCollection(Context context) {
-//        context = context;
-//    }
-//
-//
-//    public static void addUser(UserData userData) {
-//        allUserData.put(userData.getUserId(), userData);
-//    }
-//
-//    public static UserData getUserData(String userID) {
-//        return allUserData.get(userID);
-//    }
+public class UserDataCollection {
+
+    // Tracks who is currently logged in
+    private static String currentUser;
+
+    // Stores data from all different users using the application
+    public static HashMap<String, UserData> allUserData = new HashMap<String, UserData>();
 
 
-//    public static void addRating(String article, String userId, int rating){
-////        UserData toTest = new UserData(Integer.parseInt(userId), article);
-//        for(UserData data: allUserData){
-//
-//            if (toTest.equals(data)){
-//                data.rate(rating);
-//            }
-//
-//
-//
-//        }
-//    }
+    public static void login(String user) {
+        if (!allUserData.keySet().contains(user)) {
+            allUserData.put(user, new UserData(user));
+        }
+        currentUser = user;
+    }
 
-//    public static Set<UserData> getAllUserData() {
-//        Set<UserData> copyOfData = new HashSet<UserData>();
-//        for (UserData data : allUserData) {
-//            copyOfData.add(data);
-//        }
-//        return copyOfData;
-//    }
+    /**
+     *
+     * @param userData
+     */
+    public static void addUser(UserData userData) {
+        allUserData.put(userData.getUserId(), userData);
+    }
 
+    /**
+     * Gets all data associated with a given user
+     * @param userID the user to retrieve data for
+     * @return UserData instance for specified user
+     */
+    public static UserData getUserData(String userID) {
+        return allUserData.get(userID);
+    }
 
+    /**
+     * Specifies who the current user is
+     * @param name the username of the user to set
+     */
+    public static void setCurrentUser(String name) {
+        currentUser = name;
+    }
 
+    /**
+     * Stores a  rating from the current user for a specified article
+     * @param article the article being rated
+     * @param rating  the rating given to the article
+     */
+    public static void addRating(String article, int rating) {
+        UserData user = allUserData.get(currentUser);
+        user.rateArticle(article, rating);
+    }
+
+    /**
+     * Adds a word that was looked up to the current user UserData instance
+     * @param word the word that was looked up
+     */
+    public static void addWord(String word) {
+        UserData user = allUserData.get(currentUser);
+        user.addWord(word);
+    }
+
+    /**
+     * Sets the amount time the current user spent on a specified article
+     * @param article article user read
+     * @param time time user spent on article
+     */
+    public static void setTimeSpentOnArticle(String article, Long time) {
+        UserData user = allUserData.get(currentUser);
+        user.setTimeSpentOnArticle(article, time);
+    }
+
+    /**
+     * Returns a set of all user data
+     * @return a set of all UserData instances
+     */
+    public static Set<UserData> getAllUserData() {
+        Set<UserData> copyOfData = new HashSet<UserData>();
+        for (UserData data : allUserData.values()) {
+            copyOfData.add(data);
+        }
+        return copyOfData;
+    }
+
+    /**
+     * Gets vocabulary of current user
+     * @return a map of word to WordLookup instances for the current user
+     */
+
+    public static HashMap<String, WordLookup> getCurrentVocabulary() {
+        UserData user = allUserData.get(currentUser);
+        return user.getWordsLookedUp();
+    }
+}
 
 //    public void writeToFile(String filename) throws IOException {
 //
@@ -95,13 +130,8 @@ import java.util.Set;
 //
 //        }
 //
-//
 //        FileWriter fw = new FileWriter(file.getAbsoluteFile()); // how do I make sure that the file is not overwritten? or maybe I'm ok with it being overwritten
 //        BufferedWriter bw = new BufferedWriter(fw);
 //        bw.write(content);
 //        bw.close();
-
 //    }
-
-
-//}

@@ -25,8 +25,6 @@ import com.appspot.backendgear_1121.gear.model.GearBackendDefinition;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.BreakIterator;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
@@ -143,6 +141,14 @@ public class ReadArticleActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View widget) {
+                Log.d("tapped on:", mWord);
+                Context context = getApplicationContext();
+                CharSequence message = mWord + " ausgewählt.";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, message, duration);
+                toast.setGravity(Gravity.TOP, 0, 0);
+                toast.show();
                 // Mike's server stuff
                 // Use of an anonymous class is done for sample code simplicity. {@code AsyncTasks} should be
                 // static-inner or top-level classes to prevent memory leak issues.
@@ -185,12 +191,12 @@ public class ReadArticleActivity extends AppCompatActivity {
                             }
                         };
 
+
                 getAndDisplayDefinition.execute(mWord);
                 Log.d("lookup", mWord);
-
                 // Update data collection structures
                 if (mWord != null) {
-                    UserData.addWord(mWord);
+                    UserDataCollection.addWord(mWord);
                 }
             }
 
@@ -241,7 +247,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         // updates user data with time spent
         Long endTime = System.currentTimeMillis();
         Long timeSpent = endTime - startTime;
-        UserData.setTimeSpentOnArticle(currentArticle, timeSpent);
+        UserDataCollection.setTimeSpentOnArticle(currentArticle, timeSpent);
     }
 
     protected void OnResume() {
