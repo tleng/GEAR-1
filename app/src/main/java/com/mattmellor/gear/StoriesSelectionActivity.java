@@ -7,15 +7,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import static com.mattmellor.gear.R.id.app_article_bar;
+
 /**
  * Activity where user can browse and select which story to read
  */
 public class StoriesSelectionActivity extends AppCompatActivity {
 
+    private android.support.v7.widget.Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stories_selection);
+        toolbar = (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
+        setSupportActionBar(toolbar);
+
         // TODO: Make this dynamically read articles in folder and
         // create buttons, like in stories selection, instead of hardcoding
     }
@@ -24,8 +31,7 @@ public class StoriesSelectionActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 
-        // TODO: make sure this shows menu
-        getMenuInflater().inflate(R.menu.menu_stories_selection, menu);
+        getMenuInflater().inflate(R.menu.menu_stories_suggestion_and_selection, menu);
         return true;
     }
 

@@ -1,30 +1,29 @@
 package com.mattmellor.gear;
 
+import android.util.Log;
+
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Class to store data associated with user behavior
- * TODO: Make this non-static, and make UserDataCollection static,
- * TODO: but this first requires implementing user login
  */
 public class UserData {
 
     // Identifies unique users
-    private final String userId;
+    private String userId;
 
     // Store all words looked up by the user along with associated data
     // Associated data such as when the word is looked up, # times looked up, etc.
     // is stored in the WordLookup structure
-    private static final HashMap<String, WordLookup> wordsLookedUp = new HashMap<String, WordLookup>();
+    private final HashMap<String, WordLookup> wordsLookedUp = new HashMap<String, WordLookup>();
 
     // Stores user ratings of different articles
-    private static final HashMap<String, Integer> articleRatings = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> articleRatings = new HashMap<String, Integer>();
 
     // Stores total time user spent on each article
-    // TODO: Update this when article is opened and closed
-    private static final Map<String, Long> articleTime = new HashMap<String, Long>();
+    private final Map<String, Long> articleTime = new HashMap<String, Long>();
 
 
     // TODO: Create data structure representing inferred user vocabulary
@@ -48,7 +47,7 @@ public class UserData {
      * Acts on user lookup of a word
      * @param word the word the user looked up
      */
-    public static void addWord(String word){
+    public void addWord(String word){
         String wordLowerCase = word.toLowerCase();
 
         // update WordLookup data if user looks up word a second time
@@ -67,7 +66,7 @@ public class UserData {
      * @param article name of the article
      * @param timeSpent total time user spent in session on article
      */
-    public static void setTimeSpentOnArticle(String article, Long timeSpent) {
+    public void setTimeSpentOnArticle(String article, Long timeSpent) {
         articleTime.put(article, timeSpent);
     }
 
@@ -83,9 +82,27 @@ public class UserData {
      * Getter method for wordsLookedUp
      * @return
      */
-    public static HashMap<String, WordLookup> getWordsLookedUp() {
+    public HashMap<String, WordLookup> getWordsLookedUp() {
         return wordsLookedUp;
     }
+
+
+    /**
+     *
+     * @param name
+     */
+    public void setUserName(String name) {
+        Log.i("userdata", "Set username to " + name);
+        userId = name;
+    }
+
+
+    @Override
+    public int hashCode(){
+        return this.userId.hashCode();
+    }
+
+
 
 //    Not sure if logic of this equals method is correct?
 //    @Override
@@ -105,10 +122,6 @@ public class UserData {
 //        }
 //    }
 
-    @Override
-    public int hashCode(){
-        return this.userId.hashCode();
-    }
 
 //    @Override
 //    public String toString(){
@@ -124,8 +137,5 @@ public class UserData {
 //
 //        return outputString;
 //    }
-
-
-
 
 }

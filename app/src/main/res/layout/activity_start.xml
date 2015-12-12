@@ -38,8 +38,16 @@
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/textView2">
-    <!--android:padding="10dp">-->
 
+        <Button
+            android:layout_width="133dp"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:id="@+id/loginButton"
+            android:onClick="goToLoginOnClick"
+            android:layout_gravity="center_horizontal"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="10dp" />
 
 
         <LinearLayout
@@ -139,6 +147,7 @@
                 android:layout_alignStart="@+id/button2"
                 android:layout_gravity="center_vertical"/>
         </LinearLayout>
+
     </LinearLayout>
 
 

@@ -1,5 +1,6 @@
 package com.mattmellor.gear;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
@@ -10,11 +11,13 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appspot.backendgear_1121.gear.Gear;
 import com.appspot.backendgear_1121.gear.model.GearBackendDefinition;
@@ -141,6 +144,14 @@ public class ReadArticleActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View widget) {
+                Log.d("tapped on:", mWord);
+                Context context = getApplicationContext();
+                CharSequence message = mWord + " ausgewählt.";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, message, duration);
+                toast.setGravity(Gravity.TOP, 0, 0);
+                toast.show();
                 // Mike's server stuff
                 // Use of an anonymous class is done for sample code simplicity. {@code AsyncTasks} should be
                 // static-inner or top-level classes to prevent memory leak issues.
@@ -183,12 +194,11 @@ public class ReadArticleActivity extends AppCompatActivity {
                             }
                         };
 
+
                 getAndDisplayDefinition.execute(mWord);
                 Log.d("lookup", mWord);
-
                 // Update data collection structures
                 if (mWord != null) {
-                    UserData.addWord(mWord);
                     DataStorage dataStorage = new DataStorage(getApplicationContext());
                     try {
                         dataStorage.addToJSONDictionary(mWord);
@@ -199,6 +209,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    UserDataCollection.addWord(mWord);
                 }
             }
 
@@ -249,7 +260,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         // updates user data with time spent
         Long endTime = System.currentTimeMillis();
         Long timeSpent = endTime - startTime;
-        UserData.setTimeSpentOnArticle(currentArticle, timeSpent);
+        UserDataCollection.setTimeSpentOnArticle(currentArticle, timeSpent);
     }
 
     protected void OnResume() {

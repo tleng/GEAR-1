@@ -8,11 +8,8 @@ import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.Toolbar;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,11 +41,23 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
         toolbar = (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
         setSupportActionBar(toolbar);
 
-        // Getting rid of title for the action bar
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        generateRecommendationButtons();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+
+        getMenuInflater().inflate(R.menu.menu_stories_suggestion_and_selection, menu);
+        return true;
+    }
 
 
-        // TODO: Move code to generate buttons for recommendations into separate method for modularity
+    /**
+     * Gets recommended stories and adds buttons for each story to the view
+     */
+    private void generateRecommendationButtons() {
         List<String> articles = recommendKArticles(num_recommended_articles);
 
         // adjust linear layout to display articles in
@@ -75,15 +84,6 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
             ll.addView(myButton, lp);
             Log.d("number of buttons:", Integer.toString(ll.getChildCount()));
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-
-        // TODO: make sure this shows menu
-        getMenuInflater().inflate(R.menu.menu_stories_suggestion_and_selection, menu);
-        return true;
     }
 
     // TODO: replace with either recommendation from backend (needs
@@ -151,7 +151,7 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
      * @return
      */
     private Double getFractionOfWords(String article) {
-        HashMap<String, WordLookup> userVocab = UserData.getWordsLookedUp();
+        HashMap<String, WordLookup> userVocab = UserDataCollection.getCurrentVocabulary();
 
         InputStream input;
         String text = article;

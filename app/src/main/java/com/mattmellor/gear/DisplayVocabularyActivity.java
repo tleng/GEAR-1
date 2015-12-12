@@ -28,7 +28,7 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_overall_user_vocab, menu);
+        getMenuInflater().inflate(R.menu.menu_stories_suggestion_and_selection, menu);
         return true;
     }
 
@@ -48,11 +48,12 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
 
 
     /**
+     * TODO: Determine meaningful way to display vocabulary – what does user want?
      * Turns user vocabulary into string representation for display
      * @return string to display
      */
     private String getVocabularyString() {
-        Map<String, WordLookup> vocabulary = UserData.getWordsLookedUp();
+        Map<String, WordLookup> vocabulary = UserDataCollection.getCurrentVocabulary();
 
         String vocabString = "";
         if (vocabulary.isEmpty()) {
@@ -61,7 +62,7 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
 
         // list vocabulary words
         for (String key:vocabulary.keySet()) {
-            vocabString += key + "\n";
+            vocabString += key + ": " + vocabulary.get(key).getTimesLookedUp() + "\n";
         }
         return vocabString;
     }
