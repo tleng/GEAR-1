@@ -1,6 +1,5 @@
 package com.mattmellor.gear;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
@@ -11,22 +10,21 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appspot.backendgear_1121.gear.Gear;
 import com.appspot.backendgear_1121.gear.model.GearBackendDefinition;
 
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.BreakIterator;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
@@ -191,6 +189,16 @@ public class ReadArticleActivity extends AppCompatActivity {
                 // Update data collection structures
                 if (mWord != null) {
                     UserData.addWord(mWord);
+                    DataStorage dataStorage = new DataStorage(getApplicationContext());
+                    try {
+                        dataStorage.addToJSONDictionary(mWord);
+                        HashMap<String, Integer> map = dataStorage.loadJSONDictionary();
+                        Log.d("Dictionary",map.toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
