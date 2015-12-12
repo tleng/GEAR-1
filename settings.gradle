@@ -1,1 +1,1 @@
-include ':gear', ':app'
+include ':app', ':gear'
