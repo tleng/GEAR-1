@@ -40,8 +40,8 @@ public class DataStorage {
         return json;
     }
 
-    public HashMap<String, Integer> loadJSONDictionary() throws IOException {
-        HashMap<String,Integer> map = new HashMap<String, Integer>();
+    public HashMap<String, WordLookup> loadJSONDictionary() throws IOException {
+        HashMap<String, WordLookup> map = new HashMap<String, WordLookup>();
         try {
 
             InputStream in = context.openFileInput(USERDICTIONARY);
@@ -57,7 +57,7 @@ public class DataStorage {
 
                 in.close();
                 Log.d("Saved File", buf.toString());
-                map = new Gson().fromJson(buf.toString(), new TypeToken<HashMap<String, Integer>>() {
+                map = new Gson().fromJson(buf.toString(), new TypeToken<HashMap<String, WordLookup>>() {
                 }.getType());
                 Log.d("SaveFile",map.toString());
             }
@@ -73,13 +73,9 @@ public class DataStorage {
     }
 
     public void addToJSONDictionary(String word) throws JSONException, IOException {
-        HashMap<String, Integer> dictionary = loadJSONDictionary();
+        HashMap<String, WordLookup> dictionary = loadJSONDictionary();
         Log.d("File", dictionary.toString());
-        if (dictionary.containsKey(word)) {
-            dictionary.put(word,dictionary.get(word)+1);
-        } else {
-            dictionary.put(word,1);
-        }
+        dictionary.put(word,UserDataCollection.getCurrentVocabulary().get(word));
         Gson gson = new Gson();
         String json = gson.toJson(dictionary);
         OutputStreamWriter out=

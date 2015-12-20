@@ -218,17 +218,17 @@ public class ReadArticleActivity extends AppCompatActivity {
     private void updateDataStorage(String word, String definition, String lemma) {
         // Update data collection structures
         if (word != null) {
+            UserDataCollection.addWord(word, definition, lemma);
             DataStorage dataStorage = new DataStorage(getApplicationContext());
             try {
                 dataStorage.addToJSONDictionary(word);
-                HashMap<String, Integer> map = dataStorage.loadJSONDictionary();
+                HashMap<String, WordLookup> map = dataStorage.loadJSONDictionary();
                 Log.d("Dictionary",map.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            UserDataCollection.addWord(word, definition, lemma);
         }
     }
 
