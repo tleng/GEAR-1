@@ -1,7 +1,7 @@
 package com.mattmellor.gear;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -53,7 +53,8 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
      * @return string to display
      */
     private String getVocabularyString() {
-        Map<String, WordLookup> vocabulary = UserDataCollection.getCurrentVocabulary();
+        DataStorage dataStorage = new DataStorage(getApplicationContext());
+        HashMap<String, WordLookup> vocabulary = dataStorage.loadJSONDictionary();
 
         String vocabString = "";
         if (vocabulary.isEmpty()) {

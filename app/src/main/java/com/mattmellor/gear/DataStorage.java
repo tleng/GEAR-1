@@ -40,7 +40,7 @@ public class DataStorage {
         return json;
     }
 
-    public HashMap<String, WordLookup> loadJSONDictionary() throws IOException {
+    public HashMap<String, WordLookup> loadJSONDictionary() {
         HashMap<String, WordLookup> map = new HashMap<String, WordLookup>();
         try {
 
@@ -67,7 +67,9 @@ public class DataStorage {
 
         } catch (Throwable t) {
 
-        } finally {
+        }
+
+        finally {
             return map;
         }
     }
