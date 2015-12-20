@@ -1,11 +1,17 @@
 package com.mattmellor.gear;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+
+import java.io.IOException;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
 
@@ -22,6 +28,11 @@ public class StoriesSelectionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_stories_selection);
         toolbar = (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
         setSupportActionBar(toolbar);
+        try {
+            generateRecommendationButtons();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // TODO: Make this dynamically read articles in folder and
         // create buttons, like in stories selection, instead of hardcoding
@@ -50,14 +61,54 @@ public class StoriesSelectionActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Starts the ReadArticleActivity for the selected story
-     * @param view
-     */
-    public void openStory(View view){
-        Intent intent = new Intent(StoriesSelectionActivity.this, ReadArticleActivity.class);
-        intent.putExtra("story", (String) view.getTag());
-        startActivity(intent);
-        finish();
+//    /**
+//     * Starts the ReadArticleActivity for the selected story
+//     * @param view
+//     */
+//    public void openStory(View view){
+//        Intent intent = new Intent(StoriesSelectionActivity.this, ReadArticleActivity.class);
+//        intent.putExtra("story", (String) view.getTag());
+//        startActivity(intent);
+//        finish();
+//    }
+
+    View.OnClickListener getOnClickSetStory(final Button button)  {
+        return new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(StoriesSelectionActivity.this, ReadArticleActivity.class);
+                intent.putExtra("story",button.getContentDescription());
+                startActivity(intent);
+                finish();
+            }
+        };
+    }
+
+    private void generateRecommendationButtons() throws IOException {
+        String [] articles = getAssets().list("");
+
+        // adjust linear layout to display articles in
+        LinearLayout ll = (LinearLayout) findViewById(R.id.allStoriesLinearLayout);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        ll.setOrientation(LinearLayout.VERTICAL);
+
+
+        // StackOverflow suggested code to dynamically create buttons for the articles
+        for (String article:articles) {
+            if (article.equals("images") || article.equals("sounds") || article.equals("webkit")|| article.equals("pskc_schema.xsd")) {
+                continue;
+            }
+            Button myButton = new Button(this);
+            myButton.setText(Html.fromHtml(article));
+            myButton.setContentDescription(article);
+            myButton.setHeight(30);
+            myButton.setTransformationMethod(null); // ensures text is lower case
+
+            Log.d("button added:", myButton.toString());
+            myButton.setOnClickListener(getOnClickSetStory(myButton));
+
+            ll.addView(myButton, lp);
+            Log.d("number of buttons:", Integer.toString(ll.getChildCount()));
+        }
     }
 }

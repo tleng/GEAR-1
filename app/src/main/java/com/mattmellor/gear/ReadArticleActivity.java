@@ -153,10 +153,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 Toast toast = Toast.makeText(context, message, duration);
                 toast.setGravity(Gravity.TOP, 0, 0);
                 toast.show();
-                // Mike's server stuff
-                // Use of an anonymous class is done for sample code simplicity. {@code AsyncTasks} should be
-                // static-inner or top-level classes to prevent memory leak issues.
-                // @see http://goo.gl/fN1fuE @26:00 for a great explanation.
+
                 AsyncTask<String, Void, GearBackendDefinition> getAndDisplayDefinition =
                         new AsyncTask<String, Void, GearBackendDefinition>() {
 
