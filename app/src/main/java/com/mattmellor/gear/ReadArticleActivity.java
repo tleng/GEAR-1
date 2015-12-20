@@ -40,6 +40,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     private android.support.v7.widget.Toolbar toolbar;
 
     private String currentDefinition = "No definition";
+    private String currentLemma = "None";
     private Integer currentPosition = 0;
 
     private Long startTime;
@@ -181,12 +182,15 @@ public class ReadArticleActivity extends AppCompatActivity {
                             protected void onPostExecute(GearBackendDefinition definition) {
                                 final TextView readingDictionary = (TextView) findViewById(R.id.definition_box);
                                 if (definition != null) {
-                                    currentDefinition = definition.getMessage();
-                                    // TODO: Display the word looked up right away,
-                                    // TODO: without waiting for definition from backend to arrive
+                                    String[] response = definition.getMessage().split("\\+\\+");
+                                    currentDefinition = response[0];
+                                    currentLemma = response[1];
+                                    Log.d("serverResponse", response.toString());
                                     String definitionResult = "Word looked up: " + mWord + "\n";
                                     definitionResult = definitionResult + "English translation: " + currentDefinition;
                                     readingDictionary.setText(definitionResult);
+
+                                    updateDataStorage(mWord, currentDefinition, currentLemma);
                                 } else {
                                     readingDictionary.setText("");
                                     Log.e("Uh Oh", "No definitions were returned by the API.");
@@ -194,23 +198,8 @@ public class ReadArticleActivity extends AppCompatActivity {
                             }
                         };
 
-
                 getAndDisplayDefinition.execute(mWord);
                 Log.d("lookup", mWord);
-                // Update data collection structures
-                if (mWord != null) {
-                    DataStorage dataStorage = new DataStorage(getApplicationContext());
-                    try {
-                        dataStorage.addToJSONDictionary(mWord);
-                        HashMap<String, Integer> map = dataStorage.loadJSONDictionary();
-                        Log.d("Dictionary",map.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    UserDataCollection.addWord(mWord);
-                }
             }
 
             public void updateDrawState(TextPaint ds) {
@@ -220,6 +209,28 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Stores relevant data
+     * @param word
+     * @param definition
+     * @param lemma
+     */
+    private void updateDataStorage(String word, String definition, String lemma) {
+        // Update data collection structures
+        if (word != null) {
+            DataStorage dataStorage = new DataStorage(getApplicationContext());
+            try {
+                dataStorage.addToJSONDictionary(word);
+                HashMap<String, Integer> map = dataStorage.loadJSONDictionary();
+                Log.d("Dictionary",map.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            UserDataCollection.addWord(word, definition, lemma);
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

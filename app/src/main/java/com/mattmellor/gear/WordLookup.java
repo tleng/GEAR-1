@@ -1,5 +1,7 @@
 package com.mattmellor.gear;
 
+import android.util.Log;
+
 import java.util.HashSet;
 
 /**
@@ -11,13 +13,24 @@ public class WordLookup {
     // the word user looked up
     private final String word;
 
+    private final String definition;
+    private final String lemma;
+
     // stores the times the user looked up the word
-    private final HashSet<Long> timestamps;
+    private final HashSet<Long> timestamps = new HashSet<Long>();;
 
-    public WordLookup(String word) {
+    /**
+     * CONSTRUCTOR
+     * @param word the word looked up
+     * @param definition the English translation of the word
+     * @param lemma the German lemma of the word
+     */
+    public WordLookup(String word, String definition, String lemma) {
         this.word = word;
-        timestamps = new HashSet<Long>();
-
+        this.definition = definition;
+        this.lemma = lemma;
+        timestamps.add(System.currentTimeMillis());
+        Log.d("wordlookup", "Created WordLookup for " + word + " " + definition + " " + lemma);
     }
 
     /**
@@ -32,6 +45,14 @@ public class WordLookup {
      */
     public String getWord() {
         return word;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getLemma() {
+        return lemma;
     }
 
     /**

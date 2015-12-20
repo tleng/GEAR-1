@@ -61,8 +61,10 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
         }
 
         // list vocabulary words
-        for (String key:vocabulary.keySet()) {
-            vocabString += key + ": " + vocabulary.get(key).getTimesLookedUp() + "\n";
+        for (Map.Entry<String, WordLookup> entry : vocabulary.entrySet()) {
+            String key = entry.getKey();
+            WordLookup word = entry.getValue();
+            vocabString += key + ": " + word.getLemma() + " - " + word.getTimesLookedUp() + "\n";
         }
         return vocabString;
     }

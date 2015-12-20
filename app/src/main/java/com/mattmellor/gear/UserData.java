@@ -47,7 +47,7 @@ public class UserData {
      * Acts on user lookup of a word
      * @param word the word the user looked up
      */
-    public void addWord(String word){
+    public void addWord(String word, String definition, String lemma){
         String wordLowerCase = word.toLowerCase();
 
         // update WordLookup data if user looks up word a second time
@@ -55,7 +55,7 @@ public class UserData {
             wordsLookedUp.get(wordLowerCase).update();
         }
         else {
-            wordsLookedUp.put(wordLowerCase, new WordLookup(wordLowerCase));
+            wordsLookedUp.put(wordLowerCase, new WordLookup(wordLowerCase, definition, lemma));
         }
     }
 
@@ -104,38 +104,15 @@ public class UserData {
 
 
 
-//    Not sure if logic of this equals method is correct?
 //    @Override
 //    public boolean equals(Object thatObject){
-//        if(thatObject instanceof UserData){
-//            return false;
-//        }
-//
-//        else{
-//            UserData that = (UserData) thatObject;
-//            if(this.userId == that.userId && this.articleTitle.equals(that.articleTitle)){
-//                return true;
-//            }
-//            else{
-//                return false;
-//            }
-//        }
+//      TODO
 //    }
 
 
 //    @Override
-//    public String toString(){
-//        String words = "[";
-//        for(String word: wordsLookedUp.keySet()){
-//            words += word + " : " +wordsLookedUp.get(word)+",";
-//        }
-//        words += "]";
-//
-//        String outputString = "[ USER : " + userId + ", " + "article title : " + articleTitle +", "
-//                + "startTime : " + startTime +", " + "exit : " + exitTime + ", "
-//                + "words : " + words + " ]";
-//
-//        return outputString;
+//    public String toString() {
+//      TODO
 //    }
 
 }

@@ -64,9 +64,9 @@ public class UserDataCollection {
      * Adds a word that was looked up to the current user UserData instance
      * @param word the word that was looked up
      */
-    public static void addWord(String word) {
+    public static void addWord(String word, String definition, String lemma) {
         UserData user = allUserData.get(currentUser);
-        user.addWord(word);
+        user.addWord(word, definition, lemma);
     }
 
     /**
@@ -102,36 +102,3 @@ public class UserDataCollection {
     }
 }
 
-//    public void writeToFile(String filename) throws IOException {
-//
-//
-//        String content = "";
-//        for (UserData userData : getAllUserData()) {
-//            content += userData.toString() + ", "; // might want to and a new line
-//        }
-//
-//        String string = "Hello world!";
-//        FileOutputStream outputStream;
-//
-//        try {
-//            outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-//            outputStream.write(content.getBytes());
-//            outputStream.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        Context context = getApplicationContext();
-//
-//        File file = new File(context.getFilesDir(), filename); // need to add some relative path
-//
-//        // if file doesnt exists, then create it
-//        if (!file.exists()) {
-//            file.createNewFile();
-//
-//        }
-//
-//        FileWriter fw = new FileWriter(file.getAbsoluteFile()); // how do I make sure that the file is not overwritten? or maybe I'm ok with it being overwritten
-//        BufferedWriter bw = new BufferedWriter(fw);
-//        bw.write(content);
-//        bw.close();
-//    }
