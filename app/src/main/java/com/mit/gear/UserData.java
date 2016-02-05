@@ -1,8 +1,7 @@
-package com.mattmellor.gear;
+package com.mit.gear;
 
 import android.util.Log;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 

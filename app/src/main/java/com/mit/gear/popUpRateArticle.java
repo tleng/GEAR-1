@@ -1,10 +1,12 @@
-package com.mattmellor.gear;
+package com.mit.gear;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Button;
+
+import com.mattmellor.gear.R;
 
 /**
  *  TODO: Implement and track user ratings of articles

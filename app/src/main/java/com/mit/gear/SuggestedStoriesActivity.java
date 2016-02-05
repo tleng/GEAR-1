@@ -1,4 +1,4 @@
-package com.mattmellor.gear;
+package com.mit.gear;
 
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -10,6 +10,8 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+
+import com.mattmellor.gear.R;
 
 import java.io.IOException;
 import java.io.InputStream;

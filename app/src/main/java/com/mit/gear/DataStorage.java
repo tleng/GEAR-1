@@ -1,4 +1,4 @@
-package com.mattmellor.gear;
+package com.mit.gear;
 
 import android.content.Context;
 import android.content.res.AssetManager;

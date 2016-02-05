@@ -1,14 +1,13 @@
-package com.mattmellor.gear;
+package com.mit.gear;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Spannable;
 import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.Gravity;
@@ -21,14 +20,13 @@ import android.widget.Toast;
 
 import com.appspot.backendgear_1121.gear.Gear;
 import com.appspot.backendgear_1121.gear.model.GearBackendDefinition;
+import com.mattmellor.gear.R;
 
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.BreakIterator;
 import java.util.HashMap;
-import java.util.Locale;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
 
@@ -88,14 +86,19 @@ public class ReadArticleActivity extends AppCompatActivity {
             text = "Error Occurred";
         }
 
+        ViewPager pagesView = (ViewPager) findViewById(R.id.pages);
+        PageSplitter pageSplitter = new PageSplitter(pagesView.getWidth(), pagesView.getHeight(), 1, 0);
 
+        TextPaint textPaint = new TextPaint();
+        textPaint.setTextSize(12);
+        pageSplitter.append(text, textPaint);
+      /*
         // TODO: make this use page swiping instead
         txtContent.setMovementMethod(LinkMovementMethod.getInstance());
         txtContent.setText(text, TextView.BufferType.SPANNABLE);
         Spannable spans = (Spannable) txtContent.getText();
         BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
         iterator.setText(text);
-
         int start = iterator.first();
         for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
                 .next()) {
@@ -105,7 +108,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
-
+*/
     }
 
 //    /**

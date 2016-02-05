@@ -1,4 +1,4 @@
-package com.mattmellor.gear;
+package com.mit.gear;
 
 import com.appspot.backendgear_1121.gear.Gear;
 import com.google.api.client.extensions.android.http.AndroidHttp;

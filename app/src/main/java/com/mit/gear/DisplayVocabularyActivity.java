@@ -1,10 +1,12 @@
-package com.mattmellor.gear;
+package com.mit.gear;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import com.mattmellor.gear.R;
 
 import java.util.HashMap;
 import java.util.Map;
