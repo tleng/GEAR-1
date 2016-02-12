@@ -3,11 +3,11 @@ package com.mit.gear;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Spannable;
 import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.Gravity;
@@ -18,15 +18,15 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.appspot.backendgear_1121.gear.Gear;
-import com.appspot.backendgear_1121.gear.model.GearBackendDefinition;
 import com.mattmellor.gear.R;
 
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.BreakIterator;
 import java.util.HashMap;
+import java.util.Locale;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
 
@@ -35,15 +35,19 @@ import static com.mattmellor.gear.R.id.app_article_bar;
  */
 public class ReadArticleActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "ReadArticleActivity-tag";
+    private static ReadArticleActivity instance;
     private android.support.v7.widget.Toolbar toolbar;
 
-    private String currentDefinition = "No definition";
-    private String currentLemma = "None";
+    public static String currentDefinition = "No definition";
+    public static String currentLemma = "None";
     private Integer currentPosition = 0;
 
     private Long startTime;
     private String currentArticle;
 
+    public ReadArticleActivity() {
+        instance = this;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,14 +90,15 @@ public class ReadArticleActivity extends AppCompatActivity {
             text = "Error Occurred";
         }
 
-        ViewPager pagesView = (ViewPager) findViewById(R.id.pages);
+        txtContent.setText(text);
+        /*ViewPager pagesView = (ViewPager) findViewById(R.id.pages);
         PageSplitter pageSplitter = new PageSplitter(pagesView.getWidth(), pagesView.getHeight(), 1, 0);
 
         TextPaint textPaint = new TextPaint();
         textPaint.setTextSize(12);
         pageSplitter.append(text, textPaint);
-      /*
-        // TODO: make this use page swiping instead
+        */
+
         txtContent.setMovementMethod(LinkMovementMethod.getInstance());
         txtContent.setText(text, TextView.BufferType.SPANNABLE);
         Spannable spans = (Spannable) txtContent.getText();
@@ -108,25 +113,9 @@ public class ReadArticleActivity extends AppCompatActivity {
                 spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
-*/
+
     }
 
-//    /**
-//     * Method that displays the definition retrieved from the back-end.
-//     *
-//     * @param definitions returned from the backend
-//     */
-//    private void displayDefinition(GearBackendDefinition... definitions) {
-//        String msg;
-//        if (definitions == null || definitions.length < 1) {
-//            msg = "Definition was not present";
-//            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-//        } else {
-//            Log.d("Display", "Displaying " + definitions.length + " definition.");
-//            List<GearBackendDefinition> definitionsList = Arrays.asList(definitions);
-//            Toast.makeText(this, definitionsList.get(0).toString(), Toast.LENGTH_LONG).show();
-//        }
-//    }
 
 
     @Override
@@ -157,6 +146,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 toast.setGravity(Gravity.TOP, 0, 0);
                 toast.show();
 
+                /*
                 AsyncTask<String, Void, GearBackendDefinition> getAndDisplayDefinition =
                         new AsyncTask<String, Void, GearBackendDefinition>() {
 
@@ -198,7 +188,10 @@ public class ReadArticleActivity extends AppCompatActivity {
                             }
                         };
 
-                getAndDisplayDefinition.execute(mWord);
+*/
+                //getAndDisplayDefinition.execute(mWord);
+                DefinitionRequest definitionRequest = new DefinitionRequest(mWord);
+                definitionRequest.execute(mWord);
                 Log.d("lookup", mWord);
             }
 
@@ -215,7 +208,7 @@ public class ReadArticleActivity extends AppCompatActivity {
      * @param definition
      * @param lemma
      */
-    private void updateDataStorage(String word, String definition, String lemma) {
+    public void updateDataStorage(String word, String definition, String lemma) {
         // Update data collection structures
         if (word != null) {
             UserDataCollection.addWord(word, definition, lemma);
@@ -278,5 +271,9 @@ public class ReadArticleActivity extends AppCompatActivity {
         super.onResume();
         ScrollView articleView = (ScrollView) findViewById(R.id.SCROLLER_ID);
         articleView.scrollTo(0, currentPosition);
+    }
+
+    public static ReadArticleActivity getReadArticleActivityInstance() {
+        return instance;
     }
 }
