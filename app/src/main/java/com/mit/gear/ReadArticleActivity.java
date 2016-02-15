@@ -4,18 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Spannable;
 import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mattmellor.gear.R;
@@ -24,11 +23,7 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.BreakIterator;
 import java.util.HashMap;
-import java.util.Locale;
-
-import static com.mattmellor.gear.R.id.app_article_bar;
 
 /**
  * Activity where user reads article
@@ -45,6 +40,8 @@ public class ReadArticleActivity extends AppCompatActivity {
     private Long startTime;
     private String currentArticle;
 
+    private ViewPager pagesView;
+
     public ReadArticleActivity() {
         instance = this;
     }
@@ -52,10 +49,43 @@ public class ReadArticleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_read_article);
-        toolbar = (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
+        setContentView(R.layout.pages);
+        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
         setSupportActionBar(toolbar);
 
+        pagesView = (ViewPager) findViewById(R.id.pages);
+        pagesView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                PageSplitter pageSplitter = new PageSplitter(pagesView.getWidth(), pagesView.getHeight(), 1, 0);
+
+                TextPaint textPaint = new TextPaint();
+                textPaint.setTextSize(getResources().getDimension(R.dimen.text_size));
+                AssetManager assetManager = getAssets();
+                String story = "cinderella";
+                InputStream input;
+                String text;
+                try {
+                    input = assetManager.open(story);
+                    int size = input.available();
+                    byte[] buffer = new byte[size];
+                    input.read(buffer);
+                    input.close();
+
+                    // byte buffer into a string
+                    text = new String(buffer).trim();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    text = "Error Occurred";
+                }
+                pageSplitter.append(text, textPaint);
+                pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages()));
+                pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+
+        /*
         // Getting rid of title for the action bar
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -90,15 +120,17 @@ public class ReadArticleActivity extends AppCompatActivity {
             text = "Error Occurred";
         }
 
-        txtContent.setText(text);
-        /*ViewPager pagesView = (ViewPager) findViewById(R.id.pages);
+        //txtContent.setText(text);
+        ViewPager pagesView = (ViewPager) findViewById(R.id.pages);
         PageSplitter pageSplitter = new PageSplitter(pagesView.getWidth(), pagesView.getHeight(), 1, 0);
 
         TextPaint textPaint = new TextPaint();
         textPaint.setTextSize(12);
         pageSplitter.append(text, textPaint);
-        */
-
+        pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages()));
+        pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+*/
+/*
         txtContent.setMovementMethod(LinkMovementMethod.getInstance());
         txtContent.setText(text, TextView.BufferType.SPANNABLE);
         Spannable spans = (Spannable) txtContent.getText();
@@ -113,6 +145,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
+        */
 
     }
 

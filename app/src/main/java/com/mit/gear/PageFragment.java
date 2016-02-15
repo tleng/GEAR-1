@@ -23,7 +23,7 @@ public class PageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         CharSequence text = getArguments().getCharSequence(PAGE_TEXT);
-        TextView pageView = (TextView) inflater.inflate(R.layout.pages, container, false);
+        TextView pageView = (TextView) inflater.inflate(R.layout.page, container, false);
         pageView.setText(text);
         return pageView;
     }
