@@ -53,6 +53,12 @@ public class ReadArticleActivity extends AppCompatActivity {
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
         setSupportActionBar(toolbar);
 
+        // Getting rid of title for the action bar
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        // Log start time for when user opened article
+        startTime = System.currentTimeMillis();
+        
         pagesView = (ViewPager) findViewById(R.id.pages);
         pagesView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -62,7 +68,8 @@ public class ReadArticleActivity extends AppCompatActivity {
                 TextPaint textPaint = new TextPaint();
                 textPaint.setTextSize(getResources().getDimension(R.dimen.text_size));
                 AssetManager assetManager = getAssets();
-                String story = "cinderella";
+                String story = getIntent().getExtras().getString("story");
+                currentArticle = story;
                 InputStream input;
                 String text;
                 try {
