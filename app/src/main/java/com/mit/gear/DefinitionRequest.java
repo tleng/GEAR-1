@@ -44,14 +44,17 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
         final TextView readingDictionary = (TextView) activityInstance.findViewById(R.id.definition_box);
         if (definition != null) {
             String[] response = definition.getMessage().split("\\+\\+");
-            activityInstance.currentDefinition = response[0];
-            activityInstance.currentLemma = response[1];
-            Log.d("serverResponse", response.toString());
-            String definitionResult = "Word looked up: " + mWord + "\n";
-            definitionResult = definitionResult + "English translation: " + activityInstance.currentDefinition;
-            readingDictionary.setText(definitionResult);
+            Log.d("Server Response", response.toString());
+            if (response.length>1) {
+                activityInstance.currentDefinition = response[0];
+                activityInstance.currentLemma = response[1];
+                Log.d("serverResponse", response.toString());
+                String definitionResult = "Word looked up: " + mWord + "\n";
+                definitionResult = definitionResult + "English translation: " + activityInstance.currentDefinition;
+                readingDictionary.setText(definitionResult);
 
-            activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma);
+                activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma);
+            }
         } else {
             readingDictionary.setText("");
             Log.e("Uh Oh", "No definitions were returned by the API.");
