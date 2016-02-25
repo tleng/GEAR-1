@@ -15,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.mattmellor.gear.R;
@@ -93,73 +92,51 @@ public class ReadArticleActivity extends AppCompatActivity {
             }
         });
 
-        /*
-        // Getting rid of title for the action bar
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        // Log start time for when user opened article
-        startTime = System.currentTimeMillis();
-
-        final TextView txtContent = (TextView) findViewById(R.id.articleView);
-        final TextView definition = (TextView) findViewById(R.id.definition_box);
-
-        AssetManager assetManager = getAssets();
-
-        // Retrieve story user is reading
-        String story = getIntent().getExtras().getString("story");
-        currentArticle = story;
-
-        // TODO: load the story text in a separate thread, not on the main UI thread
-        // Load the selected story text from file
-        InputStream input;
-        String text = story;
-        try {
-            input = assetManager.open(story);
-            int size = input.available();
-            byte[] buffer = new byte[size];
-            input.read(buffer);
-            input.close();
-
-            // byte buffer into a string
-            text = new String(buffer).trim();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            text = "Error Occurred";
-        }
-
-        //txtContent.setText(text);
-        ViewPager pagesView = (ViewPager) findViewById(R.id.pages);
-        PageSplitter pageSplitter = new PageSplitter(pagesView.getWidth(), pagesView.getHeight(), 1, 0);
-
-        TextPaint textPaint = new TextPaint();
-        textPaint.setTextSize(12);
-        pageSplitter.append(text, textPaint);
-        pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages()));
-        pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-*/
-/*
-        txtContent.setMovementMethod(LinkMovementMethod.getInstance());
-        txtContent.setText(text, TextView.BufferType.SPANNABLE);
-        Spannable spans = (Spannable) txtContent.getText();
-        BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
-        iterator.setText(text);
-        int start = iterator.first();
-        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
-                .next()) {
-            String possibleWord = text.substring(start, end);
-            if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
-                ClickableSpan clickSpan = getClickableSpan(possibleWord);
-                spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-        }
-        */
-
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d("Configuration","Configuration Change");
+        setContentView(R.layout.pages);
+        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
+        setSupportActionBar(toolbar);
 
+        // Getting rid of title for the action bar
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        pagesView = (ViewPager) findViewById(R.id.pages);
+        pagesView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                PageSplitter pageSplitter = new PageSplitter(pagesView.getWidth(), pagesView.getHeight(), 1, 0);
+
+                TextPaint textPaint = new TextPaint();
+                textPaint.setTextSize(getResources().getDimension(R.dimen.text_size));
+                AssetManager assetManager = getAssets();
+                String story = getIntent().getExtras().getString("story");
+                currentArticle = story;
+                InputStream input;
+                String text;
+                try {
+                    input = assetManager.open(story);
+                    int size = input.available();
+                    byte[] buffer = new byte[size];
+                    input.read(buffer);
+                    input.close();
+
+                    // byte buffer into a string
+                    text = new String(buffer).trim();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    text = "Error Occurred";
+                }
+                pageSplitter.append(text, textPaint);
+                pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages()));
+                pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
 
     }
 
@@ -255,14 +232,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        ScrollView articleView = (ScrollView) findViewById(R.id.SCROLLER_ID);
-        int position = articleView.getBottom() - (articleView.getHeight() + articleView.getScrollY());
-        int percentage = (int) ((articleView.getHeight() + articleView.getScrollY()) / articleView.getBottom());
-        Log.d("Position", Integer.toString(position));
-        Log.d("Bottom", Integer.toString(articleView.getBottom()));
-        Log.d("Height", Integer.toString(articleView.getHeight()));
-        Log.d("Scroll Y", Integer.toString(articleView.getScrollY()));
-        currentPosition = articleView.getScrollY();
+
 
         // updates user data with time spent
         Long endTime = System.currentTimeMillis();
@@ -272,8 +242,6 @@ public class ReadArticleActivity extends AppCompatActivity {
 
     protected void OnResume() {
         super.onResume();
-        ScrollView articleView = (ScrollView) findViewById(R.id.SCROLLER_ID);
-        articleView.scrollTo(0, currentPosition);
     }
 
     public static ReadArticleActivity getReadArticleActivityInstance() {
