@@ -3,6 +3,7 @@ package com.mit.gear;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -58,7 +59,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 
         // Log start time for when user opened article
         startTime = System.currentTimeMillis();
-        
+
         pagesView = (ViewPager) findViewById(R.id.pages);
         pagesView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -156,7 +157,11 @@ public class ReadArticleActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
 
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -171,7 +176,7 @@ public class ReadArticleActivity extends AppCompatActivity {
      * @param word
      * @return
      */
-    private ClickableSpan getClickableSpan(final String word) {
+    public ClickableSpan getClickableSpan(final String word) {
         return new ClickableSpan() {
             final String mWord = word;
 
@@ -186,49 +191,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 toast.setGravity(Gravity.TOP, 0, 0);
                 toast.show();
 
-                /*
-                AsyncTask<String, Void, GearBackendDefinition> getAndDisplayDefinition =
-                        new AsyncTask<String, Void, GearBackendDefinition>() {
 
-                            // Retrieve word definition from the Gear backend
-                            @Override
-                            protected GearBackendDefinition doInBackground(String... words) {
-                                // Retrieve service handle.
-                                Gear apiServiceHandle = AppConstants.getApiServiceHandle();
-                                GearBackendDefinition definition = new GearBackendDefinition().setMessage(words[0]);
-
-                                try {
-                                    Gear.Gearapi.Define getDefinition = apiServiceHandle.gearapi().define(definition);
-                                    GearBackendDefinition gearDefinition = getDefinition.execute();
-                                    return gearDefinition;
-                                } catch (IOException e) {
-                                    Log.e("Uh Oh", "Exception during API call", e);
-                                }
-                                return null;
-                            }
-
-                            // Update the definition display with the definition retrieved from backend
-                            @Override
-                            protected void onPostExecute(GearBackendDefinition definition) {
-                                final TextView readingDictionary = (TextView) findViewById(R.id.definition_box);
-                                if (definition != null) {
-                                    String[] response = definition.getMessage().split("\\+\\+");
-                                    currentDefinition = response[0];
-                                    currentLemma = response[1];
-                                    Log.d("serverResponse", response.toString());
-                                    String definitionResult = "Word looked up: " + mWord + "\n";
-                                    definitionResult = definitionResult + "English translation: " + currentDefinition;
-                                    readingDictionary.setText(definitionResult);
-
-                                    updateDataStorage(mWord, currentDefinition, currentLemma);
-                                } else {
-                                    readingDictionary.setText("");
-                                    Log.e("Uh Oh", "No definitions were returned by the API.");
-                                }
-                            }
-                        };
-
-*/
                 //getAndDisplayDefinition.execute(mWord);
                 DefinitionRequest definitionRequest = new DefinitionRequest(mWord);
                 definitionRequest.execute(mWord);

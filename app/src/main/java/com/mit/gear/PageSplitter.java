@@ -3,6 +3,7 @@ package com.mit.gear;
 /**
  * Created by Michael on 2/4/16.
  */
+
 import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -108,6 +109,9 @@ public class PageSplitter {
         if (textPaint.isFakeBoldText()) {
             spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, spannable.length(), 0);
         }
+
         return spannable;
     }
+
+
 }
