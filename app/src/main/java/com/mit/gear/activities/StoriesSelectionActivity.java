@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.reading.ReadArticleActivity;
 
 import java.io.IOException;
 

@@ -1,5 +1,7 @@
-package com.mit.gear;
+package com.mit.gear.data;
 
+
+import com.mit.gear.words.WordLookup;
 
 import java.util.HashMap;
 import java.util.HashSet;

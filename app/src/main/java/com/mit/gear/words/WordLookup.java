@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.words;
 
 import android.util.Log;
 

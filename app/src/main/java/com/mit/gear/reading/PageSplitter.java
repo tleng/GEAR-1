@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.reading;
 
 /**
  * Created by Michael on 2/4/16.

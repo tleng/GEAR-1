@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +7,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.data.DataStorage;
+import com.mit.gear.words.WordLookup;
 
 import java.util.HashMap;
 import java.util.Map;

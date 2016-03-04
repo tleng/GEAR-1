@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.data.UserDataCollection;
 
 /**
  * Activity that represents the starting screen of the app

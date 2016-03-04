@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.miscellaneous;
 
 import java.util.Collections;
 import java.util.Comparator;

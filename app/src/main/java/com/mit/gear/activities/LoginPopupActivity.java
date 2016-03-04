@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.data.UserDataCollection;
 
 /**
  *

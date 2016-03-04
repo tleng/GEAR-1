@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.words;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -7,6 +7,8 @@ import android.widget.TextView;
 import com.appspot.backendgear_1121.gear.Gear;
 import com.appspot.backendgear_1121.gear.model.GearBackendDefinition;
 import com.mattmellor.gear.R;
+import com.mit.gear.miscellaneous.AppConstants;
+import com.mit.gear.reading.ReadArticleActivity;
 
 import java.io.IOException;
 import java.util.HashMap;

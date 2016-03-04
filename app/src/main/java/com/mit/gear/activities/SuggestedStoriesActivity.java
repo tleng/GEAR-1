@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.activities;
 
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -12,6 +12,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.miscellaneous.MapUtil;
+import com.mit.gear.data.UserDataCollection;
+import com.mit.gear.reading.ReadArticleActivity;
+import com.mit.gear.words.WordLookup;
 
 import java.io.IOException;
 import java.io.InputStream;

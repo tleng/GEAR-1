@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.reading;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +19,10 @@ import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.data.DataStorage;
+import com.mit.gear.words.DefinitionRequest;
+import com.mit.gear.data.UserDataCollection;
+import com.mit.gear.words.WordLookup;
 
 import org.json.JSONException;
 

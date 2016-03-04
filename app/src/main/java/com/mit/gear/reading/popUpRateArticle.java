@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.reading;
 
 import android.app.Activity;
 import android.os.Bundle;

@@ -1,6 +1,8 @@
-package com.mit.gear;
+package com.mit.gear.data;
 
 import android.util.Log;
+
+import com.mit.gear.words.WordLookup;
 
 import java.util.HashMap;
 import java.util.Map;

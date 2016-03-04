@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.data;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.mit.gear.words.WordLookup;
 
 import org.json.JSONException;
 

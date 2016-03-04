@@ -1,4 +1,4 @@
-package com.mit.gear;
+package com.mit.gear.reading;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
