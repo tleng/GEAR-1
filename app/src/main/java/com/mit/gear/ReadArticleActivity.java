@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +33,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "ReadArticleActivity-tag";
     private static ReadArticleActivity instance;
     private android.support.v7.widget.Toolbar toolbar;
+    public static HashMap<String,String> offlineDictionary;
 
     public static String currentDefinition = "No definition";
     public static String currentLemma = "None";
@@ -46,12 +48,15 @@ public class ReadArticleActivity extends AppCompatActivity {
         instance = this;
     }
 
+    private HashMap<String, WordLookup> dictionary;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pages);
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
         setSupportActionBar(toolbar);
+        dictionary = new DataStorage(getApplicationContext()).loadJSONDictionary();
 
         // Getting rid of title for the action bar
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -92,6 +97,8 @@ public class ReadArticleActivity extends AppCompatActivity {
             }
         });
 
+        DataStorage dataStorage = new DataStorage(getApplicationContext());
+        offlineDictionary = dataStorage.loadOfflineDictionary();
     }
 
     @Override
@@ -170,6 +177,9 @@ public class ReadArticleActivity extends AppCompatActivity {
 
 
                 //getAndDisplayDefinition.execute(mWord);
+                if (offlineDictionary.containsKey(mWord)) {
+                    Log.d("Offline Dictionary",mWord);
+                }
                 DefinitionRequest definitionRequest = new DefinitionRequest(mWord);
                 definitionRequest.execute(mWord);
                 Log.d("lookup", mWord);
@@ -177,6 +187,10 @@ public class ReadArticleActivity extends AppCompatActivity {
 
             public void updateDrawState(TextPaint ds) {
                 ds.setUnderlineText(false);
+                if (dictionary.containsKey(mWord)) {
+                    ds.setColor(Color.BLUE);
+                }
+
             }
         };
     }

@@ -27,7 +27,10 @@ public class DataStorage {
     Context context;
     AssetManager assetManager;
     String USERINFO = "gearUserInformation";
+    //USERDICTIONARY is stored on the local file storage of the android device
     String USERDICTIONARY = "gearUserDictionary";
+    //OFFLINEDICTIONARY is stored in assets
+    String OFFLINEDICTIONARY = "offline_dictionary_json";
 
     //In order to open files from assets, we need to pass a context and retrieve the assetManager from that context
     public DataStorage(Context context) {
@@ -38,6 +41,30 @@ public class DataStorage {
     private String loadJSON(String fileName) throws IOException {
         String json = null;
         return json;
+    }
+
+    public HashMap<String, String> loadOfflineDictionary() {
+        InputStream input;
+        String text;
+        try {
+            input = assetManager.open(OFFLINEDICTIONARY);
+            int size = input.available();
+            byte[] buffer = new byte[size];
+            input.read(buffer);
+            input.close();
+            // byte buffer into a string
+            text = new String(buffer);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            text = "{\"dictionary\":{\"error\":\"occurred\"}}";
+        }
+
+        Log.d("OfflineDictionary","Text Loaded");
+        HashMap<String,String> map = new Gson().fromJson(text, new TypeToken<HashMap<String, String>>() {
+        }.getType());
+        return map;
+
     }
 
     public HashMap<String, WordLookup> loadJSONDictionary() {
@@ -56,10 +83,10 @@ public class DataStorage {
                 }
 
                 in.close();
-                Log.d("Saved File", buf.toString());
+                Log.d("Saved User Dictionary", buf.toString());
                 map = new Gson().fromJson(buf.toString(), new TypeToken<HashMap<String, WordLookup>>() {
                 }.getType());
-                Log.d("SaveFile",map.toString());
+                Log.d("GsonConversionDict",map.toString());
             }
 
         } catch (java.io.FileNotFoundException e) {
