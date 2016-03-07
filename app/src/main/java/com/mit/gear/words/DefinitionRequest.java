@@ -23,13 +23,23 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
     public DefinitionRequest(String word) {
         mWord = word;
     }
+    private boolean running = true;
 
+    @Override
+    protected void onCancelled() {
+        Log.d("Cancelled","True");
+        running = false;
+    }
     @Override
     protected GearBackendDefinition doInBackground(String... words) {
         // Retrieve service handle.
         HashMap<String,String> offlineDictionary = ReadArticleActivity.getReadArticleActivityInstance().offlineDictionary;
         if (offlineDictionary.containsKey(words[0])) {
             localDefintion = offlineDictionary.get(words[0]);
+            return null;
+        }
+
+        if (isCancelled() || !running) {
             return null;
         }
         Gear apiServiceHandle = AppConstants.getApiServiceHandle();
@@ -40,7 +50,11 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
             GearBackendDefinition gearDefinition = getDefinition.execute();
             return gearDefinition;
         } catch (IOException e) {
-            Log.e("Uh Oh", "Exception during API call", e);
+            Log.e("Server Response Error", "Exception during API call", e);
+        }
+
+        if (isCancelled() || !running) {
+            return null;
         }
         return null;
     }
@@ -48,35 +62,38 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
     // Update the definition display with the definition retrieved from backend
     @Override
     protected void onPostExecute(GearBackendDefinition definition) {
-        ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();
-        final TextView readingDictionary = (TextView) activityInstance.findViewById(R.id.definition_box);
-        String definitionResult = "Word looked up: " + mWord + "\n";
-        if (localDefintion!=null) {
-            Log.d("LocalDefinition", localDefintion);
-            definitionResult = definitionResult + "English translation: " + localDefintion;
-            readingDictionary.setText(definitionResult);
+        if (isCancelled() || !running) {
         } else {
-            if (definition != null) {
-                String[] response = definition.getMessage().split("\\+\\+");
-                Log.d("Server Response", response.toString());
-                if (response.length > 1) {
-                    activityInstance.currentDefinition = response[0];
-                    activityInstance.currentLemma = response[1];
-                    Log.d("serverResponse", response.toString());
-                    definitionResult = definitionResult + "English translation: " + activityInstance.currentDefinition;
-                    readingDictionary.setText(definitionResult);
-
-                    activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma);
-                } else {
-                    activityInstance.currentDefinition = "None";
-                    activityInstance.currentLemma = "None";
-                    Log.d("serverResponse", response.toString());
-                    readingDictionary.setText("Error");
-                    activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma);
-                }
+            ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();
+            final TextView readingDictionary = (TextView) activityInstance.findViewById(R.id.definition_box);
+            String definitionResult = "Word looked up: " + mWord + "\n";
+            if (localDefintion != null) {
+                Log.d("LocalDefinition", localDefintion);
+                definitionResult = definitionResult + "English translation: " + localDefintion;
+                readingDictionary.setText(definitionResult);
             } else {
-                readingDictionary.setText("");
-                Log.e("Uh Oh", "No definitions were returned by the API.");
+                if (definition != null) {
+                    String[] response = definition.getMessage().split("\\+\\+");
+                    Log.d("Server Response", response.toString());
+                    if (response.length > 1) {
+                        activityInstance.currentDefinition = response[0];
+                        activityInstance.currentLemma = response[1];
+                        Log.d("serverResponse", response.toString());
+                        definitionResult = definitionResult + "English translation: " + activityInstance.currentDefinition;
+                        readingDictionary.setText(definitionResult);
+
+                        activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma);
+                    } else {
+                        activityInstance.currentDefinition = "None";
+                        activityInstance.currentLemma = "None";
+                        Log.d("serverResponse", response.toString());
+                        readingDictionary.setText("Error");
+                        activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma);
+                    }
+                } else {
+                    readingDictionary.setText("");
+                    Log.e("Uh Oh", "No definitions were returned by the API.");
+                }
             }
         }
     }

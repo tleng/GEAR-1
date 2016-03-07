@@ -11,17 +11,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.data.DataStorage;
-import com.mit.gear.words.DefinitionRequest;
 import com.mit.gear.data.UserDataCollection;
+import com.mit.gear.words.DefinitionRequest;
 import com.mit.gear.words.WordLookup;
 
 import org.json.JSONException;
@@ -38,6 +37,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     private static ReadArticleActivity instance;
     private android.support.v7.widget.Toolbar toolbar;
     public static HashMap<String,String> offlineDictionary;
+    private DefinitionRequest currentDefinitionRequest;
 
     public static String currentDefinition = "No definition";
     public static String currentLemma = "None";
@@ -61,6 +61,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
         setSupportActionBar(toolbar);
         dictionary = new DataStorage(getApplicationContext()).loadJSONDictionary();
+        currentDefinitionRequest = null;
 
         // Getting rid of title for the action bar
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -170,14 +171,24 @@ public class ReadArticleActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View widget) {
+                if (currentDefinitionRequest != null) {
+                    Log.d("Cancel","Cancel current definition request: " + currentDefinitionRequest.toString());
+                    currentDefinitionRequest.cancel(true);
+                }
+                Log.d("No cancel","current definition request not cancelled");
                 Log.d("tapped on:", mWord);
                 Context context = getApplicationContext();
                 CharSequence message = mWord + " ausgewählt.";
-                int duration = Toast.LENGTH_SHORT;
 
+                /*
+                int duration = Toast.LENGTH_SHORT;
                 Toast toast = Toast.makeText(context, message, duration);
                 toast.setGravity(Gravity.TOP, 0, 0);
                 toast.show();
+                */
+
+                TextView definitionBox = (TextView) findViewById(R.id.definition_box);
+                definitionBox.setText(message);
 
 
                 //getAndDisplayDefinition.execute(mWord);
@@ -185,6 +196,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                     Log.d("Offline Dictionary",mWord);
                 }
                 DefinitionRequest definitionRequest = new DefinitionRequest(mWord);
+                currentDefinitionRequest = definitionRequest;
                 definitionRequest.execute(mWord);
                 Log.d("lookup", mWord);
             }
