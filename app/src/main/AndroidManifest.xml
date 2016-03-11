@@ -3,7 +3,6 @@
     package="com.mattmellor.gear" >
 
     <uses-permission android:name="android.permission.INTERNET" />
-0
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application

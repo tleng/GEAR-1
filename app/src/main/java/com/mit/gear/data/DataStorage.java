@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -44,7 +45,7 @@ public class DataStorage {
         return json;
     }
 
-    public HashMap<String, String> loadOfflineDictionary() {
+    public HashMap<String, ArrayList<String>> loadOfflineDictionary() {
         InputStream input;
         String text;
         try {
@@ -62,8 +63,13 @@ public class DataStorage {
         }
 
         Log.d("OfflineDictionary","Text Loaded");
-        HashMap<String,String> map = new Gson().fromJson(text, new TypeToken<HashMap<String, String>>() {
-        }.getType());
+        HashMap<String, ArrayList<String>> map = new HashMap<>();
+        try {
+            map = new Gson().fromJson(text, new TypeToken<HashMap<String, ArrayList<String>>>() {
+            }.getType());
+        } catch (Exception e) {
+            Log.d("DictionaryError",e.getMessage());
+        }
         return map;
 
     }

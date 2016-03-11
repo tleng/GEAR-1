@@ -46,7 +46,6 @@ public class PageFragment extends Fragment {
             if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
                 ReadArticleActivity rAA = ReadArticleActivity.getReadArticleActivityInstance();
                 ClickableSpan clickSpan = rAA.getClickableSpan(possibleWord);
-
                 spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }

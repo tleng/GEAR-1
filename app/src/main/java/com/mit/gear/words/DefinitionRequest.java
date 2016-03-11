@@ -11,6 +11,7 @@ import com.mit.gear.miscellaneous.AppConstants;
 import com.mit.gear.reading.ReadArticleActivity;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -19,7 +20,7 @@ import java.util.HashMap;
 public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefinition> {
 
     private String mWord;
-    private String localDefintion = null;
+    private String localDefinition = null;
     public DefinitionRequest(String word) {
         mWord = word;
     }
@@ -33,9 +34,9 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
     @Override
     protected GearBackendDefinition doInBackground(String... words) {
         // Retrieve service handle.
-        HashMap<String,String> offlineDictionary = ReadArticleActivity.getReadArticleActivityInstance().offlineDictionary;
+        HashMap<String,ArrayList<String>> offlineDictionary = ReadArticleActivity.getReadArticleActivityInstance().offlineDictionary;
         if (offlineDictionary.containsKey(words[0])) {
-            localDefintion = offlineDictionary.get(words[0]);
+            localDefinition = offlineDictionary.get(words[0]).get(0);
             return null;
         }
 
@@ -67,10 +68,12 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
             ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();
             final TextView readingDictionary = (TextView) activityInstance.findViewById(R.id.definition_box);
             String definitionResult = "Word looked up: " + mWord + "\n";
-            if (localDefintion != null) {
-                Log.d("LocalDefinition", localDefintion);
-                definitionResult = definitionResult + "English translation: " + localDefintion;
+            if (localDefinition != null) {
+                Log.d("LocalDefinition", localDefinition);
+                definitionResult = definitionResult + "English translation: " + localDefinition;
                 readingDictionary.setText(definitionResult);
+                activityInstance.updateDataStorage(mWord, localDefinition, "None");
+
             } else {
                 if (definition != null) {
                     String[] response = definition.getMessage().split("\\+\\+");

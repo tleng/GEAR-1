@@ -3,7 +3,6 @@ package com.mit.gear.reading;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -27,6 +26,7 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -36,7 +36,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "ReadArticleActivity-tag";
     private static ReadArticleActivity instance;
     private android.support.v7.widget.Toolbar toolbar;
-    public static HashMap<String,String> offlineDictionary;
+    public static HashMap<String,ArrayList<String>> offlineDictionary;
     private DefinitionRequest currentDefinitionRequest;
 
     public static String currentDefinition = "No definition";
@@ -106,51 +106,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         offlineDictionary = dataStorage.loadOfflineDictionary();
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Log.d("Configuration","Configuration Change");
-        setContentView(R.layout.pages);
-        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
-        setSupportActionBar(toolbar);
 
-        // Getting rid of title for the action bar
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        pagesView = (ViewPager) findViewById(R.id.pages);
-        pagesView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                PageSplitter pageSplitter = new PageSplitter(pagesView.getWidth(), pagesView.getHeight(), 1, 0);
-
-                TextPaint textPaint = new TextPaint();
-                textPaint.setTextSize(getResources().getDimension(R.dimen.text_size));
-                AssetManager assetManager = getAssets();
-                String story = getIntent().getExtras().getString("story");
-                currentArticle = story;
-                InputStream input;
-                String text;
-                try {
-                    input = assetManager.open(story);
-                    int size = input.available();
-                    byte[] buffer = new byte[size];
-                    input.read(buffer);
-                    input.close();
-
-                    // byte buffer into a string
-                    text = new String(buffer).trim();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    text = "Error Occurred";
-                }
-                pageSplitter.append(text, textPaint);
-                pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages()));
-                pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-            }
-        });
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -169,7 +125,6 @@ public class ReadArticleActivity extends AppCompatActivity {
         return new ClickableSpan() {
             final String mWord = word;
 
-            @Override
             public void onClick(View widget) {
                 if (currentDefinitionRequest != null) {
                     Log.d("Cancel","Cancel current definition request: " + currentDefinitionRequest.toString());
@@ -179,13 +134,6 @@ public class ReadArticleActivity extends AppCompatActivity {
                 Log.d("tapped on:", mWord);
                 Context context = getApplicationContext();
                 CharSequence message = mWord + " ausgewählt.";
-
-                /*
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, message, duration);
-                toast.setGravity(Gravity.TOP, 0, 0);
-                toast.show();
-                */
 
                 TextView definitionBox = (TextView) findViewById(R.id.definition_box);
                 definitionBox.setText(message);

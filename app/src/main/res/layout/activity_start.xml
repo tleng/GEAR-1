@@ -39,6 +39,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/textView2">
 
+        <!--
         <Button
             android:layout_width="133dp"
             android:layout_height="wrap_content"
@@ -48,6 +49,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_centerVertical="true"
             android:layout_marginBottom="10dp" />
+            -->
 
 
         <LinearLayout
