@@ -15,7 +15,6 @@ import com.mit.gear.data.UserDataCollection;
  */
 public class StartActivity extends AppCompatActivity {
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,6 +23,7 @@ public class StartActivity extends AppCompatActivity {
         // login with dummy user
         String defaultUserName = "defaultUser";
         UserDataCollection.login(defaultUserName);
+
     }
 
     @Override
@@ -38,7 +38,8 @@ public class StartActivity extends AppCompatActivity {
      * @param view
      */
     public void goToStoriesSelectionOnClick(View view){
-        startActivity(new Intent(StartActivity.this, StoriesSelectionActivity.class));
+        Intent startActivityIntent = new Intent(StartActivity.this, StoriesSelectionActivity.class);
+        startActivity(startActivityIntent);
     }
 
     /**
@@ -46,7 +47,8 @@ public class StartActivity extends AppCompatActivity {
      * @param view
      */
     public void goToSuggestedStories(View view) {
-        startActivity(new Intent(StartActivity.this, SuggestedStoriesActivity.class));
+        Intent suggestedStoriesIntent = new Intent(StartActivity.this, SuggestedStoriesActivity.class);
+        startActivity(suggestedStoriesIntent);
     }
 
     /**
@@ -54,7 +56,8 @@ public class StartActivity extends AppCompatActivity {
      * @param view
      */
     public void goToOverallUserVocabOnClick(View view){
-        startActivity(new Intent(StartActivity.this, DisplayVocabularyActivity.class));
+        Intent overallUserVocabIntent = new Intent(StartActivity.this, DisplayVocabularyActivity.class);
+        startActivity(overallUserVocabIntent);
     }
 
 

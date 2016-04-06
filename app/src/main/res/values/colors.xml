@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="start_activity_color">#99bbff</color>
+    <color name="highlighted_word">#0000ff</color>
+</resources>

@@ -36,6 +36,7 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
         // Retrieve service handle.
         HashMap<String,ArrayList<String>> offlineDictionary = ReadArticleActivity.getReadArticleActivityInstance().offlineDictionary;
         if (offlineDictionary.containsKey(words[0])) {
+            //offline dictionary is a map from word to an array list, where the first item in the array is the definition
             localDefinition = offlineDictionary.get(words[0]).get(0);
             return null;
         }

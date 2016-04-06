@@ -8,8 +8,8 @@ import android.widget.TextView;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.data.DataStorage;
-import com.mit.gear.words.WordLookup;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +58,7 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
      */
     private String getVocabularyString() {
         DataStorage dataStorage = new DataStorage(getApplicationContext());
-        HashMap<String, WordLookup> vocabulary = dataStorage.loadJSONDictionary();
+        HashMap<String, ArrayList<String>> vocabulary = dataStorage.loadUserDictionary();
 
         String vocabString = "";
         if (vocabulary.isEmpty()) {
@@ -66,10 +66,10 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
         }
 
         // list vocabulary words
-        for (Map.Entry<String, WordLookup> entry : vocabulary.entrySet()) {
+        for (Map.Entry<String, ArrayList<String>> entry : vocabulary.entrySet()) {
             String key = entry.getKey();
-            WordLookup word = entry.getValue();
-            vocabString += key + ": " + word.getLemma() + " - " + word.getTimesLookedUp() + "\n";
+            ArrayList<String> userData = entry.getValue();
+            vocabString += key + ": " + userData.toString() + "\n";
         }
         return vocabString;
     }

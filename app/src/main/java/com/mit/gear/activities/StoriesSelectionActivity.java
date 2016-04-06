@@ -22,7 +22,6 @@ import static com.mattmellor.gear.R.id.app_article_bar;
  * Activity where user can browse and select which story to read
  */
 public class StoriesSelectionActivity extends AppCompatActivity {
-
     private android.support.v7.widget.Toolbar toolbar;
 
     @Override
@@ -36,9 +35,6 @@ public class StoriesSelectionActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // TODO: Make this dynamically read articles in folder and
-        // create buttons, like in stories selection, instead of hardcoding
     }
 
     @Override
@@ -64,16 +60,6 @@ public class StoriesSelectionActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-//    /**
-//     * Starts the ReadArticleActivity for the selected story
-//     * @param view
-//     */
-//    public void openStory(View view){
-//        Intent intent = new Intent(StoriesSelectionActivity.this, ReadArticleActivity.class);
-//        intent.putExtra("story", (String) view.getTag());
-//        startActivity(intent);
-//        finish();
-//    }
 
     View.OnClickListener getOnClickSetStory(final Button button)  {
         return new View.OnClickListener() {

@@ -1,26 +1,21 @@
 package com.mit.gear.reading;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextPaint;
-import android.text.style.ClickableSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.TextView;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
 import com.mit.gear.words.DefinitionRequest;
-import com.mit.gear.words.WordLookup;
+import com.mit.gear.words.GEARGlobal;
 
 import org.json.JSONException;
 
@@ -37,6 +32,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     private static ReadArticleActivity instance;
     private android.support.v7.widget.Toolbar toolbar;
     public static HashMap<String,ArrayList<String>> offlineDictionary;
+    private HashMap<String,ArrayList<String>> userDictionary;
     private DefinitionRequest currentDefinitionRequest;
 
     public static String currentDefinition = "No definition";
@@ -52,15 +48,14 @@ public class ReadArticleActivity extends AppCompatActivity {
         instance = this;
     }
 
-    private HashMap<String, WordLookup> dictionary;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pages);
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
         setSupportActionBar(toolbar);
-        dictionary = new DataStorage(getApplicationContext()).loadJSONDictionary();
+        offlineDictionary = GEARGlobal.getOfflineDictionary(getApplicationContext());
+        userDictionary = new DataStorage(getApplicationContext()).loadUserDictionary();
         currentDefinitionRequest = null;
 
         // Getting rid of title for the action bar
@@ -69,6 +64,12 @@ public class ReadArticleActivity extends AppCompatActivity {
         // Log start time for when user opened article
         startTime = System.currentTimeMillis();
 
+        setPagesView();
+
+
+    }
+
+    public void setPagesView() {
         pagesView = (ViewPager) findViewById(R.id.pages);
         pagesView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -101,9 +102,6 @@ public class ReadArticleActivity extends AppCompatActivity {
                 pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
-
-        DataStorage dataStorage = new DataStorage(getApplicationContext());
-        offlineDictionary = dataStorage.loadOfflineDictionary();
     }
 
 
@@ -113,50 +111,6 @@ public class ReadArticleActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
-
-    /**
-     * Method that lets users click on words
-     *
-     * @param word
-     * @return
-     */
-    public ClickableSpan getClickableSpan(final String word) {
-        return new ClickableSpan() {
-            final String mWord = word;
-
-            public void onClick(View widget) {
-                if (currentDefinitionRequest != null) {
-                    Log.d("Cancel","Cancel current definition request: " + currentDefinitionRequest.toString());
-                    currentDefinitionRequest.cancel(true);
-                }
-                Log.d("No cancel","current definition request not cancelled");
-                Log.d("tapped on:", mWord);
-                Context context = getApplicationContext();
-                CharSequence message = mWord + " ausgewählt.";
-
-                TextView definitionBox = (TextView) findViewById(R.id.definition_box);
-                definitionBox.setText(message);
-
-
-                //getAndDisplayDefinition.execute(mWord);
-                if (offlineDictionary.containsKey(mWord)) {
-                    Log.d("Offline Dictionary",mWord);
-                }
-                DefinitionRequest definitionRequest = new DefinitionRequest(mWord);
-                currentDefinitionRequest = definitionRequest;
-                definitionRequest.execute(mWord);
-                Log.d("lookup", mWord);
-            }
-
-            public void updateDrawState(TextPaint ds) {
-                ds.setUnderlineText(false);
-                if (dictionary.containsKey(mWord)) {
-                    ds.setColor(Color.BLUE);
-                }
-
-            }
-        };
     }
 
 
@@ -172,9 +126,7 @@ public class ReadArticleActivity extends AppCompatActivity {
             UserDataCollection.addWord(word, definition, lemma);
             DataStorage dataStorage = new DataStorage(getApplicationContext());
             try {
-                dataStorage.addToJSONDictionary(word);
-                HashMap<String, WordLookup> map = dataStorage.loadJSONDictionary();
-                Log.d("Dictionary",map.toString());
+                dataStorage.addToUserDictionary(word);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -189,13 +141,21 @@ public class ReadArticleActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_clear:
+                try {
+                    DataStorage dataStorage = new DataStorage(getApplicationContext());
+                    dataStorage.clearUserDictionary();
+                    userDictionary = dataStorage.loadUserDictionary();
+                    setPagesView();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
     }
 
 
