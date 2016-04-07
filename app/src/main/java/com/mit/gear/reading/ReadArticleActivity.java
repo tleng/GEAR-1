@@ -32,17 +32,16 @@ public class ReadArticleActivity extends AppCompatActivity {
     private static ReadArticleActivity instance;
     private android.support.v7.widget.Toolbar toolbar;
     public static HashMap<String,ArrayList<String>> offlineDictionary;
-    private HashMap<String,ArrayList<String>> userDictionary;
+    public HashMap<String,ArrayList<String>> userDictionary;
     private DefinitionRequest currentDefinitionRequest;
-
     public static String currentDefinition = "No definition";
     public static String currentLemma = "None";
     private Integer currentPosition = 0;
-
     private Long startTime;
     private String currentArticle;
-
     private ViewPager pagesView;
+    // Set definition_scroll to true when using a scrolling definition textbox
+    public boolean definition_scroll = true;
 
     public ReadArticleActivity() {
         instance = this;
@@ -51,7 +50,11 @@ public class ReadArticleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.pages);
+        if (definition_scroll) {
+            setContentView(R.layout.pages_scrolling_definition);
+        } else {
+            setContentView(R.layout.pages);
+        }
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
         setSupportActionBar(toolbar);
         offlineDictionary = GEARGlobal.getOfflineDictionary(getApplicationContext());
@@ -147,6 +150,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                     DataStorage dataStorage = new DataStorage(getApplicationContext());
                     dataStorage.clearUserDictionary();
                     userDictionary = dataStorage.loadUserDictionary();
+                    GEARClickableSpan.clear();
                     setPagesView();
                 } catch (IOException e) {
                     e.printStackTrace();

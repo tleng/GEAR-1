@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Spannable;
-import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
@@ -29,6 +28,7 @@ public class PageFragment extends Fragment {
     public static HashMap<String,ArrayList<String>> offlineDictionary = GEARGlobal.getOfflineDictionary(readArticleContext);
     private HashMap<String,ArrayList<String>> userDictionary = new DataStorage(readArticleContext).loadUserDictionary();
     private String clickedWord;
+    private TextView pageView;
 
     private DefinitionRequest currentDefinitionRequest = null;
 
@@ -43,7 +43,11 @@ public class PageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         CharSequence text = getArguments().getCharSequence(PAGE_TEXT);
-        TextView pageView = (TextView) inflater.inflate(R.layout.page, container, false);
+        pageView = (TextView) inflater.inflate(R.layout.page, container, false);
+        Log.d("Viewthis",pageView.toString());
+        if (GEARClickableSpan.clearWidget == null) {
+            GEARClickableSpan.clearWidget = pageView;
+        }
         //pageView.setText(text);
 
         String stringText = text.toString();
@@ -66,7 +70,8 @@ public class PageFragment extends Fragment {
         return pageView;
     }
 
-    private class GEARClickableSpan extends ClickableSpan {
+    /*
+    public class GEARClickableSpan extends ClickableSpan {
         final String mWord;
         private TextPaint textPaint;
 
@@ -114,54 +119,15 @@ public class PageFragment extends Fragment {
             updateDrawState(textPaint);
             widget.invalidate();
         }
+
+        public static void clear(View widget) {
+
+        }
     }
+    */
 
     public ClickableSpan getClickSpan(final String word) {
         return new GEARClickableSpan(word);
     }
-    /**
-     * Method that lets users click on words
-     *
-     * @param word
-     * @return
-     */
-    public ClickableSpan getClickableSpan(final String word) {
-        return new ClickableSpan() {
-            final String mWord = word;
 
-            public void onClick(View widget) {
-                if (currentDefinitionRequest != null) {
-                    Log.d("Cancel", "Cancel current definition request: " + currentDefinitionRequest.toString());
-                    currentDefinitionRequest.cancel(true);
-                }
-                Log.d("No cancel","current definition request not cancelled");
-                Log.d("tapped on:", mWord);
-                clickedWord = mWord;
-                ArrayList<String> time_place_holder = new ArrayList<>();
-                time_place_holder.add("0");
-                userDictionary.put(mWord, time_place_holder);
-                CharSequence message = mWord + " ausgewählt.";
-
-                TextView definitionBox = (TextView) ReadArticleActivity.getReadArticleActivityInstance().findViewById(R.id.definition_box);
-                definitionBox.setText(message);
-
-                //getAndDisplayDefinition.execute(mWord);
-                if (offlineDictionary.containsKey(mWord)) {
-                    Log.d("Offline Dictionary",mWord);
-                }
-                DefinitionRequest definitionRequest = new DefinitionRequest(mWord);
-                currentDefinitionRequest = definitionRequest;
-                definitionRequest.execute(mWord);
-                Log.d("lookup", mWord);
-            }
-
-            public void updateDrawState(TextPaint ds) {
-                ds.setUnderlineText(false);
-                if (userDictionary.containsKey(mWord)) {
-                    ds.setColor(getResources().getColor(R.color.highlighted_word));
-                }
-
-            }
-        };
-    }
 }

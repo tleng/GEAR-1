@@ -1,0 +1,74 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context=".MainActivity"
+    android:id="@+id/new_layer"
+    android:orientation="vertical"
+    android:background="#e6e6e6"
+    android:weightSum="1">
+
+    <include android:id="@+id/app_article_bar"
+    layout = "@layout/app_article_bar" />
+
+    <!--Story TextView-->
+    <!-- TODO: Successfully use layout weights instead to divide screen into
+    story view box and definition box -->
+    <ScrollView
+        android:id="@+id/SCROLLER_ID"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:scrollbars="vertical"
+        android:fillViewport="false"
+        android:layout_below="@+id/definition_box"
+        android:layout_margin="10dp"
+        android:background="#fff"
+
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/story"
+        android:id="@+id/articleView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textIsSelectable="false"
+        android:layout_below="@+id/definition_box" />
+    </ScrollView>
+
+
+    <!-- Definition Box TextView -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_above="@id/articleView"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="10dp"
+        android:background="#fff"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="2dp"
+        android:id="@+id/scrollView" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="No words looked up yet."
+            android:id="@+id/definition_box"
+            android:layout_above="@id/articleView"
+            android:background="#fff"
+            android:singleLine="false"
+            />
+    </ScrollView>
+
+</LinearLayout>

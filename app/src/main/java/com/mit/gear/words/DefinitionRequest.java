@@ -72,7 +72,6 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
             if (localDefinition != null) {
                 Log.d("LocalDefinition", localDefinition);
                 definitionResult = definitionResult + "English translation: " + localDefinition;
-                readingDictionary.setText(definitionResult);
                 activityInstance.updateDataStorage(mWord, localDefinition, "None");
 
             } else {
@@ -84,20 +83,25 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
                         activityInstance.currentLemma = response[1];
                         Log.d("serverResponse", response.toString());
                         definitionResult = definitionResult + "English translation: " + activityInstance.currentDefinition;
-                        readingDictionary.setText(definitionResult);
+
 
                         activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma);
                     } else {
                         activityInstance.currentDefinition = "None";
                         activityInstance.currentLemma = "None";
                         Log.d("serverResponse", response.toString());
-                        readingDictionary.setText("Error");
+                        definitionResult = "Error";
                         activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma);
                     }
                 } else {
                     readingDictionary.setText("");
                     Log.e("Uh Oh", "No definitions were returned by the API.");
                 }
+            }
+            if (activityInstance.definition_scroll){
+                readingDictionary.setText(definitionResult + "\n" + readingDictionary.getText().toString());
+            } else {
+                readingDictionary.setText(definitionResult);
             }
         }
     }
