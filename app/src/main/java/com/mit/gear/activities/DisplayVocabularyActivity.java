@@ -8,8 +8,8 @@ import android.widget.TextView;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.data.DataStorage;
+import com.mit.gear.words.Word;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +58,8 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
      */
     private String getVocabularyString() {
         DataStorage dataStorage = new DataStorage(getApplicationContext());
-        HashMap<String, ArrayList<String>> vocabulary = dataStorage.loadUserDictionary();
+        HashMap<String, Word> vocabulary = dataStorage.loadUserDictionary();
+        HashMap<String, Word> unclicked = dataStorage.loadUnclickedWords();
 
         String vocabString = "";
         if (vocabulary.isEmpty()) {
@@ -66,10 +67,20 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
         }
 
         // list vocabulary words
-        for (Map.Entry<String, ArrayList<String>> entry : vocabulary.entrySet()) {
+        for (Map.Entry<String, Word> entry : vocabulary.entrySet()) {
             String key = entry.getKey();
-            ArrayList<String> userData = entry.getValue();
-            vocabString += key + ": " + userData.toString() + "\n";
+            Word word = entry.getValue();
+            vocabString += key + ": " + Integer.toString(word.getTimesLookedUp()) + "\n";
+        }
+        vocabString += "\nUnclicked Words:\n";
+        if (unclicked.isEmpty()) {
+            vocabString += "No work saved";
+        }
+
+        for (Map.Entry<String, Word> entry: unclicked.entrySet()) {
+            String key = entry.getKey();
+            Word word = entry.getValue();
+            vocabString += key + ": " + Integer.toString(word.getTimesLookedUp()) + "\n";
         }
         return vocabString;
     }

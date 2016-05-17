@@ -15,7 +15,7 @@ import com.mattmellor.gear.R;
 import com.mit.gear.miscellaneous.MapUtil;
 import com.mit.gear.data.UserDataCollection;
 import com.mit.gear.reading.ReadArticleActivity;
-import com.mit.gear.words.WordLookup;
+import com.mit.gear.words.Word;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,6 +64,7 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
      * Gets recommended stories and adds buttons for each story to the view
      */
     private void generateRecommendationButtons() {
+        //Replace recommendedKArticles with different algorithms
         List<String> articles = recommendKArticles(num_recommended_articles);
 
         // adjust linear layout to display articles in
@@ -157,7 +158,7 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
      * @return
      */
     private Double getFractionOfWords(String article) {
-        HashMap<String, WordLookup> userVocab = UserDataCollection.getCurrentVocabulary();
+        HashMap<String, Word> userVocab = UserDataCollection.getCurrentVocabulary();
 
         InputStream input;
         String text = article;

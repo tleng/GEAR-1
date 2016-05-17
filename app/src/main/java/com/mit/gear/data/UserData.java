@@ -2,7 +2,7 @@ package com.mit.gear.data;
 
 import android.util.Log;
 
-import com.mit.gear.words.WordLookup;
+import com.mit.gear.words.Word;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +17,8 @@ public class UserData {
 
     // Store all words looked up by the user along with associated data
     // Associated data such as when the word is looked up, # times looked up, etc.
-    // is stored in the WordLookup structure
-    private final HashMap<String, WordLookup> wordsLookedUp = new HashMap<String, WordLookup>();
+    // is stored in the Word structure
+    private final HashMap<String, Word> wordsLookedUp = new HashMap<String, Word>();
 
     // Stores user ratings of different articles
     private final HashMap<String, Integer> articleRatings = new HashMap<String, Integer>();
@@ -51,13 +51,13 @@ public class UserData {
     public void addWord(String word, String definition, String lemma){
         String wordLowerCase = word.toLowerCase();
 
-        // update WordLookup data if user looks up word a second time
-        if (wordsLookedUp.containsKey(wordLowerCase)){
-            wordsLookedUp.get(wordLowerCase).update();
-        }
-        else {
-            wordsLookedUp.put(wordLowerCase, new WordLookup(wordLowerCase, definition, lemma));
-        }
+        // update Word data if user looks up word a second time
+//        if (wordsLookedUp.containsKey(wordLowerCase)){
+//            wordsLookedUp.get(wordLowerCase).update(ReadArticleActivity.getReadArticleActivityInstance().currentArticle,);
+//        }
+//        else {
+//            wordsLookedUp.put(wordLowerCase, new Word(wordLowerCase, lemma));
+//        }
     }
 
     /**
@@ -83,7 +83,7 @@ public class UserData {
      * Getter method for wordsLookedUp
      * @return
      */
-    public HashMap<String, WordLookup> getWordsLookedUp() {
+    public HashMap<String, Word> getWordsLookedUp() {
         return wordsLookedUp;
     }
 

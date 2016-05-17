@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mattmellor.gear.R;
+import com.mit.gear.words.Word;
 
 import org.json.JSONException;
 
@@ -34,6 +35,10 @@ public class DataStorage {
     //OFFLINEDICTIONARY is stored in assets
     String OFFLINEDICTIONARY = "offline_dictionary_json";
     String TESTDICTIONARY = "offline_dictionary_maparray_json";
+    HashMap<String, Word> userDictionary = new HashMap<>();
+
+    String UNCLICKEDWORDS = "unclickedWords";
+    HashMap<String, Word> unclickedWords = new HashMap<>();
 
     //In order to open files from assets, we need to pass a context and retrieve the assetManager from that context
     public DataStorage(Context context) {
@@ -45,10 +50,20 @@ public class DataStorage {
         return loadJSONDictionary(context.getString(R.string.offline_dictionary));
     }
 
-    public HashMap<String, ArrayList<String>> loadUserDictionary() {
-        HashMap<String, ArrayList<String>> userDictionary = new HashMap<>();
+    public HashMap<String, Word> loadUserDictionary() {
+        userDictionary = loadWordsFile(USERDICTIONARY);
+        return userDictionary;
+    }
+
+    public HashMap<String, Word> loadUnclickedWords() {
+        unclickedWords = loadWordsFile(UNCLICKEDWORDS);
+        return unclickedWords;
+    }
+
+    private HashMap<String, Word> loadWordsFile(String file) {
+        HashMap<String, Word> loadingFile = new HashMap<>();
         try {
-            InputStream in = context.openFileInput(USERDICTIONARY);
+            InputStream in = context.openFileInput(file);
             if (in != null) {
                 InputStreamReader tmp=new InputStreamReader(in);
                 BufferedReader reader=new BufferedReader(tmp);
@@ -59,11 +74,11 @@ public class DataStorage {
                 }
 
                 in.close();
-                userDictionary = new Gson().fromJson(buf.toString(), new TypeToken<HashMap<String, ArrayList<String>>>() {
+                loadingFile = new Gson().fromJson(buf.toString(), new TypeToken<HashMap<String, Word>>() {
                 }.getType());
-                Log.d("userDictionary",userDictionary.toString());
+                Log.d(file,loadingFile.toString());
             }
-            Log.d("userDict input","null");
+            Log.d(file,"null");
 
         } catch (java.io.FileNotFoundException e) {
             Log.d("Dictionary","No dictionary file found.");
@@ -73,7 +88,7 @@ public class DataStorage {
         }
 
         finally {
-            return userDictionary;
+            return loadingFile;
         }
 
     }
@@ -108,7 +123,7 @@ public class DataStorage {
     }
 
     public void clearUserDictionary() throws IOException {
-        HashMap<String,ArrayList<String>> userDictionary = new HashMap<>();
+        HashMap<String,Word> userDictionary = new HashMap<>();
         Gson gson = new Gson();
         String json = gson.toJson(userDictionary);
         OutputStreamWriter out=
@@ -119,26 +134,32 @@ public class DataStorage {
         out.close();
     }
 
-    public void addToUserDictionary(String word) throws JSONException, IOException {
-        HashMap<String, ArrayList<String>> dictionary = loadUserDictionary();
-        Log.d("UserDictionary", dictionary.toString());
-        ArrayList<String> userData;
+    public void addToUserDictionary(String word, String lemma, String article, boolean click) throws JSONException, IOException {
+        addToWordsFile(word, lemma, USERDICTIONARY, article, click);
+    }
+
+    public void addToWordsFile(String word, String lemma, String file, String article, boolean click) throws JSONException, IOException {
+        HashMap<String, Word> dictionary = loadWordsFile(file);
+        Log.d(file, dictionary.toString());
+        Word userData;
         if (dictionary.containsKey(word)) {
             userData = dictionary.get(word);
+            userData.update(article, click);
         } else {
-            userData = new ArrayList<>();
+            userData = new Word(word, lemma);
+            userData.update(article, click);
         }
-        userData.add(Long.toString(System.currentTimeMillis()));
         dictionary.put(word, userData);
         Gson gson = new Gson();
         String json = gson.toJson(dictionary);
         OutputStreamWriter out=
 
-                new OutputStreamWriter(context.openFileOutput(USERDICTIONARY, 0));
+                new OutputStreamWriter(context.openFileOutput(file, 0));
 
         out.write(json);
         Log.d("File", "Saved " + word);
 
         out.close();
     }
+    
 }

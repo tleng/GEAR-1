@@ -69,10 +69,11 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
             ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();
             final TextView readingDictionary = (TextView) activityInstance.findViewById(R.id.definition_box);
             String definitionResult = "Word looked up: " + mWord + "\n";
+            String currentArticle = activityInstance.currentArticle;
             if (localDefinition != null) {
                 Log.d("LocalDefinition", localDefinition);
                 definitionResult = definitionResult + "English translation: " + localDefinition;
-                activityInstance.updateDataStorage(mWord, localDefinition, "None");
+                activityInstance.updateDataStorage(mWord, localDefinition, "None", currentArticle, true);
 
             } else {
                 if (definition != null) {
@@ -85,13 +86,13 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
                         definitionResult = definitionResult + "English translation: " + activityInstance.currentDefinition;
 
 
-                        activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma);
+                        activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma, currentArticle, true);
                     } else {
                         activityInstance.currentDefinition = "None";
                         activityInstance.currentLemma = "None";
                         Log.d("serverResponse", response.toString());
                         definitionResult = "Error";
-                        activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma);
+                        activityInstance.updateDataStorage(mWord, activityInstance.currentDefinition, activityInstance.currentLemma, currentArticle, true);
                     }
                 } else {
                     readingDictionary.setText("");

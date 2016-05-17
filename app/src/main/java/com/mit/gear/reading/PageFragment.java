@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,7 @@ import com.mattmellor.gear.R;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.words.DefinitionRequest;
 import com.mit.gear.words.GEARGlobal;
+import com.mit.gear.words.Word;
 
 import java.text.BreakIterator;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class PageFragment extends Fragment {
     private final static String PAGE_TEXT = "PAGE_TEXT";
     private static Context readArticleContext = ReadArticleActivity.getReadArticleActivityInstance().getApplicationContext();
     public static HashMap<String,ArrayList<String>> offlineDictionary = GEARGlobal.getOfflineDictionary(readArticleContext);
-    private HashMap<String,ArrayList<String>> userDictionary = new DataStorage(readArticleContext).loadUserDictionary();
+    private HashMap<String, Word> userDictionary = new DataStorage(readArticleContext).loadUserDictionary();
     private String clickedWord;
     private TextView pageView;
 
@@ -63,70 +63,16 @@ public class PageFragment extends Fragment {
             String possibleWord = stringText.substring(start, end);
             if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
                 //ClickableSpan clickSpan = getClickableSpan(possibleWord);
-                ClickableSpan clickSpan = getClickSpan(possibleWord);
+                GEARClickableSpan clickSpan = getClickSpan(possibleWord);
+                clickSpan.setIndex(GEARGlobal.getWordIndex());
+                GEARGlobal.incrementWordIndex();
                 spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
         return pageView;
     }
 
-    /*
-    public class GEARClickableSpan extends ClickableSpan {
-        final String mWord;
-        private TextPaint textPaint;
-
-        public GEARClickableSpan(String word) {
-            mWord = word;
-        }
-
-        @Override
-        public void onClick(View widget) {
-            if (currentDefinitionRequest != null) {
-                Log.d("Cancel", "Cancel current definition request: " + currentDefinitionRequest.toString());
-                currentDefinitionRequest.cancel(true);
-            }
-
-
-            Log.d("No cancel","current definition request not cancelled");
-            Log.d("tapped on:", mWord);
-            ArrayList<String> time_place_holder = new ArrayList<>();
-            time_place_holder.add("0");
-            userDictionary.put(mWord, time_place_holder);
-
-            if (textPaint != null) {
-                color(widget);
-            }
-            CharSequence message = mWord + " ausgewählt.";
-
-            TextView definitionBox = (TextView) ReadArticleActivity.getReadArticleActivityInstance().findViewById(R.id.definition_box);
-            definitionBox.setText(message);
-
-            DefinitionRequest definitionRequest = new DefinitionRequest(mWord);
-            currentDefinitionRequest = definitionRequest;
-            definitionRequest.execute(mWord);
-            Log.d("lookup", mWord);
-        }
-
-        public void updateDrawState(TextPaint ds) {
-            textPaint = ds;
-            ds.setUnderlineText(false);
-            if (userDictionary.containsKey(mWord)) {
-                ds.setColor(getResources().getColor(R.color.highlighted_word));
-            }
-        }
-
-        public void color(View widget) {
-            updateDrawState(textPaint);
-            widget.invalidate();
-        }
-
-        public static void clear(View widget) {
-
-        }
-    }
-    */
-
-    public ClickableSpan getClickSpan(final String word) {
+    public GEARClickableSpan getClickSpan(final String word) {
         return new GEARClickableSpan(word);
     }
 

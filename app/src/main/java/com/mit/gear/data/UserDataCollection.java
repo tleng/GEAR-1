@@ -1,7 +1,7 @@
 package com.mit.gear.data;
 
 
-import com.mit.gear.words.WordLookup;
+import com.mit.gear.words.Word;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,10 +95,10 @@ public class UserDataCollection {
 
     /**
      * Gets vocabulary of current user
-     * @return a map of word to WordLookup instances for the current user
+     * @return a map of word to Word instances for the current user
      */
 
-    public static HashMap<String, WordLookup> getCurrentVocabulary() {
+    public static HashMap<String, Word> getCurrentVocabulary() {
         UserData user = allUserData.get(currentUser);
         return user.getWordsLookedUp();
     }
