@@ -59,7 +59,6 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
     private String getVocabularyString() {
         DataStorage dataStorage = new DataStorage(getApplicationContext());
         HashMap<String, Word> vocabulary = dataStorage.loadUserDictionary();
-        HashMap<String, Word> unclicked = dataStorage.loadUnclickedWords();
 
         String vocabString = "";
         if (vocabulary.isEmpty()) {
@@ -70,18 +69,9 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
         for (Map.Entry<String, Word> entry : vocabulary.entrySet()) {
             String key = entry.getKey();
             Word word = entry.getValue();
-            vocabString += key + ": " + Integer.toString(word.getTimesLookedUp()) + "\n";
-        }
-        vocabString += "\nUnclicked Words:\n";
-        if (unclicked.isEmpty()) {
-            vocabString += "No work saved";
+            vocabString += key + " Clicked: " + Integer.toString(word.totalWordClicks()) + " Passed: " + Integer.toString(word.totalWordPasses()) + "\n";
         }
 
-        for (Map.Entry<String, Word> entry: unclicked.entrySet()) {
-            String key = entry.getKey();
-            Word word = entry.getValue();
-            vocabString += key + ": " + Integer.toString(word.getTimesLookedUp()) + "\n";
-        }
         return vocabString;
     }
 }

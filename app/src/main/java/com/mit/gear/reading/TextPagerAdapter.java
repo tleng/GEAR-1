@@ -2,11 +2,11 @@ package com.mit.gear.reading;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.List;
 
-public class TextPagerAdapter extends FragmentPagerAdapter {
+public class TextPagerAdapter extends FragmentStatePagerAdapter {
     private final List<CharSequence> pageTexts;
 
     public TextPagerAdapter(FragmentManager fm, List<CharSequence> pageTexts) {
@@ -16,7 +16,8 @@ public class TextPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int i) {
-        return PageFragment.newInstance(pageTexts.get(i));
+        PageFragment pageFragment = PageFragment.newInstance(pageTexts.get(i));
+        return pageFragment;
     }
 
     @Override

@@ -29,10 +29,12 @@ public class PageFragment extends Fragment {
     private HashMap<String, Word> userDictionary = new DataStorage(readArticleContext).loadUserDictionary();
     private String clickedWord;
     private TextView pageView;
+    private static CharSequence articleText;
 
     private DefinitionRequest currentDefinitionRequest = null;
 
     public static PageFragment newInstance(CharSequence pageText) {
+        articleText = pageText;
         PageFragment frag = new PageFragment();
         Bundle args = new Bundle();
         args.putCharSequence(PAGE_TEXT, pageText);
@@ -40,6 +42,33 @@ public class PageFragment extends Fragment {
         return frag;
     }
 
+//    public static void update() {
+//        PageFragment frag = new PageFragment();
+//        Bundle args = new Bundle();
+//        args.putCharSequence(PAGE_TEXT, articleText);
+//        frag.setArguments(args);
+//        return frag;
+//    }
+
+//    private static View setText() {
+//        pageView = (TextView) inflater.inflate(R.layout.page, container, false);
+//        pageView.setText(text, TextView.BufferType.SPANNABLE);
+//        Spannable spans = (Spannable) pageView.getText();
+//        BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);
+//        iterator.setText(stringText);
+//        int start = iterator.first();
+//        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
+//                .next()) {
+//            String possibleWord = stringText.substring(start, end);
+//            if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
+//                //ClickableSpan clickSpan = getClickableSpan(possibleWord);
+//                GEARClickableSpan clickSpan = getClickSpan(possibleWord);
+//                clickSpan.setIndex(GEARGlobal.getWordIndex());
+//                GEARGlobal.incrementWordIndex();
+//                spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            }
+//        }
+//    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         CharSequence text = getArguments().getCharSequence(PAGE_TEXT);

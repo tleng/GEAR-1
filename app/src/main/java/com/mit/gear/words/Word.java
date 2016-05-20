@@ -17,8 +17,8 @@ public class Word {
     private final String lemma;
     public double score;
     public boolean clicked;
-    private HashMap<String,ArrayList<Long>> articleClicks;
-    private HashMap<String,ArrayList<Long>> articlePasses;
+    public HashMap<String,ArrayList<Long>> articleClicks;
+    public HashMap<String,ArrayList<Long>> articlePasses;
 
     // stores the times the user looked up the word
     private final HashSet<Long> timestamps = new HashSet<Long>();
@@ -33,7 +33,7 @@ public class Word {
         this.lemma = lemma;
         timestamps.add(System.currentTimeMillis());
         Log.d("Word", "Created Word for " + word + " " + lemma);
-        score = 0.5; // just to test, set to 1
+        score = 0.0; // just to test, set to 1
         clicked = false;
         articleClicks = new HashMap<>();
         articlePasses = new HashMap<>();
@@ -50,7 +50,35 @@ public class Word {
     }
 
 
+    public void scoreWord(boolean click, boolean inUserDictionary) {
+        double p = totalWordClicks();
+        double np = totalWordPasses();
+        double clicked = 1;
+        if (!click) { clicked = 0; }
+        if (inUserDictionary) {
+            score = score * (p + 1) / (p + np + 2) + clicked/(p+np+2);
+        } else {
+            score = clicked/2;
+        }
 
+        Log.d("Word Score", word + ":" + "p: " + Double.toString(p) + "np: " + Double.toString(np) + "score: " + Double.toString(score));
+    }
+
+    public int totalWordClicks() {
+        int totalClicks = 0;
+        for (String article : articleClicks.keySet()) {
+            totalClicks += articleClicks.get(article).size();
+        }
+        return totalClicks;
+    }
+
+    public int totalWordPasses() {
+        int totalPasses = 0;
+        for (String article : articlePasses.keySet()) {
+            totalPasses += articlePasses.get(article).size();
+        }
+        return totalPasses;
+    }
     /**
      * Updates structure to account for new user lookup
      */

@@ -92,10 +92,13 @@ public class GEARClickableSpan extends ClickableSpan {
     public void updateDrawState(TextPaint ds) {
         textPaint = ds;
         ds.setUnderlineText(false);
+        HashMap<String, Word> currentSessionWords = ReadArticleActivity.getReadArticleActivityInstance().userDictionary;
         if (userDictionary.containsKey(mWord)) {
             if (userDictionary.get(mWord).clicked) {
             ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.highlighted_word));
-        }
+        } else if (currentSessionWords.containsKey(mWord)) {
+                ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.highlighted_word));
+            }
         }
     }
 

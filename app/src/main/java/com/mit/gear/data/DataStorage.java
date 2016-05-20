@@ -138,6 +138,40 @@ public class DataStorage {
         addToWordsFile(word, lemma, USERDICTIONARY, article, click);
     }
 
+    //The ArrayList is made up of String Lemma, String Article, Boolean Click
+    public void addGroupToUserDictionary(HashMap<String,ArrayList<Object>> wordWithLemmaArticleClick) throws JSONException, IOException {
+        HashMap<String, Word> dictionary = loadWordsFile(USERDICTIONARY);
+        for (String word : wordWithLemmaArticleClick.keySet()) {
+            Word userData;
+            ArrayList<Object> lemmaArticleClick = wordWithLemmaArticleClick.get(word);
+            String lemma = (String) lemmaArticleClick.get(0); // Lemma
+            String article = (String) lemmaArticleClick.get(1); // Article filename
+            boolean click = (boolean) lemmaArticleClick.get(2); // click should be false
+            userData = null;
+            for (int i = 0; i < (Integer) lemmaArticleClick.get(3); i++) {
+                if (dictionary.containsKey(word)) {
+                    userData = dictionary.get(word);
+                    userData.update(article, click);
+                    userData.scoreWord(click, true);
+                } else {
+                    userData = new Word(word, lemma);
+                    userData.update(article, click);
+                    userData.scoreWord(click, false);
+                }
+            }
+            dictionary.put(word, userData);
+        }
+        Gson gson = new Gson();
+        String json = gson.toJson(dictionary);
+        OutputStreamWriter out=
+
+                new OutputStreamWriter(context.openFileOutput(USERDICTIONARY, 0));
+
+        out.write(json);
+
+        out.close();
+    }
+
     public void addToWordsFile(String word, String lemma, String file, String article, boolean click) throws JSONException, IOException {
         HashMap<String, Word> dictionary = loadWordsFile(file);
         Log.d(file, dictionary.toString());
@@ -145,9 +179,11 @@ public class DataStorage {
         if (dictionary.containsKey(word)) {
             userData = dictionary.get(word);
             userData.update(article, click);
+            userData.scoreWord(click, true);
         } else {
             userData = new Word(word, lemma);
             userData.update(article, click);
+            userData.scoreWord(click, false);
         }
         dictionary.put(word, userData);
         Gson gson = new Gson();

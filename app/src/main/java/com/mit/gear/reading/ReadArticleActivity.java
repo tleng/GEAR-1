@@ -188,6 +188,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                HashMap<String, ArrayList<Object>> wordsToSave = new HashMap<String, ArrayList<Object>>();
                 userDictionary = dataStorage.loadUserDictionary();
                 BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);
                 iterator.setText(storyText);
@@ -201,7 +202,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                         if (count >= GEARGlobal.getLastWordClickedIndex()) {
                             break;
                         }
-                        try {
+                        //try {
                             if (currentSessionWords.containsKey(possibleWord)) {
                                 Integer sessionCount = currentSessionWords.get(possibleWord);
                                 if (sessionCount > 0) {
@@ -210,15 +211,33 @@ public class ReadArticleActivity extends AppCompatActivity {
                                     continue;
                                 }
                             }
-                            dataStorage.addToUserDictionary(possibleWord, "None", currentArticle, false);
-                            newWords += 1;
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            ArrayList<Object> wordArrayList = new ArrayList<>();
+                            wordArrayList.add("None");
+                            wordArrayList.add(currentArticle);
+                            wordArrayList.add(false);
+                        Integer wordCount = 1;
+                            if (wordsToSave.containsKey(possibleWord)) {
+                            wordCount = (Integer) wordsToSave.get(possibleWord).get(3) + 1;
                         }
+                        wordArrayList.add(wordCount);
+                            wordsToSave.put(possibleWord, wordArrayList);
+                            //dataStorage.addToUserDictionary(possibleWord, "None", currentArticle, false);
+                            newWords += 1;
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
                         count += 1;
                     }
+                }
+
+                try {
+                    dataStorage.addGroupToUserDictionary(wordsToSave);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
                 Toast endToast = Toast.makeText(getApplicationContext(), "Updated " + newWords.toString() + " unclicked words.", Toast.LENGTH_SHORT);
                 endToast.show();

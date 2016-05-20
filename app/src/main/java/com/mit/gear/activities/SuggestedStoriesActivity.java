@@ -1,5 +1,6 @@
 package com.mit.gear.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
@@ -38,8 +39,8 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
 
     private final Map<String, Double> articlesWithRatings = new HashMap<>();
     private android.support.v7.widget.Toolbar toolbar;
-
-    private int num_recommended_articles = 5;
+    private ProgressDialog progress;
+    private int num_recommended_articles = 10;
 
     private Map<String,Double> articleAndScoreMap = new HashMap<>();
 
@@ -149,10 +150,22 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
 
         try {
             ArrayList<String> listOfArticleAssets = listAllArticles();
+            progress=new ProgressDialog(this);
+            progress.setMessage("Generating Recommendations");
+            progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progress.setIndeterminate(true);
+            progress.setProgress(0);
+            progress.show();
+            int articleNumber = 0;
+            int totalArticles = listOfArticleAssets.size();
             for(String article: listOfArticleAssets){
                 Double fraction = getScore(article);
                 articleAndScoreMap.put(article,fraction);
+                articleNumber += 1;
+                int percentComplete = 50;
+                progress.setProgress(percentComplete);
             }
+            progress.hide();
             articleAndScoreMap = MapUtil.sortByValue(articleAndScoreMap);
             Set<String> sortedArticles = articleAndScoreMap.keySet();
             List<String> sortedArticleList = new ArrayList<>();
@@ -236,10 +249,10 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
         Double counter=1.0;
         for(String word: articleWords){
             if(userDictionary.containsKey(word)){
-                counter *= userDictionary.get(word).score;
+                counter *= 1-userDictionary.get(word).score;
             } else {
                 // word has never been encountered before
-                counter *= 1.0;
+                counter *= 0.5;
             }
         }
 
