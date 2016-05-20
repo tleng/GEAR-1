@@ -68,7 +68,7 @@ public class StartActivity extends AppCompatActivity {
      * @param view
      */
     public void goToLoginOnClick(View view){
-        startActivity(new Intent(StartActivity.this, LoginPopupActivity.class));
+        startActivity(new Intent(StartActivity.this, SavePopupActivity.class));
     }
 
 

@@ -12,9 +12,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.data.DataStorage;
 import com.mit.gear.miscellaneous.MapUtil;
-import com.mit.gear.data.UserDataCollection;
 import com.mit.gear.reading.ReadArticleActivity;
+import com.mit.gear.words.GEARGlobal;
 import com.mit.gear.words.Word;
 
 import java.io.IOException;
@@ -39,6 +40,9 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
     private android.support.v7.widget.Toolbar toolbar;
 
     private int num_recommended_articles = 5;
+
+    private Map<String,Double> articleAndScoreMap = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +69,7 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
      */
     private void generateRecommendationButtons() {
         //Replace recommendedKArticles with different algorithms
-        List<String> articles = recommendKArticles(num_recommended_articles);
+        List<String> articles = recommendKArticles2(num_recommended_articles);
 
         // adjust linear layout to display articles in
         LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
@@ -79,7 +83,9 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
             Button myButton = new Button(this);
             Double rating = articlesWithRatings.get(article) * 100;
             int suggestNumber = rating.intValue();
-            String ratingString = "<b> " + suggestNumber + "%" + " </b>";
+            //String ratingString = "<b> " + suggestNumber + "%" + " </b>";
+            String ratingString = "<b> "+articleAndScoreMap.get(article)+" </b>";
+
             myButton.setText(Html.fromHtml(article + "   " + ratingString));
             myButton.setContentDescription(article);
             myButton.setHeight(30);
@@ -93,6 +99,7 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
         }
     }
 
+
     // TODO: replace with either recommendation from backend (needs
     // further setup of backend) or more sophisticated inference of user vocabulary
     // rather than words the user has clicked on
@@ -102,20 +109,21 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
      * @param k is number of articles to recommmend, requires k< number of articles
      * @return k articles with highest fraction of words in userDictionary
      */
+    /**
     private List<String> recommendKArticles(int k) {
-        Map<String,Double> allFractionMappings = new HashMap<>();
+        Map<String,Double> articleAndScoreMap = new HashMap<>();
         //Map<String,Double> setNumberOfArticlesWithFractions  = new HashMap<>();
 
         try {
             ArrayList<String> listOfArticleAssets = listAllArticles();
             for(String article: listOfArticleAssets){
                 Double fraction = getFractionOfWords(article);
-                allFractionMappings.put(article,fraction);
+                articleAndScoreMap.put(article,fraction);
             }
-            allFractionMappings = MapUtil.sortByValue(allFractionMappings);
-            Set<String> sortedArticles = allFractionMappings.keySet();
+            articleAndScoreMap = MapUtil.sortByValue(articleAndScoreMap);
+            Set<String> sortedArticles = articleAndScoreMap.keySet();
             List<String> sortedArticleList = new ArrayList<>();
-            this.articlesWithRatings.putAll(allFractionMappings);
+            this.articlesWithRatings.putAll(articleAndScoreMap);
             for(String article: sortedArticles){
                 sortedArticleList.add(article);
                 //This just returns the keyset as a list???
@@ -125,7 +133,7 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
             for(int i=n-1;i>=n-k-1;i--){
                 recommendedArticles.add(sortedArticleList.get(i));
                 Log.d("article", sortedArticleList.get(i));
-                Log.d("fraction", allFractionMappings.get(sortedArticleList.get(i)).toString());
+                Log.d("fraction", articleAndScoreMap.get(sortedArticleList.get(i)).toString());
             }
             return recommendedArticles;
 
@@ -134,6 +142,43 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
         }
         return new ArrayList<>();
     }
+*/
+
+    private List<String> recommendKArticles2(int k) {
+        //Map<String,Double> setNumberOfArticlesWithFractions  = new HashMap<>();
+
+        try {
+            ArrayList<String> listOfArticleAssets = listAllArticles();
+            for(String article: listOfArticleAssets){
+                Double fraction = getScore(article);
+                articleAndScoreMap.put(article,fraction);
+            }
+            articleAndScoreMap = MapUtil.sortByValue(articleAndScoreMap);
+            Set<String> sortedArticles = articleAndScoreMap.keySet();
+            List<String> sortedArticleList = new ArrayList<>();
+            this.articlesWithRatings.putAll(articleAndScoreMap);
+            for(String article: sortedArticles){
+                sortedArticleList.add(article);
+                //This just returns the keyset as a list???
+            }
+            int n = sortedArticles.size();
+            List<String> recommendedArticles = new ArrayList<>();
+
+            // check if there are sortedArticles
+            if (n>0) {
+                for (int i = n - 1; i >= n - k - 1; i--) {
+                    recommendedArticles.add(sortedArticleList.get(i));
+                    Log.d("article", sortedArticleList.get(i));
+                    Log.d("fraction", articleAndScoreMap.get(sortedArticleList.get(i)).toString());
+                }
+            }
+            return recommendedArticles;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
 
     /**
      * Lists all articles in the article folder
@@ -142,7 +187,7 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
      */
     private ArrayList<String> listAllArticles() throws IOException {
         AssetManager assetManager = getResources().getAssets();
-        String assets[] = assetManager.list("");
+        String assets[] = assetManager.list(GEARGlobal.articlePathName);
         ArrayList<String> assetsAsString = new ArrayList<String>();
         Collections.addAll(assetsAsString,assets);
         assetsAsString.remove("sounds");
@@ -151,48 +196,54 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
     }
 
 
+
+
     /**
-     * Gets fraction of words in the article that are also in the
-     * set of words the user has looked up previously
-     * @param article
+     * @param articleFilename = filename of the article
      * @return
      */
-    private Double getFractionOfWords(String article) {
-        HashMap<String, Word> userVocab = UserDataCollection.getCurrentVocabulary();
-
+    private Double getScore(String articleFilename) {
+        DataStorage dataStorage = new DataStorage(getApplicationContext());
+        HashMap<String,Word> userDictionary = dataStorage.loadUserDictionary();
         InputStream input;
-        String text = article;
+        String articleText;
+
         try {
+            // open articleFilename and read article into articleText
             AssetManager assetManager = getResources().getAssets();
-            input = assetManager.open(article);
+            input = assetManager.open(GEARGlobal.articlePath+articleFilename);
             int size = input.available();
             byte[] buffer = new byte[size];
             input.read(buffer);
             input.close();
 
             // byte buffer into a string
-            text = new String(buffer).trim();
+            articleText = new String(buffer).trim();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            text = "Error Occurred";
+            articleText = "Error Occurred";  // better - signal error differently
         }
 
-        String[] articleWords = text.split("[\\p{Punct}\\s]+");
-        List<String> lowerCaseArticleWords = new ArrayList<String>(); // we are considering all words
-        for (String word : articleWords) {
-            lowerCaseArticleWords.add(word.toLowerCase());
-        }
 
-        Double counter=0.0;
-        for(String word: lowerCaseArticleWords){
-            if(userVocab.containsKey(word)){
-                counter += 1;
+        String[] articleWords = articleText.split("[\\p{Punct}\\s]+");
+
+//        List<String> lowerCaseArticleWords = new ArrayList<String>(); // we are considering all words
+//        for (String word : articleWords) {
+//            lowerCaseArticleWords.add(word.toLowerCase());
+//        }
+
+        Double counter=1.0;
+        for(String word: articleWords){
+            if(userDictionary.containsKey(word)){
+                counter *= userDictionary.get(word).score;
+            } else {
+                // word has never been encountered before
+                counter *= 1.0;
             }
         }
 
-        Double fraction = counter/lowerCaseArticleWords.size();
-        return fraction;
+        return counter;
 
     }
 
@@ -200,7 +251,7 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
         return new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(SuggestedStoriesActivity.this, ReadArticleActivity.class);
-                intent.putExtra("story",button.getContentDescription());
+                intent.putExtra("story", GEARGlobal.articlePath + button.getContentDescription());
                 startActivity(intent);
                 finish();
             }

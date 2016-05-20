@@ -4,21 +4,20 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.widget.EditText;
 
 import com.mattmellor.gear.R;
-import com.mit.gear.data.UserDataCollection;
+import com.mit.gear.reading.ReadArticleActivity;
 
 /**
  *
  */
-public class LoginPopupActivity extends Activity {
+public class SavePopupActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.popup_login);
+        setContentView(R.layout.popup_save);
 
 
         DisplayMetrics dm = new DisplayMetrics();
@@ -33,14 +32,12 @@ public class LoginPopupActivity extends Activity {
 
     }
 
-    public void onClick(View view){
-
+    public void dontSave(View view){
+        finish();
     }
 
-    public void completeLogin(View view) {
-        EditText loginInputName = (EditText) findViewById(R.id.loginName);
-        String username = loginInputName.getText().toString();
-        UserDataCollection.login(username);
+    public void saveProgress(View view) {
+        ReadArticleActivity.getReadArticleActivityInstance().saveProgress(view);
         finish();
     }
 

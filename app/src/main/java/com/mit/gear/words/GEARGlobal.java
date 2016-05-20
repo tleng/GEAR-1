@@ -17,6 +17,8 @@ public class GEARGlobal {
     private static Integer wordIndex;
     private static String lastWordClicked = "None";
     private static Integer lastWordClickedIndex = -1;
+    public final static String articlePathName = "articles";
+    public final static String articlePath = articlePathName+"/";
 
 
 

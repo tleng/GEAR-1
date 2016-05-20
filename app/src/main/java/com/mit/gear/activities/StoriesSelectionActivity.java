@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.reading.ReadArticleActivity;
+import com.mit.gear.words.GEARGlobal;
 
 import java.io.IOException;
 
@@ -65,7 +66,7 @@ public class StoriesSelectionActivity extends AppCompatActivity {
         return new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(StoriesSelectionActivity.this, ReadArticleActivity.class);
-                intent.putExtra("story",button.getContentDescription());
+                intent.putExtra("story", GEARGlobal.articlePath + button.getContentDescription());
                 startActivity(intent);
                 finish();
             }
@@ -73,7 +74,7 @@ public class StoriesSelectionActivity extends AppCompatActivity {
     }
 
     private void generateRecommendationButtons() throws IOException {
-        String [] articles = getAssets().list("");
+        String [] articles = getAssets().list(GEARGlobal.articlePathName);
 
         // adjust linear layout to display articles in
         LinearLayout ll = (LinearLayout) findViewById(R.id.allStoriesLinearLayout);
@@ -84,20 +85,23 @@ public class StoriesSelectionActivity extends AppCompatActivity {
 
         // StackOverflow suggested code to dynamically create buttons for the articles
         for (String article:articles) {
-            if (article.equals("images") || article.equals("sounds") || article.equals("webkit")|| article.equals("pskc_schema.xsd")) {
-                continue;
+           // if (asset.equals("images") || article.equals("sounds") || article.equals("webkit")|| article.equals("pskc_schema.xsd")) {
+           //     continue;
+           // }
+
+                Button myButton = new Button(this);
+                myButton.setText(Html.fromHtml(article));
+                myButton.setContentDescription(article);
+                myButton.setHeight(30);
+                myButton.setTransformationMethod(null); // ensures text is lower case
+
+                Log.d("button added:", myButton.toString());
+                myButton.setOnClickListener(getOnClickSetStory(myButton));
+
+                ll.addView(myButton, lp);
+                Log.d("number of buttons:", Integer.toString(ll.getChildCount()));
             }
-            Button myButton = new Button(this);
-            myButton.setText(Html.fromHtml(article));
-            myButton.setContentDescription(article);
-            myButton.setHeight(30);
-            myButton.setTransformationMethod(null); // ensures text is lower case
 
-            Log.d("button added:", myButton.toString());
-            myButton.setOnClickListener(getOnClickSetStory(myButton));
-
-            ll.addView(myButton, lp);
-            Log.d("number of buttons:", Integer.toString(ll.getChildCount()));
         }
     }
-}
+

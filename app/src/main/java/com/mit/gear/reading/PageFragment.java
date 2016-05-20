@@ -55,7 +55,7 @@ public class PageFragment extends Fragment {
         pageView.setMovementMethod(LinkMovementMethod.getInstance());
         pageView.setText(text, TextView.BufferType.SPANNABLE);
         Spannable spans = (Spannable) pageView.getText();
-        BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
+        BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);
         iterator.setText(stringText);
         int start = iterator.first();
         for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator

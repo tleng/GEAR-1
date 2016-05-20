@@ -44,7 +44,7 @@
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="com.mit.gear.activities.LoginPopupActivity"
+            android:name="com.mit.gear.activities.SavePopupActivity"
             android:theme="@style/AppTheme.CustomTheme" >
         </activity>
 

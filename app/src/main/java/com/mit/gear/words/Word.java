@@ -33,7 +33,7 @@ public class Word {
         this.lemma = lemma;
         timestamps.add(System.currentTimeMillis());
         Log.d("Word", "Created Word for " + word + " " + lemma);
-        score = 0;
+        score = 0.5; // just to test, set to 1
         clicked = false;
         articleClicks = new HashMap<>();
         articlePasses = new HashMap<>();

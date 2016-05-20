@@ -14,6 +14,7 @@ import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.activities.SavePopupActivity;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
 import com.mit.gear.words.DefinitionRequest;
@@ -180,15 +181,15 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     public void saveProgress(View view) {
-        Log.d("Save Progress", "Clicked");
-        Toast toast = Toast.makeText(getApplicationContext(), "Saving work...", Toast.LENGTH_SHORT);
+        Log.d("Save Progress", "Clicked index " + GEARGlobal.getLastWordClickedIndex().toString());
+        Toast toast = Toast.makeText(getApplicationContext(), "Saving work...", Toast.LENGTH_LONG);
         toast.show();
         final DataStorage dataStorage = new DataStorage(getApplicationContext());
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 userDictionary = dataStorage.loadUserDictionary();
-                BreakIterator iterator = BreakIterator.getWordInstance(Locale.US);
+                BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);
                 iterator.setText(storyText);
                 int start = iterator.first();
                 Integer count = 0;
@@ -216,8 +217,8 @@ public class ReadArticleActivity extends AppCompatActivity {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        count += 1;
                     }
-                    count += 1;
                 }
                 Toast endToast = Toast.makeText(getApplicationContext(), "Updated " + newWords.toString() + " unclicked words.", Toast.LENGTH_SHORT);
                 endToast.show();
@@ -229,8 +230,8 @@ public class ReadArticleActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
-
+        Intent intent = new Intent(ReadArticleActivity.this, SavePopupActivity.class);
+        startActivity(intent);
         // updates user data with time spent
         Long endTime = System.currentTimeMillis();
         Long timeSpent = endTime - startTime;
