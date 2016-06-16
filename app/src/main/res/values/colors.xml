@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="start_activity_color">#99bbff</color>
-    <color name="highlighted_word">#0000ff</color>
+    <color name="clicked_word_background">#FFFF00</color>
+    <color name="clicked_word">#0000ff</color>
+    <color name="passed_word">#767676</color>
+    <color name="default_word">#000000</color>
 </resources>

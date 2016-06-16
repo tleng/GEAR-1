@@ -1,6 +1,7 @@
 package com.mit.gear.reading;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Spannable;
@@ -73,6 +74,8 @@ public class PageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         CharSequence text = getArguments().getCharSequence(PAGE_TEXT);
         pageView = (TextView) inflater.inflate(R.layout.page, container, false);
+        //removing the highlight color for the textView if clicked
+        pageView.setHighlightColor(Color.TRANSPARENT);
         Log.d("Viewthis",pageView.toString());
         if (GEARClickableSpan.clearWidget == null) {
             GEARClickableSpan.clearWidget = pageView;

@@ -1,6 +1,8 @@
 package com.mit.gear.reading;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.util.Log;
@@ -30,6 +32,9 @@ public class GEARClickableSpan extends ClickableSpan {
     private static HashMap<String,Word> userDictionary = ReadArticleActivity.getReadArticleActivityInstance().userDictionary;
     static View clearWidget;
     private Integer index;
+    //create sharedPreferences to get user choice of text coloring
+    public SharedPreferences sharedPreferences;
+    public boolean colorChoice;
 
     public GEARClickableSpan(String word) {
         mWord = word;
@@ -37,6 +42,8 @@ public class GEARClickableSpan extends ClickableSpan {
 
     @Override
     public void onClick(View widget) {
+        //set progressSaved to false to popup the savePopupActivity in case user did not save
+        ReadArticleActivity.getReadArticleActivityInstance().setProgressSaved(false);
         GEARGlobal.setLastWordClicked(mWord);
         GEARGlobal.setLastWordClickedIndex(index);
         if (currentDefinitionRequest != null) {
@@ -53,6 +60,8 @@ public class GEARClickableSpan extends ClickableSpan {
         time_place_holder.add("0");
         Word wordData = new Word(mWord);
         wordData.setClicked(true);
+        //get the latest userDictionary to add new words clicked
+        userDictionary = ReadArticleActivity.getReadArticleActivityInstance().userDictionary;
         userDictionary.put(mWord, wordData);
         DataStorage dataStorage = new DataStorage(context);
         ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();
@@ -92,13 +101,35 @@ public class GEARClickableSpan extends ClickableSpan {
     public void updateDrawState(TextPaint ds) {
         textPaint = ds;
         ds.setUnderlineText(false);
-        HashMap<String, Word> currentSessionWords = ReadArticleActivity.getReadArticleActivityInstance().userDictionary;
-        if (userDictionary.containsKey(mWord)) {
-            if (userDictionary.get(mWord).clicked) {
-            ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.highlighted_word));
-        } else if (currentSessionWords.containsKey(mWord)) {
-                ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.highlighted_word));
+        //access the latest userDictionary
+        HashMap<String, Word> userDictionary = ReadArticleActivity.getReadArticleActivityInstance().userDictionary;
+        //creating ReadArticleActivity instance to access the currentSessionWords
+        ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();
+        //accessing the color sharedPreferences to get user text color choice or true for default
+        sharedPreferences = context.getSharedPreferences("ColorPreference", Context.MODE_PRIVATE);
+        colorChoice = sharedPreferences.getBoolean("color", true);
+        //if the color choice is true(color switch is on)
+        if (colorChoice) {
+            //if the word in the currentSessionWords word ( clicked in the current session )
+            if( activityInstance.currentSessionWords.containsKey(mWord)){
+                ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
+                ds.bgColor=(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word_background));
             }
+            //if the word in the userDictionary check if it is clicked or passed
+            else if(userDictionary.containsKey(mWord)){
+                if(userDictionary.get(mWord).clicked)
+                    ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
+                else{
+                    ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.passed_word));
+                }
+                //else color the rest of the word with the default color
+            }else{
+                ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));
+            }
+        }
+        //if the user turned off the text coloring color with the default color
+        else{
+            ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));
         }
     }
 
@@ -109,10 +140,15 @@ public class GEARClickableSpan extends ClickableSpan {
 
     public static void clear() {
         if (clearWidget != null) {
+            //clearing the current session words
+            ReadArticleActivity.getReadArticleActivityInstance().currentSessionWords.clear();
             userDictionary.clear();
             clearWidget.invalidate();
             Log.d("Clear","View updated");
         }
+        GEARGlobal.setLastWordClickedIndex(-1);
+        //setting the saveProgress to true (do not show the SavePopupActivity)
+        ReadArticleActivity.getReadArticleActivityInstance().setProgressSaved(true);
     }
 
     public void setIndex(Integer i) {

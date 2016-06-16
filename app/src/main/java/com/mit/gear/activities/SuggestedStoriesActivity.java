@@ -51,8 +51,20 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_suggested_stories);
         toolbar = (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
         setSupportActionBar(toolbar);
+        //prepare progressDialog
+        progress=new ProgressDialog(this);
+        progress.setMessage("Generating Recommendations");
+        progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progress.setProgress(0);
+        progress.show();
 
-        generateRecommendationButtons();
+        //create thread to generate the suggested stories and update progressDialog
+        new Thread(new Runnable() {
+        @Override
+        public void run() {
+            generateRecommendationButtons();
+        }
+            }).start();
 
     }
 
@@ -70,37 +82,40 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
      */
     private void generateRecommendationButtons() {
         //Replace recommendedKArticles with different algorithms
-        List<String> articles = recommendKArticles2(num_recommended_articles);
-
+        //making variables as final to access it from inner thread
+        final List<String> articles = recommendKArticles2(num_recommended_articles);
         // adjust linear layout to display articles in
-        LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
+        final LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
+        final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         ll.setOrientation(LinearLayout.VERTICAL);
-
-
         // StackOverflow suggested code to dynamically create buttons for the articles
         for (String article:articles) {
-            Button myButton = new Button(this);
+            final Button myButton = new Button(this);
             Double rating = articlesWithRatings.get(article) * 100;
             int suggestNumber = rating.intValue();
             //String ratingString = "<b> " + suggestNumber + "%" + " </b>";
             String ratingString = "<b> "+articleAndScoreMap.get(article)+" </b>";
-
             myButton.setText(Html.fromHtml(article + "   " + ratingString));
             myButton.setContentDescription(article);
             myButton.setHeight(30);
             myButton.setTransformationMethod(null); // ensures text is lower case
-
             Log.d("button added:", myButton.toString());
             myButton.setOnClickListener(getOnClickSetStory(myButton));
 
-            ll.addView(myButton, lp);
-            Log.d("number of buttons:", Integer.toString(ll.getChildCount()));
+            //Ui thread to attach the buttons to the linerLayout
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ll.addView(myButton, lp);
+                    Log.d("number of buttons:", Integer.toString(ll.getChildCount()));
+                }
+            });
+
         }
+        //dismissing the progressDialog
+        progress.dismiss();
     }
-
-
     // TODO: replace with either recommendation from backend (needs
     // further setup of backend) or more sophisticated inference of user vocabulary
     // rather than words the user has clicked on
@@ -150,22 +165,18 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
 
         try {
             ArrayList<String> listOfArticleAssets = listAllArticles();
-            progress=new ProgressDialog(this);
-            progress.setMessage("Generating Recommendations");
-            progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            progress.setIndeterminate(true);
-            progress.setProgress(0);
-            progress.show();
             int articleNumber = 0;
             int totalArticles = listOfArticleAssets.size();
+            //setting the progressDialog maximum to the total articles
+            progress.setMax(totalArticles);
             for(String article: listOfArticleAssets){
                 Double fraction = getScore(article);
                 articleAndScoreMap.put(article,fraction);
                 articleNumber += 1;
                 int percentComplete = 50;
-                progress.setProgress(percentComplete);
+                //updating the progressDialog with article number
+                progress.setProgress(articleNumber);
             }
-            progress.hide();
             articleAndScoreMap = MapUtil.sortByValue(articleAndScoreMap);
             Set<String> sortedArticles = articleAndScoreMap.keySet();
             List<String> sortedArticleList = new ArrayList<>();

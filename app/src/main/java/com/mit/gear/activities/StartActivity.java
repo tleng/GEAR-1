@@ -23,7 +23,6 @@ public class StartActivity extends AppCompatActivity {
         // login with dummy user
         String defaultUserName = "defaultUser";
         UserDataCollection.login(defaultUserName);
-
     }
 
     @Override
@@ -69,6 +68,10 @@ public class StartActivity extends AppCompatActivity {
      */
     public void goToLoginOnClick(View view){
         startActivity(new Intent(StartActivity.this, SavePopupActivity.class));
+    }
+    //open userSettingsActivity
+    public void goToSettings(View view) {
+        startActivity(new Intent(StartActivity.this, UserSettingsActivity.class));
     }
 
 

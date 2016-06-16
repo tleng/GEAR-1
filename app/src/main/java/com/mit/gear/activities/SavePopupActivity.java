@@ -12,9 +12,11 @@ import com.mit.gear.reading.ReadArticleActivity;
  *
  */
 public class SavePopupActivity extends Activity {
-
+    //creating savePopupActivity instance
+    public static SavePopupActivity savePopupActivity;
     @Override
     protected void onCreate(Bundle savedInstanceState){
+        savePopupActivity = this;
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.popup_save);
@@ -33,12 +35,12 @@ public class SavePopupActivity extends Activity {
     }
 
     public void dontSave(View view){
-        finish();
+        //dismissing the savePopupActivity
+        savePopupActivity.finish();
     }
 
     public void saveProgress(View view) {
         ReadArticleActivity.getReadArticleActivityInstance().saveProgress(view);
-        finish();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.mit.gear.reading;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
@@ -11,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.Toast;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.activities.SavePopupActivity;
@@ -29,6 +29,7 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import android.os.Handler;
 
 /**
  * Activity where user reads article
@@ -50,11 +51,23 @@ public class ReadArticleActivity extends AppCompatActivity {
     // Set definition_scroll to true when using a scrolling definition textbox
     public boolean definition_scroll = true;
     public HashMap<String,Integer> currentSessionWords = new HashMap<>();
+    //setting the progressSaved to true (Assuming no clicks happened)
+    private boolean progressSaved = true;
+    private ProgressDialog progress;
+    //Handler to update the progress
+    private Handler progressBarHandler = new Handler();
 
     public ReadArticleActivity() {
         instance = this;
     }
+    //checking if user saved the progress or not
+    public boolean isProgressSaved() {
+        return progressSaved;
+    }
 
+    public void setProgressSaved(boolean progressSaved) {
+        this.progressSaved = progressSaved;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,7 +174,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                     dataStorage.clearUserDictionary();
                     userDictionary = dataStorage.loadUserDictionary();
                     GEARClickableSpan.clear();
-                    setPagesView();
+                    //setPagesView();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -181,15 +194,26 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     public void saveProgress(View view) {
+        //preparing the progressDialog
+        progress=new ProgressDialog(view.getContext());
+        progress.setMessage("Saving Progress");
+        progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progress.setProgress(0);
+        progress.setCancelable(false);
+        //setting the progressDialog to the last clicked word index
+        progress.setMax(GEARGlobal.getLastWordClickedIndex());
+        progress.show();
+        setProgressSaved(true);
         Log.d("Save Progress", "Clicked index " + GEARGlobal.getLastWordClickedIndex().toString());
-        Toast toast = Toast.makeText(getApplicationContext(), "Saving work...", Toast.LENGTH_LONG);
-        toast.show();
+        //Toast toast = Toast.makeText(getApplicationContext(), "Saving work...", Toast.LENGTH_LONG);
+        //toast.show();
         final DataStorage dataStorage = new DataStorage(getApplicationContext());
-        runOnUiThread(new Runnable() {
+
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 HashMap<String, ArrayList<Object>> wordsToSave = new HashMap<String, ArrayList<Object>>();
-                userDictionary = dataStorage.loadUserDictionary();
+                //userDictionary = dataStorage.loadUserDictionary();
                 BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);
                 iterator.setText(storyText);
                 int start = iterator.first();
@@ -230,27 +254,48 @@ public class ReadArticleActivity extends AppCompatActivity {
 //                        }
                         count += 1;
                     }
+                    try {
+                        //sleep the thread for user interface experience
+                        Thread.sleep(5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    final Integer finalCount = count;
+                    progressBarHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            //updating the progress with words count
+                            progress.setProgress(finalCount);
+                        }
+                    });
                 }
 
                 try {
                     dataStorage.addGroupToUserDictionary(wordsToSave);
+                    //dismiss the progress and finish the SavePopupActivity if exist
+                    progress.dismiss();
+                    if(SavePopupActivity.savePopupActivity != null) {
+                        SavePopupActivity.savePopupActivity.finish();
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Toast endToast = Toast.makeText(getApplicationContext(), "Updated " + newWords.toString() + " unclicked words.", Toast.LENGTH_SHORT);
-                endToast.show();
             }
-        });
+        }).start();
+        //Toast endToast = Toast.makeText(getApplicationContext(), "Updated " + newWords.toString() + " unclicked words.", Toast.LENGTH_SHORT);
+        //endToast.show();
     }
 
 
     @Override
     protected void onPause() {
         super.onPause();
-        Intent intent = new Intent(ReadArticleActivity.this, SavePopupActivity.class);
-        startActivity(intent);
+        //show SavePopupActivity if the user did not save when exiting
+        if (!isProgressSaved()){
+            Intent intent = new Intent(ReadArticleActivity.this, SavePopupActivity.class);
+            startActivity(intent);}
         // updates user data with time spent
         Long endTime = System.currentTimeMillis();
         Long timeSpent = endTime - startTime;
@@ -259,6 +304,8 @@ public class ReadArticleActivity extends AppCompatActivity {
 
     protected void OnResume() {
         super.onResume();
+        //update the userDictionary
+        ReadArticleActivity.getReadArticleActivityInstance().userDictionary=new DataStorage(getApplicationContext()).loadUserDictionary();
     }
 
     public static ReadArticleActivity getReadArticleActivityInstance() {

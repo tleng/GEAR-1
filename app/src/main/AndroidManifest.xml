@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mattmellor.gear" >
+    package="com.mattmellor.gear">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_gear"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name="android.support.multidex.MultiDexApplication">
+        android:theme="@style/AppTheme">
         <activity
             android:name="com.mit.gear.reading.ReadArticleActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"></activity>
         <activity
             android:name="com.mit.gear.activities.StartActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,29 +27,26 @@
         </activity>
         <activity
             android:name="com.mit.gear.activities.StoriesSelectionActivity"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name"></activity>
         <activity
             android:name="com.mit.gear.activities.DisplayVocabularyActivity"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name"></activity>
         <activity
             android:name="com.mit.gear.reading.popUpRateArticle"
-            android:theme="@style/AppTheme.CustomTheme" >
-        </activity>
+            android:theme="@style/AppTheme.CustomTheme"></activity>
         <activity
             android:name="com.mit.gear.activities.SuggestedStoriesActivity"
             android:label="@string/title_activity_suggested_stories"
-            android:theme="@style/AppTheme" >
-        </activity>
+            android:theme="@style/AppTheme"></activity>
         <activity
             android:name="com.mit.gear.activities.SavePopupActivity"
-            android:theme="@style/AppTheme.CustomTheme" >
-        </activity>
+            android:theme="@style/AppTheme.CustomTheme"></activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <activity android:name="com.mit.gear.activities.UserSettingsActivity"></activity>
     </application>
 
 </manifest>

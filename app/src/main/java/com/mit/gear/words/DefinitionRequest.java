@@ -68,7 +68,7 @@ public class DefinitionRequest extends AsyncTask<String, Void, GearBackendDefini
         } else {
             ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();
             final TextView readingDictionary = (TextView) activityInstance.findViewById(R.id.definition_box);
-            String definitionResult = "Word looked up: " + mWord + "\n";
+            String definitionResult = "Word looked up: " + mWord + ", Index: "+GEARGlobal.getLastWordClickedIndex()+"\n";
             String currentArticle = activityInstance.currentArticle;
             if (localDefinition != null) {
                 Log.d("LocalDefinition", localDefinition);
