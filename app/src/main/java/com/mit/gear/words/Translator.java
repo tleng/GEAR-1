@@ -36,9 +36,7 @@ public class Translator extends AsyncTask<Void, Void, Void> {
             translatedText = Translate.execute(mWord, Language.ENGLISH);
 
         } catch (Exception e) {
-            Toast.makeText(ReadArticleActivity.getReadArticleActivityInstance(),"Make sure you have internet connection",Toast.LENGTH_LONG).show();
             Log.e("Error", e.getMessage());
-            e.printStackTrace();
         }
         return null;
     }
