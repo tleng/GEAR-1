@@ -27,18 +27,23 @@ public class PageFragment extends Fragment {
     private final static String PAGE_TEXT = "PAGE_TEXT";
     private static Context readArticleContext = ReadArticleActivity.getReadArticleActivityInstance().getApplicationContext();
     public static HashMap<String,ArrayList<String>> offlineDictionary = GEARGlobal.getOfflineDictionary(readArticleContext);
+    //HashMap to keep track of each fragment starting-index
+    public static HashMap<Integer,Integer> wordIndexing= new HashMap<>();
     private HashMap<String, Word> userDictionary = new DataStorage(readArticleContext).loadUserDictionary();
     private String clickedWord;
     private TextView pageView;
     private static CharSequence articleText;
+    public static Integer fragmentIndex =0 ;
 
     private DefinitionRequest currentDefinitionRequest = null;
 
-    public static PageFragment newInstance(CharSequence pageText) {
+    public static PageFragment newInstance(CharSequence pageText, int fragmentIndex) {
         articleText = pageText;
         PageFragment frag = new PageFragment();
         Bundle args = new Bundle();
         args.putCharSequence(PAGE_TEXT, pageText);
+        //saving the fragment index into its args
+        args.putInt("index",fragmentIndex);
         frag.setArguments(args);
         return frag;
     }
@@ -72,7 +77,10 @@ public class PageFragment extends Fragment {
 //    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        //the first fragment default starting index
+        wordIndexing.put(0,0);
         CharSequence text = getArguments().getCharSequence(PAGE_TEXT);
+        fragmentIndex = getArguments().getInt("index");
         pageView = (TextView) inflater.inflate(R.layout.page, container, false);
         //removing the highlight color for the textView if clicked
         pageView.setHighlightColor(Color.TRANSPARENT);
@@ -90,6 +98,8 @@ public class PageFragment extends Fragment {
         BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);
         iterator.setText(stringText);
         int start = iterator.first();
+        //accessing the hashMap to get the fragment's starting index
+        GEARGlobal.setWordIndex(wordIndexing.get(fragmentIndex));
         for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
                 .next()) {
             String possibleWord = stringText.substring(start, end);
@@ -101,6 +111,8 @@ public class PageFragment extends Fragment {
                 spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
+        //putting the next fragment starting index into the hashMap
+        wordIndexing.put(fragmentIndex + 1, GEARGlobal.getWordIndex());
         return pageView;
     }
 

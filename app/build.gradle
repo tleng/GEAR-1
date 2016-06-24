@@ -38,4 +38,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-gcm:8.1.0'
     compile project(':gear')
     compile 'com.google.code.gson:gson:2.2.4'
+    compile files('libs/microsoft-translator-java-api-0.6.1-jar-with-dependencies.jar')
 }

@@ -46,7 +46,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     private Integer currentPosition = 0;
     private Long startTime;
     public String currentArticle;
-    private ViewPager pagesView;
+    public static ViewPager pagesView;
     private String storyText = "None";
     // Set definition_scroll to true when using a scrolling definition textbox
     public boolean definition_scroll = true;
@@ -72,6 +72,9 @@ public class ReadArticleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         GEARGlobal.resetWordIndex();
+        //clearing the last word index every time the story loads
+        GEARGlobal.setLastWordClickedIndex(-1);
+        GEARGlobal.setLastWordClicked("None");
         if (definition_scroll) {
             setContentView(R.layout.pages_scrolling_definition);
         } else {
@@ -95,6 +98,8 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     public void setPagesView() {
+        //clearing the hash map that contains the fragments starting-indexes
+        PageFragment.wordIndexing.clear();
         pagesView = (ViewPager) findViewById(R.id.pages);
         pagesView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -128,6 +133,8 @@ public class ReadArticleActivity extends AppCompatActivity {
                 pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
+        //limiting the preloading to one page per side
+        pagesView.setOffscreenPageLimit(1);
     }
 
 

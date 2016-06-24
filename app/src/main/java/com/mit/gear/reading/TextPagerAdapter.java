@@ -16,8 +16,14 @@ public class TextPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int i) {
-        PageFragment pageFragment = PageFragment.newInstance(pageTexts.get(i));
+        //passing the page text and the fragment index
+        PageFragment pageFragment = PageFragment.newInstance(pageTexts.get(i),i);
         return pageFragment;
+    }
+    //return position none to force the pagerView to update
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
     }
 
     @Override

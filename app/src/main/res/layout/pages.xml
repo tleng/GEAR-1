@@ -29,7 +29,6 @@
         android:layout_width="match_parent"
         android:layout_height="130dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="No words looked up yet."
         android:id="@+id/definition_box"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"

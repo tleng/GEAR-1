@@ -65,4 +65,8 @@ public class GEARGlobal {
     public static Integer getLastWordClickedIndex() {
         return lastWordClickedIndex;
     }
+
+    public static void setWordIndex(int index){
+        wordIndex = index;
+    }
 }
