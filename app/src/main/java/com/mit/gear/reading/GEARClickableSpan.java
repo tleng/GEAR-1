@@ -37,46 +37,24 @@ public class GEARClickableSpan extends ClickableSpan {
     private static HashMap<String,Word> userDictionary = ReadArticleActivity.getReadArticleActivityInstance().userDictionary;
     static View clearWidget;
     private Integer index;
-    //create sharedPreferences to get user choice of text coloring and speak choice
-    public SharedPreferences sharedPreferences;
-    public boolean colorChoice;
-    public boolean speakChoice;
-    public TextToSpeech textToSpeech;
-    final private Locale LanguageSpeak= Locale.GERMAN;
+    public static boolean colorChoice;
+    public static boolean speakChoice;
+    private ReadArticleActivity readArticleActivity =ReadArticleActivity.getReadArticleActivityInstance();
+    private static String lemma;
 
     public GEARClickableSpan(String word) {
         mWord = word;
-        //accessing the color/speak sharedPreferences to get user text color choice or true for default
-        sharedPreferences = context.getSharedPreferences("Settings", Context.MODE_PRIVATE);
-        colorChoice = sharedPreferences.getBoolean("color", true);
-        speakChoice = sharedPreferences.getBoolean("speak", true);
     }
 
     @Override
     public void onClick(View widget) {
-        //update the view for all the preloaded fragments (max 3)
-        ReadArticleActivity.getReadArticleActivityInstance().pagesView.getAdapter().notifyDataSetChanged();
-        //set progressSaved to false to popup the savePopupActivity in case user did not save
-        ReadArticleActivity.getReadArticleActivityInstance().setProgressSaved(false);
-        //save the maximum word index
-        if(GEARGlobal.getLastWordClickedIndex()< index)
-        {
-            GEARGlobal.setLastWordClickedIndex(index);
-            GEARGlobal.setLastWordClicked(mWord);
-        }
-        //speak the word when clicked
-        if(speakChoice) {
-            textToSpeech = new TextToSpeech(ReadArticleActivity.getReadArticleActivityInstance(), new TextToSpeech.OnInitListener() {
-                @Override
-                public void onInit(int status) {
-                    if (status != TextToSpeech.ERROR) {
-                        textToSpeech.setLanguage(LanguageSpeak);
-                        textToSpeech.speak(mWord, TextToSpeech.QUEUE_FLUSH, null);
+        readArticleActivity.pagesView.getAdapter().notifyDataSetChanged();         //update the view for all the preloaded fragments (max 3)
+        readArticleActivity.setProgressSaved(false);                               //set progressSaved to false to popup the savePopupActivity in case user did not save
+        readArticleActivity.menu.getItem(1).setEnabled(true);                      //enable Undo menu option
+        readArticleActivity.UndoClicks++;
 
-                    }
-                }
-            });
-        }
+        updateLastClickedWord();
+
         if (currentDefinitionRequest != null) {
             Log.d("Cancel", "Cancel current definition request: " + currentDefinitionRequest.toString());
             currentDefinitionRequest.cancel(true);
@@ -89,22 +67,24 @@ public class GEARClickableSpan extends ClickableSpan {
         Log.d("tapped on:", mWord);
         ArrayList<String> time_place_holder = new ArrayList<>();
         time_place_holder.add("0");
-        Word wordData = new Word(mWord);
+
+        translate();
+
+        Word wordData = new Word(mWord,lemma);
         wordData.setClicked(true);
         //get the latest userDictionary to add new words clicked
-        userDictionary = ReadArticleActivity.getReadArticleActivityInstance().userDictionary;
+        userDictionary = readArticleActivity.userDictionary;
         userDictionary.put(mWord, wordData);
         DataStorage dataStorage = new DataStorage(context);
-        ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();
-        if (activityInstance.currentSessionWords.containsKey(mWord)) {
-            Integer count = activityInstance.currentSessionWords.get(mWord);
+        if (readArticleActivity.currentSessionWords.containsKey(mWord)) {
+            Integer count = readArticleActivity.currentSessionWords.get(mWord);
             count += 1;
-            activityInstance.currentSessionWords.put(mWord, count);
+            readArticleActivity.currentSessionWords.put(mWord, count);
         } else {
-            activityInstance.currentSessionWords.put(mWord, 1);
+            readArticleActivity.currentSessionWords.put(mWord, 1);
         }
         try {
-            dataStorage.addToUserDictionary(mWord, "None", activityInstance.currentArticle, true);
+            dataStorage.addToUserDictionary(mWord, lemma, readArticleActivity.currentArticle, true);
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -114,56 +94,45 @@ public class GEARClickableSpan extends ClickableSpan {
         if (textPaint != null) {
             color(widget);
         }
-        CharSequence message = mWord + " ausgewählt.";
+        speakWord(); //speak the word when clicked
 
-        TextView definitionBox = (TextView) activityInstance.findViewById(R.id.definition_box);
-        if (activityInstance.definition_scroll) {
+        /*
+        CharSequence message = mWord + " ausgewählt.";
+        TextView definitionBox = (TextView) readArticleActivity.findViewById(R.id.definition_box);
+        if (readArticleActivity.definition_scroll) {
             // do nothing to the definitionBox
         } else {
             definitionBox.setText(message);
         }
-
-        //DefinitionRequest definitionRequest = new DefinitionRequest(mWord);
-        //currentDefinitionRequest = definitionRequest;
-        //definitionRequest.execute(mWord);
-
-        try {
-            new Translator(mWord).execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Log.d("lookup", mWord);
+        DefinitionRequest definitionRequest = new DefinitionRequest(mWord);
+        currentDefinitionRequest = definitionRequest;
+        definitionRequest.execute(mWord);
+        */
     }
 
     @Override
     public void updateDrawState(TextPaint ds) {
         textPaint = ds;
         ds.setUnderlineText(false);
-        //access the latest userDictionary
-        HashMap<String, Word> userDictionary = ReadArticleActivity.getReadArticleActivityInstance().userDictionary;
-        //creating ReadArticleActivity instance to access the currentSessionWords
-        ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();
-        //if the color choice is true(color switch is on)
-        if (colorChoice) {
-            //if the word in the currentSessionWords word ( clicked in the current session )
-            if( activityInstance.currentSessionWords.containsKey(mWord)){
+        HashMap<String, Word> userDictionary = ReadArticleActivity.getReadArticleActivityInstance().userDictionary; //access the latest userDictionary
+        ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();         //creating ReadArticleActivity instance to access the currentSessionWords
+        if (colorChoice) {         //if the color choice is true(color switch is on)
+
+            if( activityInstance.currentSessionWords.containsKey(mWord)){       //if the word in the currentSessionWords word ( clicked in the current session )
                 ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
                 ds.bgColor=(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word_background));
             }
-            //if the word in the userDictionary check if it is clicked or passed
-            else if(userDictionary.containsKey(mWord)){
+            else if(userDictionary.containsKey(mWord)){             //if the word in the userDictionary check if it is clicked or passed
                 if(userDictionary.get(mWord).clicked)
                     ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
                 else{
                     ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.passed_word));
                 }
-                //else color the rest of the word with the default color
-            }else{
+            }else{                                                  //else color the rest of the word with the default color
                 ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));
             }
         }
-        //if the user turned off the text coloring color with the default color
-        else{
+        else{                                                       //if the user turned off the text coloring color with the default color
             ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));
         }
     }
@@ -198,6 +167,65 @@ public class GEARClickableSpan extends ClickableSpan {
             return index;
         } else {
             return -1;
+        }
+    }
+
+    /*
+    * this method updates the last clicked word to the maximum index of  clicked words
+    * add the index to the MaximumLastClickedWords if it was set as the LastWordClickedIndex
+    * add the new clicked word to ListLastClickedWords
+    * the MaximumLastClickedWords list keeps track of the indexes that was set as the last clicked words index
+    * the ListLastClickedWords list keeps track of the last 3 clicked words
+    * */
+    public void updateLastClickedWord(){
+        if(GEARGlobal.getLastWordClickedIndex()<index) {
+            GEARGlobal.setLastWordClickedIndex(index);
+            GEARGlobal.setLastWordClicked(mWord);
+            ArrayList<String> word = new ArrayList<String>();
+            word.add(mWord);
+            word.add(String.valueOf(index));
+            GEARGlobal.MaximumLastClickedWords.add(word);
+        }
+        if (GEARGlobal.ListLastClickedWords.size() < GEARGlobal.undoThreshold){
+            ArrayList<String> word = new ArrayList<String>();
+            word.add(mWord);
+            word.add(String.valueOf(index));
+            GEARGlobal.ListLastClickedWords.add(word);
+        }
+        else {
+            GEARGlobal.ListLastClickedWords.remove(0);
+
+            ArrayList<String> word = new ArrayList<String>();
+            word.add(mWord);
+            word.add(String.valueOf(index));
+            GEARGlobal.ListLastClickedWords.add(word);
+        }
+    }
+
+    /*
+    * this method speak the clicked word if the speack option is on
+    * */
+
+    public void speakWord(){
+        if(speakChoice) {
+            readArticleActivity.textToSpeech.speak(mWord, TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
+
+    /*
+    * this method call translator class to translate the clicked word  and sets its lemma
+    * if the translator return empty lemma, set it to None
+    * */
+
+    public void translate(){
+        try {
+            currentDefinitionRequest=  new Translator(mWord);
+            lemma= currentDefinitionRequest.execute().get();
+            if(lemma.isEmpty()){
+                lemma="None";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

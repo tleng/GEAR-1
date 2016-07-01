@@ -1,9 +1,12 @@
 package com.mit.gear.reading;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextPaint;
@@ -29,7 +32,9 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+
 import android.os.Handler;
+import android.widget.Toast;
 
 /**
  * Activity where user reads article
@@ -38,8 +43,8 @@ public class ReadArticleActivity extends AppCompatActivity {
     private static String LOG_APP_TAG = "ReadArticleActivity-tag";
     private static ReadArticleActivity instance;
     private android.support.v7.widget.Toolbar toolbar;
-    public static HashMap<String,ArrayList<String>> offlineDictionary;
-    public HashMap<String,Word> userDictionary;
+    public static HashMap<String, ArrayList<String>> offlineDictionary;
+    public HashMap<String, Word> userDictionary;
     private DefinitionRequest currentDefinitionRequest;
     public static String currentDefinition = "No definition";
     public static String currentLemma = "None";
@@ -48,18 +53,26 @@ public class ReadArticleActivity extends AppCompatActivity {
     public String currentArticle;
     public static ViewPager pagesView;
     private String storyText = "None";
-    // Set definition_scroll to true when using a scrolling definition textbox
-    public boolean definition_scroll = true;
-    public HashMap<String,Integer> currentSessionWords = new HashMap<>();
-    //setting the progressSaved to true (Assuming no clicks happened)
-    private boolean progressSaved = true;
+    public boolean definition_scroll = true;                // Set definition_scroll to true when using a scrolling definition textbox
+    public HashMap<String, Integer> currentSessionWords = new HashMap<>();
+    private boolean progressSaved = true;                   //setting the progressSaved to true (Assuming no clicks happened)
     private ProgressDialog progress;
-    //Handler to update the progress
-    private Handler progressBarHandler = new Handler();
+    private Handler progressBarHandler = new Handler();     //Handler to update the progress
+    public Integer fragmentIndex = 0;                       //index of the current fragment(page) in current article
+    public Integer numberOfPages = 0;                         //total number of pages in current article
+    public Menu menu;
+    private Integer MaximumUndoClicks = 2;                 //limit the undo clicks to 2
+    public Integer UndoClicks = 0;                           //keep track of undo clicks
+    public TextToSpeech textToSpeech;
+    final private Locale LanguageSpeak = Locale.GERMAN;
+    public SharedPreferences sharedPreferences;             //sharedPreferences to get user choice of text coloring/speak choice
+    ArrayList<ArrayList<String>> ListLastClickedWords = GEARGlobal.ListLastClickedWords;
+    ArrayList<ArrayList<String>> MaximumLastClickedWords = GEARGlobal.MaximumLastClickedWords;
 
     public ReadArticleActivity() {
         instance = this;
     }
+
     //checking if user saved the progress or not
     public boolean isProgressSaved() {
         return progressSaved;
@@ -68,12 +81,14 @@ public class ReadArticleActivity extends AppCompatActivity {
     public void setProgressSaved(boolean progressSaved) {
         this.progressSaved = progressSaved;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GEARGlobal.ListLastClickedWords.clear();
+        GEARGlobal.MaximumLastClickedWords.clear();
         GEARGlobal.resetWordIndex();
-        //clearing the last word index every time the story loads
-        GEARGlobal.setLastWordClickedIndex(-1);
+        GEARGlobal.setLastWordClickedIndex(-1);                   //clearing the last word index every time the story loads
         GEARGlobal.setLastWordClicked("None");
         if (definition_scroll) {
             setContentView(R.layout.pages_scrolling_definition);
@@ -86,20 +101,16 @@ public class ReadArticleActivity extends AppCompatActivity {
         userDictionary = new DataStorage(getApplicationContext()).loadUserDictionary();
         currentDefinitionRequest = null;
 
-        // Getting rid of title for the action bar
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        // Log start time for when user opened article
-        startTime = System.currentTimeMillis();
-
+        getSupportActionBar().setDisplayShowTitleEnabled(false);    // Getting rid of title for the action bar
+        startTime = System.currentTimeMillis();                     // Log start time for when user opened article
         setPagesView();
-
+        initTextToSpeech();
+        getUserSettings();
 
     }
 
     public void setPagesView() {
-        //clearing the hash map that contains the fragments starting-indexes
-        PageFragment.wordIndexing.clear();
+        PageFragment.wordIndexing.clear();         //clearing the hash map that contains the fragments starting-indexes
         pagesView = (ViewPager) findViewById(R.id.pages);
         pagesView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -129,26 +140,43 @@ public class ReadArticleActivity extends AppCompatActivity {
                 }
                 storyText = text;
                 pageSplitter.append(text, textPaint);
+                numberOfPages = pageSplitter.getPages().size(); //getting total number of pages in current atricle
                 pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages()));
                 pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
-        //limiting the preloading to one page per side
-        pagesView.setOffscreenPageLimit(1);
-    }
+        pagesView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
 
+            @Override
+            public void onPageSelected(int position) {
+                fragmentIndex = position; //update the fragment index to current page position
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        pagesView.setOffscreenPageLimit(1);         //limiting the preloading to one page per side
+    }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        this.menu = menu;
+        menu.getItem(1).setEnabled(false); //disabling the Undo option
         return true;
     }
 
 
     /**
      * Stores relevant data
+     *
      * @param word
      * @param definition
      * @param lemma
@@ -168,11 +196,13 @@ public class ReadArticleActivity extends AppCompatActivity {
         }
     }
 
+    /*
+     Handle action bar item clicks here. The action bar will
+     automatically handle clicks on the Home/Up button, so long
+     as you specify a parent activity in AndroidManifest.xml.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         switch (id) {
             case R.id.action_clear:
@@ -181,10 +211,18 @@ public class ReadArticleActivity extends AppCompatActivity {
                     dataStorage.clearUserDictionary();
                     userDictionary = dataStorage.loadUserDictionary();
                     GEARClickableSpan.clear();
+                    GEARGlobal.ListLastClickedWords.clear();
+                    GEARGlobal.MaximumLastClickedWords.clear();
+                    menu.getItem(1).setEnabled(false);
+                    MaximumUndoClicks = 2;
+                    UndoClicks = 0;
                     //setPagesView();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                return true;
+            case R.id.action_undo:
+                Undo();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -202,14 +240,19 @@ public class ReadArticleActivity extends AppCompatActivity {
 
     public void saveProgress(View view) {
         //preparing the progressDialog
-        progress=new ProgressDialog(view.getContext());
+        progress = new ProgressDialog(view.getContext());
         progress.setMessage("Saving Progress");
         progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progress.setProgress(0);
         progress.setCancelable(false);
         //setting the progressDialog to the last clicked word index
         progress.setMax(GEARGlobal.getLastWordClickedIndex());
-        progress.show();
+        if (progressSaved) {
+            Toast.makeText(this, "No progress to save", Toast.LENGTH_LONG).show();
+            return;
+        } else {
+            progress.show();
+        }
         setProgressSaved(true);
         Log.d("Save Progress", "Clicked index " + GEARGlobal.getLastWordClickedIndex().toString());
         //Toast toast = Toast.makeText(getApplicationContext(), "Saving work...", Toast.LENGTH_LONG);
@@ -234,32 +277,35 @@ public class ReadArticleActivity extends AppCompatActivity {
                             break;
                         }
                         //try {
-                            if (currentSessionWords.containsKey(possibleWord)) {
-                                Integer sessionCount = currentSessionWords.get(possibleWord);
-                                if (sessionCount > 0) {
-                                    sessionCount -= 1;
-                                    currentSessionWords.put(possibleWord, sessionCount);
-                                    continue;
-                                }
+                        if (currentSessionWords.containsKey(possibleWord)) {
+                            Integer sessionCount = currentSessionWords.get(possibleWord);
+                            if (sessionCount > 0) {
+                                sessionCount -= 1;
+                                currentSessionWords.put(possibleWord, sessionCount);
+                                continue;
                             }
-                            ArrayList<Object> wordArrayList = new ArrayList<>();
-                            wordArrayList.add("None");
-                            wordArrayList.add(currentArticle);
-                            wordArrayList.add(false);
+                        }
+                        ArrayList<Object> wordArrayList = new ArrayList<>();
+                        wordArrayList.add("None");
+                        wordArrayList.add(currentArticle);
+                        wordArrayList.add(false);
                         Integer wordCount = 1;
-                            if (wordsToSave.containsKey(possibleWord)) {
+                        if (wordsToSave.containsKey(possibleWord)) {
                             wordCount = (Integer) wordsToSave.get(possibleWord).get(3) + 1;
                         }
                         wordArrayList.add(wordCount);
+                        if (!currentSessionWords.containsKey(possibleWord)) {
                             wordsToSave.put(possibleWord, wordArrayList);
                             //dataStorage.addToUserDictionary(possibleWord, "None", currentArticle, false);
                             newWords += 1;
+
 //                        } catch (JSONException e) {
 //                            e.printStackTrace();
 //                        } catch (IOException e) {
 //                            e.printStackTrace();
 //                        }
-                        count += 1;
+                            count += 1;
+                        }
                     }
                     try {
                         //sleep the thread for user interface experience
@@ -281,7 +327,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                     dataStorage.addGroupToUserDictionary(wordsToSave);
                     //dismiss the progress and finish the SavePopupActivity if exist
                     progress.dismiss();
-                    if(SavePopupActivity.savePopupActivity != null) {
+                    if (SavePopupActivity.savePopupActivity != null) {
                         SavePopupActivity.savePopupActivity.finish();
                     }
                 } catch (JSONException e) {
@@ -299,12 +345,25 @@ public class ReadArticleActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        //show SavePopupActivity if the user did not save when exiting
-        if (!isProgressSaved()){
+        Log.i("On pause", String.valueOf(fragmentIndex) + " / " + String.valueOf(numberOfPages));
+        //fragment index starts from zero
+        if (fragmentIndex == numberOfPages - 1) {
             Intent intent = new Intent(ReadArticleActivity.this, SavePopupActivity.class);
-            startActivity(intent);}
-        // updates user data with time spent
-        Long endTime = System.currentTimeMillis();
+            progressSaved = false;
+            intent.putExtra("saveProgressQuery", "You reached the end of the article do you want to save?");
+            intent.putExtra("isLastPage", true);
+            intent.putExtra("numberOfPages", numberOfPages);
+            startActivity(intent);
+        }
+        //show SavePopupActivity if the user did not save when exiting
+        else if (!isProgressSaved()) {
+            Intent intent = new Intent(ReadArticleActivity.this, SavePopupActivity.class);
+            intent.putExtra("saveProgressQuery", "Save Progress?");
+            intent.putExtra("isLastPage", false);
+            startActivity(intent);
+        }
+
+        Long endTime = System.currentTimeMillis();         // updates user data with time spent
         Long timeSpent = endTime - startTime;
         UserDataCollection.setTimeSpentOnArticle(currentArticle, timeSpent);
     }
@@ -312,10 +371,117 @@ public class ReadArticleActivity extends AppCompatActivity {
     protected void OnResume() {
         super.onResume();
         //update the userDictionary
-        ReadArticleActivity.getReadArticleActivityInstance().userDictionary=new DataStorage(getApplicationContext()).loadUserDictionary();
+        ReadArticleActivity.getReadArticleActivityInstance().userDictionary = new DataStorage(getApplicationContext()).loadUserDictionary();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        textToSpeech.shutdown();
     }
 
     public static ReadArticleActivity getReadArticleActivityInstance() {
         return instance;
+    }
+
+    private void initTextToSpeech() {
+        textToSpeech = new TextToSpeech(ReadArticleActivity.getReadArticleActivityInstance(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status != TextToSpeech.ERROR) {
+                    textToSpeech.setLanguage(LanguageSpeak);
+                }
+            }
+        });
+    }
+
+    /*
+    *this method access the color/speak sharedPreferences to get user
+    *text color choice or true for default
+     */
+    private void getUserSettings() {
+        sharedPreferences = this.getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        GEARClickableSpan.colorChoice = sharedPreferences.getBoolean("color", true);
+        GEARClickableSpan.speakChoice = sharedPreferences.getBoolean("speak", true);
+    }
+
+    /*
+    *this method remove the last clicked word and update the view
+    * keeps track of undoClicks
+    * remove the last clicked word from  ListLastClickedWords and MaximumUndoClicks
+     */
+    private void Undo() {
+        load();
+        DataStorage dataStorage = new DataStorage(this);
+        userDictionary = dataStorage.loadUserDictionary();
+        try {
+            dataStorage.deleteFromWordFile(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0), "None", dataStorage.USERDICTIONARY, currentArticle, true);
+            currentSessionWords.remove(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
+            ListLastClickedWords = GEARGlobal.ListLastClickedWords;
+            pagesView.getAdapter().notifyDataSetChanged();
+            userDictionary = dataStorage.loadUserDictionary();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (UndoClicks >= 3) {
+            if (MaximumUndoClicks > 0) {
+                MaximumUndoClicks--;
+                int l1size = Integer.valueOf(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(1));
+                int l2size = Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1));
+                if (l1size - l2size == 0) {
+                    int listSize = ListLastClickedWords.size();
+                    ListLastClickedWords.remove(listSize - 1);
+                    load();
+                    listSize = MaximumLastClickedWords.size();
+                    MaximumLastClickedWords.remove(listSize - 1);
+                    load();
+                    listSize = MaximumLastClickedWords.size();
+                    GEARGlobal.setLastWordClickedIndex(Integer.valueOf(MaximumLastClickedWords.get(listSize - 1).get(1)));
+                    GEARGlobal.setLastWordClicked(MaximumLastClickedWords.get(listSize - 1).get(0));
+                } else {
+                    ListLastClickedWords.remove(GEARGlobal.ListLastClickedWords.size() - 1);
+                    load();
+                }
+
+                if (MaximumUndoClicks == 0) {
+                    menu.getItem(1).setEnabled(false);
+                    MaximumUndoClicks = 2;
+                }
+            }
+        }
+        //if clicked for the first one/two times
+        else {
+            if (ListLastClickedWords.size() == 1) {
+                UndoClicks = 0;
+                GEARGlobal.setLastWordClickedIndex(-1);
+                GEARGlobal.setLastWordClicked("None");
+                menu.getItem(1).setEnabled(false);
+                ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
+                MaximumLastClickedWords.remove(MaximumLastClickedWords.size() - 1);
+                load();
+                progressSaved=true;
+            } else {
+                int l1size = Integer.valueOf(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(1));
+                int l2size = Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1));
+                if (l1size - l2size == 0) {
+                    ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
+                    MaximumLastClickedWords.remove(MaximumLastClickedWords.size() - 1);
+                    load();
+                    GEARGlobal.setLastWordClickedIndex(Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1)));
+                    GEARGlobal.setLastWordClicked(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(0));
+                } else {
+                    ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
+                    load();
+                }
+                UndoClicks = 1;
+            }
+        }
+    }
+    private void load(){
+        ListLastClickedWords = GEARGlobal.ListLastClickedWords;
+        MaximumLastClickedWords = GEARGlobal.MaximumLastClickedWords;
     }
 }

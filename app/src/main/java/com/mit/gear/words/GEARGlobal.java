@@ -14,6 +14,9 @@ import java.util.HashMap;
 public class GEARGlobal {
 
     private static HashMap<String,ArrayList<String>> offlineDictionary;
+    public static ArrayList<ArrayList<String>> ListLastClickedWords = new ArrayList<ArrayList<String>>();      // keeps track of the last 3 clicked words
+    public static ArrayList<ArrayList<String>> MaximumLastClickedWords = new ArrayList<ArrayList<String>>();     //keeps track of the indexes set as the last clicked words index
+    public static final Integer undoThreshold = 3;
     private static Integer wordIndex;
     private static String lastWordClicked = "None";
     private static Integer lastWordClickedIndex = -1;

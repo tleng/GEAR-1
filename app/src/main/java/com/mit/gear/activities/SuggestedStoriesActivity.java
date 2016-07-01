@@ -1,9 +1,12 @@
 package com.mit.gear.activities;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
@@ -21,6 +24,7 @@ import com.mit.gear.words.Word;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,17 +41,19 @@ import static com.mattmellor.gear.R.id.app_article_bar;
  */
 public class SuggestedStoriesActivity extends AppCompatActivity {
 
-    private final Map<String, Double> articlesWithRatings = new HashMap<>();
+    private  Map<String, Double> articlesWithRatings = new HashMap<>();
     private android.support.v7.widget.Toolbar toolbar;
     private ProgressDialog progress;
     private int num_recommended_articles = 10;
+    private List<String> articles;
 
     private Map<String,Double> articleAndScoreMap = new HashMap<>();
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED); //lock the current orientation
         setContentView(R.layout.activity_suggested_stories);
         toolbar = (android.support.v7.widget.Toolbar) findViewById(app_article_bar);
         setSupportActionBar(toolbar);
@@ -56,15 +62,38 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
         progress.setMessage("Generating Recommendations");
         progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progress.setProgress(0);
+        progress.setCancelable(false);
         progress.show();
 
         //create thread to generate the suggested stories and update progressDialog
         new Thread(new Runnable() {
         @Override
         public void run() {
+
+            if(savedInstanceState==null) //if suggested stories was  generating for the first time
+            {
+                articles = recommendKArticles2(num_recommended_articles);
+            }
+
+            else{  //if suggested stories was previously generated, get them from the bundle
+                articles=savedInstanceState.getStringArrayList("recommendedArticles");
+                articlesWithRatings= (Map<String, Double>) savedInstanceState.getSerializable("articlesWithRatings");
+                articleAndScoreMap= (Map<String, Double>) savedInstanceState.getSerializable("articleAndScoreMap");
+
+            }
             generateRecommendationButtons();
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
             }).start();
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putStringArrayList("recommendedArticles", (ArrayList<String>) articles); //save the suggested stories in case the user changes the orientation
+        outState.putSerializable("articlesWithRatings", (Serializable) articlesWithRatings);
+        outState.putSerializable("articleAndScoreMap", (Serializable) articleAndScoreMap);
 
     }
 
@@ -83,7 +112,6 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
     private void generateRecommendationButtons() {
         //Replace recommendedKArticles with different algorithms
         //making variables as final to access it from inner thread
-        final List<String> articles = recommendKArticles2(num_recommended_articles);
         // adjust linear layout to display articles in
         final LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
         final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
@@ -113,8 +141,9 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
             });
 
         }
-        //dismissing the progressDialog
-        progress.dismiss();
+        //dismissing the progressDialog if it was shown
+        if ((this.progress != null) && this.progress.isShowing())
+            this.progress.dismiss();
     }
     // TODO: replace with either recommendation from backend (needs
     // further setup of backend) or more sophisticated inference of user vocabulary

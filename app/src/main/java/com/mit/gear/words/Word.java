@@ -104,6 +104,28 @@ public class Word {
     }
 
     /**
+     *this method is used when undo button is clicked
+     *remove recent clicks from article clicks
+     *remove recent timestamp from timestamps
+     *@return false if the word is not clicked or passed, return true otherwise
+     */
+    public boolean RemoveUpdate(String article, boolean click) {
+        clicked = click;
+        timestamps.remove(timestamps.size() - 1);
+        ArrayList<Long> times = articleClicks.get(article);
+        if(times.size()!=0){
+            times.remove(times.size()-1);
+            articleClicks.put(article, times);}
+        if(totalWordClicks()==0){
+            clicked=false;
+        }
+        if(!clicked&&totalWordPasses()==0)
+            return false;
+        else
+            return true;
+    }
+
+    /**
      * @return the word the Word structure stores information for
      */
     public String getWord() {

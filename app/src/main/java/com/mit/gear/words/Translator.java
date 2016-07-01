@@ -19,7 +19,7 @@ import com.mit.gear.reading.ReadArticleActivity;
  * Class used to translate words using Microsoft's (Bing) translator
  * The internet connection is required
  */
-public class Translator extends AsyncTask<Void, Void, Void> {
+public class Translator extends AsyncTask<Void, Void, String> {
     public String translatedText = "";
     private String mWord ;
 
@@ -28,7 +28,7 @@ public class Translator extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected String doInBackground(Void... params) {
         try {
             Translate.setClientId("Najla");
             Translate.setClientSecret("LS/TatMvBX0vSn2uPwXeTQzWmzhZviDv7Zg9VEggMjY=");
@@ -38,16 +38,15 @@ public class Translator extends AsyncTask<Void, Void, Void> {
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
         }
-        return null;
+        return translatedText;
     }
     @Override
-    protected void onPostExecute(Void result) {
+    protected void onPostExecute(String result) {
         ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();
         final TextView readingDictionary = (TextView) activityInstance.findViewById(R.id.definition_box);
         String definitionResult = mWord+" " ;
-        if (translatedText != null) {
-            Log.d("LocalDefinition", translatedText);
-            definitionResult = definitionResult +",\t"+ translatedText;
+        if (result != null) {
+            definitionResult = definitionResult +",\t"+ result;
 
             if (activityInstance.definition_scroll){
                 if(readingDictionary.getText().toString().isEmpty())
@@ -58,18 +57,17 @@ public class Translator extends AsyncTask<Void, Void, Void> {
                 readingDictionary.setText(definitionResult);
             }
             final ScrollView scrollview = (ScrollView) activityInstance.findViewById(R.id.definition_scroll);
-            //scroll the definition box to the bottom whenever word translation added
             scrollview.post(new Runnable() {
                 @Override
                 public void run() {
-                    scrollview.fullScroll(View.FOCUS_DOWN);
+
+                    scrollview.fullScroll(View.FOCUS_DOWN);             //scroll the definition box to the bottom whenever word translation added
                 }
             });
 
             super.onPostExecute(result);
         }else{
-            //If no translation found
-            readingDictionary.setText("");
+            readingDictionary.setText("");             //If no translation found
         }
     }
 }

@@ -31,7 +31,7 @@ public class DataStorage {
     AssetManager assetManager;
     String USERINFO = "gearUserInformation";
     //USERDICTIONARY is stored on the local file storage of the android device
-    String USERDICTIONARY = "gearUserDictionary";
+    public static String USERDICTIONARY = "gearUserDictionary";
     //OFFLINEDICTIONARY is stored in assets
     String OFFLINEDICTIONARY = "offline_dictionary_json";
     String TESTDICTIONARY = "offline_dictionary_maparray_json";
@@ -195,6 +195,28 @@ public class DataStorage {
         out.write(json);
         Log.d("File", "Saved " + word);
 
+        out.close();
+    }
+    /*
+    this method delete a specific word from the dictionary
+    used when user clicks UNDO button
+    */
+
+    public void deleteFromWordFile(String word, String lemma, String file, String article, boolean click) throws JSONException, IOException {
+        HashMap<String, Word> dictionary = loadWordsFile(file);
+        Word userData;
+        userData = dictionary.get(word);
+        boolean KeepInDictionary = userData.RemoveUpdate(article, click); //update the word clicks (decrement)
+        if(KeepInDictionary){
+            dictionary.put(word, userData); //update the word if clicked or passed
+        }
+        else {
+            dictionary.remove(word); // remove from dictionary if not clikced or passed
+        }
+        Gson gson = new Gson();
+        String json = gson.toJson(dictionary);
+        OutputStreamWriter out= new OutputStreamWriter(context.openFileOutput(file, 0));
+        out.write(json);
         out.close();
     }
     

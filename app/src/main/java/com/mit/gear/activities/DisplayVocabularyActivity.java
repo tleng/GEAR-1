@@ -69,7 +69,10 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
         for (Map.Entry<String, Word> entry : vocabulary.entrySet()) {
             String key = entry.getKey();
             Word word = entry.getValue();
-            vocabString += key + " Clicked: " + Integer.toString(word.totalWordClicks()) + " Passed: " + Integer.toString(word.totalWordPasses()) + "\n";
+            if(word.getLemma().equals("None"))
+                vocabString += key +"\nClicked: " + Integer.toString(word.totalWordClicks()) + "\t\t\tPassed: " + Integer.toString(word.totalWordPasses()) + "\n\n";
+            else
+                vocabString += key + " , "+word.getLemma()+"\nClicked: " + Integer.toString(word.totalWordClicks()) + "\t\t\tPassed: " + Integer.toString(word.totalWordPasses()) + "\n\n";
         }
 
         return vocabString;

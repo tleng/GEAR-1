@@ -1,12 +1,18 @@
 package com.mit.gear.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.reading.GEARClickableSpan;
+import com.mit.gear.reading.PageFragment;
 import com.mit.gear.reading.ReadArticleActivity;
+import com.mit.gear.words.GEARGlobal;
 
 /**
  *
@@ -14,14 +20,19 @@ import com.mit.gear.reading.ReadArticleActivity;
 public class SavePopupActivity extends Activity {
     //creating savePopupActivity instance
     public static SavePopupActivity savePopupActivity;
+    public boolean isLastPage = false;
+    public Integer numberOfPages;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         savePopupActivity = this;
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.popup_save);
-
-
+        TextView saveProgressQuery = (TextView)findViewById(R.id.saveProgressQuery);
+        Intent i = getIntent();
+        saveProgressQuery.setText( i.getStringExtra("saveProgressQuery"));
+        isLastPage = i.getBooleanExtra("isLastPage",false);
+        numberOfPages = i.getIntExtra("numberOfPages", 0);
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -40,6 +51,13 @@ public class SavePopupActivity extends Activity {
     }
 
     public void saveProgress(View view) {
+    //checks if the user in the last page sets the last clicked word index to the end of the article
+        if (isLastPage)
+    {
+        GEARGlobal.setLastWordClicked("None");
+        Integer LastWordIndex= PageFragment.wordIndexing.get(numberOfPages);
+        GEARGlobal.setLastWordClickedIndex(LastWordIndex);
+    }
         ReadArticleActivity.getReadArticleActivityInstance().saveProgress(view);
     }
 
