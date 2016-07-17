@@ -5,4 +5,11 @@
     <color name="clicked_word">#0000ff</color>
     <color name="passed_word">#767676</color>
     <color name="default_word">#000000</color>
+    <color name="list_item_title">#000000</color>
+    <color name="list_background">#ffffff</color>
+    <color name="list_background_pressed">#dedede</color>
+    <color name="list_divider">#ffffff</color>
+    <color name="counter_text_bg">#626262</color>
+    <color name="counter_text_color">#ffffff</color>
+    <color name="colorPrimary">#3F51B5</color>
 </resources>

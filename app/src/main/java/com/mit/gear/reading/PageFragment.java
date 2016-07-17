@@ -5,7 +5,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -103,12 +105,14 @@ public class PageFragment extends Fragment {
         for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
                 .next()) {
             String possibleWord = stringText.substring(start, end);
-            if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
+            if (Character.isLetter(possibleWord.charAt(0))) {
                 //ClickableSpan clickSpan = getClickableSpan(possibleWord);
                 GEARClickableSpan clickSpan = getClickSpan(possibleWord);
                 clickSpan.setIndex(GEARGlobal.getWordIndex());
                 GEARGlobal.incrementWordIndex();
                 spans.setSpan(clickSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }else{
+                spans.setSpan(new ForegroundColorSpan(Color.BLACK), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
         //putting the next fragment starting index into the hashMap

@@ -19,6 +19,29 @@
     <string name="title_activity_main2">Main2Activity</string>
     <string name="title_activity_suggested_stories">SuggestedStories</string>
     <string name="offline_dictionary">offline_dictionary_maparray_json</string>
+    <string name="drawer_open">Slider Menu Opened</string>
+    <string name="drawer_close">Slider Menu Closed</string>
+
+    <!-- Nav Drawer Menu Items -->
+    <string-array name="nav_drawer_items">
+        <item>News</item>
+        <item>Stories</item>
+        <item>Vocabulary</item>
+    </string-array>
+
+    <!-- Nav Drawer List Item Icons -->
+    <array name="nav_drawer_icons">
+        <item>@mipmap/allstories</item>
+        <item>@mipmap/stories</item>
+        <item>@mipmap/vocab</item>
+
+    </array>
+
+    <!-- Content Description -->
+    <string name="desc_list_item_icon">Item Icon</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="rssLink">http://www.spiegel.de/schlagzeilen/index.rss</string>
 
 
 </resources>

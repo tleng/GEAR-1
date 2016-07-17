@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.Menu;
@@ -17,7 +18,9 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.activities.DisplayVocabularyActivity;
 import com.mit.gear.activities.SavePopupActivity;
+import com.mit.gear.activities.StartActivity;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
 import com.mit.gear.words.DefinitionRequest;
@@ -119,9 +122,13 @@ public class ReadArticleActivity extends AppCompatActivity {
 
                 TextPaint textPaint = new TextPaint();
                 textPaint.setTextSize(getResources().getDimension(R.dimen.text_size));
+                textPaint.setColor(255);
                 AssetManager assetManager = getAssets();
-                String story = getIntent().getExtras().getString("story");
+                String story = getIntent().getExtras().getString("title");
+                String storyContent = getIntent().getExtras().getString("content");
+
                 currentArticle = story;
+                if(storyContent==null) {
                 InputStream input;
                 String text;
                 try {
@@ -138,8 +145,12 @@ public class ReadArticleActivity extends AppCompatActivity {
                     e.printStackTrace();
                     text = "Error Occurred";
                 }
-                storyText = text;
-                pageSplitter.append(text, textPaint);
+                    storyText=text;
+                }
+                else{
+                    storyText = storyContent;
+                }
+                pageSplitter.append(storyText, textPaint);
                 numberOfPages = pageSplitter.getPages().size(); //getting total number of pages in current atricle
                 pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages()));
                 pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -272,7 +283,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
                         .next()) {
                     String possibleWord = storyText.substring(start, end);
-                    if (Character.isLetterOrDigit(possibleWord.charAt(0))) {
+                    if (Character.isLetter(possibleWord.charAt(0))) {
                         if (count >= GEARGlobal.getLastWordClickedIndex()) {
                             break;
                         }
@@ -344,7 +355,6 @@ public class ReadArticleActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         Log.i("On pause", String.valueOf(fragmentIndex) + " / " + String.valueOf(numberOfPages));
         //fragment index starts from zero
         if (fragmentIndex == numberOfPages - 1) {
@@ -366,6 +376,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         Long endTime = System.currentTimeMillis();         // updates user data with time spent
         Long timeSpent = endTime - startTime;
         UserDataCollection.setTimeSpentOnArticle(currentArticle, timeSpent);
+        super.onPause();
     }
 
     protected void OnResume() {

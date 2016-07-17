@@ -1,9 +1,13 @@
 package com.mit.gear.activities;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.mattmellor.gear.R;
@@ -16,10 +20,22 @@ import java.util.Map;
 /**
  * Class that displays user vocabulary
  */
-public class DisplayVocabularyActivity extends AppCompatActivity {
-
+public class DisplayVocabularyActivity extends Fragment {
+    TextView vocabView;
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_display_user_vocabulary, container, false);
+    }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        View v = getView();
+        // display current user vocabulary
+        vocabView = (TextView) v.findViewById(R.id.vocabularyData);
+        vocabView.setText(getVocabularyString());
+
+    }
+    /*@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_user_vocabulary);
@@ -48,7 +64,7 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
 
     /**
@@ -57,7 +73,7 @@ public class DisplayVocabularyActivity extends AppCompatActivity {
      * @return string to display
      */
     private String getVocabularyString() {
-        DataStorage dataStorage = new DataStorage(getApplicationContext());
+        DataStorage dataStorage = new DataStorage(getActivity().getApplicationContext());
         HashMap<String, Word> vocabulary = dataStorage.loadUserDictionary();
 
         String vocabString = "";

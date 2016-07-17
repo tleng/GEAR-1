@@ -1,24 +1,26 @@
 package com.mit.gear.activities;
 
 import android.app.Activity;
+import android.content.Context;
+import android.support.annotation.Nullable;
+import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
 import android.util.Log;
-import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.reading.StoryItem;
+import com.mit.gear.reading.StoryListListener;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.miscellaneous.MapUtil;
-import com.mit.gear.reading.ReadArticleActivity;
+import com.mit.gear.NavDrawer.NavDrawerListAdapter;
 import com.mit.gear.words.GEARGlobal;
 import com.mit.gear.words.Word;
 
@@ -39,18 +41,76 @@ import static com.mattmellor.gear.R.id.app_article_bar;
  * The activity also goes through articles and the words the user has
  * looked up to recommend articles with most overlap.
  */
-public class SuggestedStoriesActivity extends AppCompatActivity {
+public class SuggestedStoriesActivity extends Fragment {
 
     private  Map<String, Double> articlesWithRatings = new HashMap<>();
     private android.support.v7.widget.Toolbar toolbar;
     private ProgressDialog progress;
-    private int num_recommended_articles = 10;
+    private int num_recommended_articles = 0;
     private List<String> articles;
-
     private Map<String,Double> articleAndScoreMap = new HashMap<>();
+    static public Context context;
 
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_suggested_stories, container, false);
+    }
 
     @Override
+    public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        View v = getView();
+        final Activity activity =  getActivity();
+        context = getActivity();
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED); //lock the current orientation
+        toolbar = (android.support.v7.widget.Toolbar) v.findViewById(app_article_bar);
+        progress=new ProgressDialog(activity);
+        progress.setMessage("Generating Recommendations");
+        progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progress.setProgress(0);
+        progress.setCancelable(false);
+        progress.show();
+
+        //create thread to generate the suggested stories and update progressDialog
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                if(savedInstanceState==null) //if suggested stories was  generating for the first time
+                {
+                    articles = recommendKArticles2();
+                }
+
+                else{  //if suggested stories was previously generated, get them from the bundle
+                    articles=savedInstanceState.getStringArrayList("recommendedArticles");
+                    articlesWithRatings= (Map<String, Double>) savedInstanceState.getSerializable("articlesWithRatings");
+                    articleAndScoreMap= (Map<String, Double>) savedInstanceState.getSerializable("articleAndScoreMap");
+
+                }
+                generateRecommendationList();
+                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // update the nav drawer to indicate the number of suggested stories are there
+                        MainActivity.navDrawerItems.get(1).setCounterVisibility(true);
+                        MainActivity.navDrawerItems.get(1).setCount(String.valueOf(num_recommended_articles));
+                        MainActivity.adapter = new NavDrawerListAdapter(MainActivity.context,
+                                MainActivity.navDrawerItems);
+                        MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
+                        MainActivity.mDrawerList.setItemChecked(1, true);
+                        MainActivity.mDrawerList.setSelection(1);
+                    }
+                });
+
+            }
+        }).start();
+
+    }
+
+    /*@Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED); //lock the current orientation
@@ -86,10 +146,10 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
         }
             }).start();
 
-    }
+    }*/
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putStringArrayList("recommendedArticles", (ArrayList<String>) articles); //save the suggested stories in case the user changes the orientation
         outState.putSerializable("articlesWithRatings", (Serializable) articlesWithRatings);
@@ -97,54 +157,92 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
 
     }
 
-    @Override
+    /**
+     * Gets recommended stories and add them to a list in the view
+     */
+    private void generateRecommendationList() {
+        //making variables as final to access it from inner thread
+        final List<StoryItem> listStoryItem = new ArrayList<>();
+        for (String article:articles) {
+            final StoryItem StoryItem =new StoryItem();
+            Double rating = articlesWithRatings.get(article) * 100;
+            int suggestNumber = rating.intValue();
+            String ratingString = " "+articleAndScoreMap.get(article)+" ";
+            StoryItem.setTitle(article + "   " + ratingString);
+            StoryItem.setContentDescription(article);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    listStoryItem.add(StoryItem);
+                }
+            });
+        }
+        final ListView lv = (ListView) getActivity().findViewById(R.id.listView2);
+        final ArrayAdapter<StoryItem> adapter = new ArrayAdapter<StoryItem>(getActivity(), android.R.layout.simple_list_item_1, listStoryItem);
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                lv.setAdapter(adapter);
+            }
+        });
+
+        lv.setOnItemClickListener(new StoryListListener(listStoryItem, getActivity()));
+        if ((this.progress != null) && this.progress.isShowing())        //dismissing the progressDialog if it was shown
+            this.progress.dismiss();
+    }
+
+
+   /* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 
         getMenuInflater().inflate(R.menu.menu_stories_suggestion_and_selection, menu);
         return true;
-    }
+    }*/
 
 
     /**
      * Gets recommended stories and adds buttons for each story to the view
      */
-    private void generateRecommendationButtons() {
-        //Replace recommendedKArticles with different algorithms
-        //making variables as final to access it from inner thread
-        // adjust linear layout to display articles in
-        final LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
-        final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        ll.setOrientation(LinearLayout.VERTICAL);
-        // StackOverflow suggested code to dynamically create buttons for the articles
-        for (String article:articles) {
-            final Button myButton = new Button(this);
-            Double rating = articlesWithRatings.get(article) * 100;
-            int suggestNumber = rating.intValue();
-            //String ratingString = "<b> " + suggestNumber + "%" + " </b>";
-            String ratingString = "<b> "+articleAndScoreMap.get(article)+" </b>";
-            myButton.setText(Html.fromHtml(article + "   " + ratingString));
-            myButton.setContentDescription(article);
-            myButton.setHeight(30);
-            myButton.setTransformationMethod(null); // ensures text is lower case
-            Log.d("button added:", myButton.toString());
-            myButton.setOnClickListener(getOnClickSetStory(myButton));
+//    private void generateRecommendationButtons() {
+//        //Replace recommendedKArticles with different algorithms
+//        //making variables as final to access it from inner thread
+//        // adjust linear layout to display articles in
+//        final LinearLayout ll = (LinearLayout) findViewById(R.id.suggestedStoriesLinearLayout);
+//        final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
+//                LinearLayout.LayoutParams.WRAP_CONTENT);
+//        ll.setOrientation(LinearLayout.VERTICAL);
+//        // StackOverflow suggested code to dynamically create buttons for the articles
+//        for (String article:articles) {
+//            final Button myButton = new Button(this);
+//            Double rating = articlesWithRatings.get(article) * 100;
+//            int suggestNumber = rating.intValue();
+//            //String ratingString = "<b> " + suggestNumber + "%" + " </b>";
+//            String ratingString = "<b> "+articleAndScoreMap.get(article)+" </b>";
+//            myButton.setText(Html.fromHtml(article + "   " + ratingString));
+//            myButton.setContentDescription(article);
+//            myButton.setHeight(30);
+//            myButton.setTransformationMethod(null); // ensures text is lower case
+//            Log.d("button added:", myButton.toString());
+//            myButton.setOnClickListener(getOnClickSetStory(myButton));
+//
+//            //Ui thread to attach the buttons to the linerLayout
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    ll.addView(myButton, lp);
+//                    Log.d("number of buttons:", Integer.toString(ll.getChildCount()));
+//                }
+//            });
+//
+//        }
+//        //dismissing the progressDialog if it was shown
+//        if ((this.progress != null) && this.progress.isShowing())
+//            this.progress.dismiss();
+//    }
 
-            //Ui thread to attach the buttons to the linerLayout
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ll.addView(myButton, lp);
-                    Log.d("number of buttons:", Integer.toString(ll.getChildCount()));
-                }
-            });
 
-        }
-        //dismissing the progressDialog if it was shown
-        if ((this.progress != null) && this.progress.isShowing())
-            this.progress.dismiss();
-    }
     // TODO: replace with either recommendation from backend (needs
     // further setup of backend) or more sophisticated inference of user vocabulary
     // rather than words the user has clicked on
@@ -189,7 +287,7 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
     }
 */
 
-    private List<String> recommendKArticles2(int k) {
+    private List<String> recommendKArticles2() {
         //Map<String,Double> setNumberOfArticlesWithFractions  = new HashMap<>();
 
         try {
@@ -215,11 +313,12 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
                 //This just returns the keyset as a list???
             }
             int n = sortedArticles.size();
+            num_recommended_articles=n;
             List<String> recommendedArticles = new ArrayList<>();
 
             // check if there are sortedArticles
             if (n>0) {
-                for (int i = n - 1; i >= n - k - 1; i--) {
+                for (int i = n - 1; i >= 0; i--) {
                     recommendedArticles.add(sortedArticleList.get(i));
                     Log.d("article", sortedArticleList.get(i));
                     Log.d("fraction", articleAndScoreMap.get(sortedArticleList.get(i)).toString());
@@ -256,7 +355,7 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
      * @return
      */
     private Double getScore(String articleFilename) {
-        DataStorage dataStorage = new DataStorage(getApplicationContext());
+        DataStorage dataStorage = new DataStorage(getActivity().getApplicationContext());
         HashMap<String,Word> userDictionary = dataStorage.loadUserDictionary();
         InputStream input;
         String articleText;
@@ -300,16 +399,15 @@ public class SuggestedStoriesActivity extends AppCompatActivity {
 
     }
 
-    View.OnClickListener getOnClickSetStory(final Button button)  {
-        return new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(SuggestedStoriesActivity.this, ReadArticleActivity.class);
-                intent.putExtra("story", GEARGlobal.articlePath + button.getContentDescription());
-                startActivity(intent);
-                finish();
-            }
-        };
-    }
+//    View.OnClickListener getOnClickSetStory(final Button button)  {
+//        return new View.OnClickListener() {
+//            public void onClick(View v) {
+//                Intent intent = new Intent(getActivity(), ReadArticleActivity.class);
+//                intent.putExtra("title", GEARGlobal.articlePath + button.getContentDescription());
+//                getActivity().startActivity(intent);
+//            }
+//        };
+//    }
 }
 
 
