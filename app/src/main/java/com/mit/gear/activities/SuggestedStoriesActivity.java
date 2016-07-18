@@ -27,10 +27,12 @@ import com.mit.gear.words.Word;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,6 +52,11 @@ public class SuggestedStoriesActivity extends Fragment {
     private List<String> articles;
     private Map<String,Double> articleAndScoreMap = new HashMap<>();
     static public Context context;
+    DataStorage dataStorage;
+    HashMap<String,Word> userDictionary;
+    AssetManager assetManager;
+
+
 
     @Nullable
     @Override
@@ -65,6 +72,7 @@ public class SuggestedStoriesActivity extends Fragment {
         context = getActivity();
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED); //lock the current orientation
         toolbar = (android.support.v7.widget.Toolbar) v.findViewById(app_article_bar);
+        dataStorage = new DataStorage(getActivity().getApplicationContext());
         progress=new ProgressDialog(activity);
         progress.setMessage("Generating Recommendations");
         progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -163,12 +171,15 @@ public class SuggestedStoriesActivity extends Fragment {
     private void generateRecommendationList() {
         //making variables as final to access it from inner thread
         final List<StoryItem> listStoryItem = new ArrayList<>();
+        int articleNumber = 0;
         for (String article:articles) {
             final StoryItem StoryItem =new StoryItem();
             Double rating = articlesWithRatings.get(article) * 100;
             int suggestNumber = rating.intValue();
             String ratingString = " "+articleAndScoreMap.get(article)+" ";
-            StoryItem.setTitle(article + "   " + ratingString);
+            String title = article +"\t"+ratingString+"\n"+Count(article);
+            articleNumber += 1;
+            StoryItem.setTitle(title);
             StoryItem.setContentDescription(article);
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -176,6 +187,9 @@ public class SuggestedStoriesActivity extends Fragment {
                     listStoryItem.add(StoryItem);
                 }
             });
+            if(articleNumber%2==0){
+                progress.setProgress(progress.getProgress()+1);
+            }
         }
         final ListView lv = (ListView) getActivity().findViewById(R.id.listView2);
         final ArrayAdapter<StoryItem> adapter = new ArrayAdapter<StoryItem>(getActivity(), android.R.layout.simple_list_item_1, listStoryItem);
@@ -302,7 +316,9 @@ public class SuggestedStoriesActivity extends Fragment {
                 articleNumber += 1;
                 int percentComplete = 50;
                 //updating the progressDialog with article number
-                progress.setProgress(articleNumber);
+                if(articleNumber%2==0){
+                    progress.setProgress(articleNumber/2);
+                }
             }
             articleAndScoreMap = MapUtil.sortByValue(articleAndScoreMap);
             Set<String> sortedArticles = articleAndScoreMap.keySet();
@@ -355,14 +371,13 @@ public class SuggestedStoriesActivity extends Fragment {
      * @return
      */
     private Double getScore(String articleFilename) {
-        DataStorage dataStorage = new DataStorage(getActivity().getApplicationContext());
-        HashMap<String,Word> userDictionary = dataStorage.loadUserDictionary();
+        userDictionary = dataStorage.loadUserDictionary();
         InputStream input;
         String articleText;
 
         try {
             // open articleFilename and read article into articleText
-            AssetManager assetManager = getResources().getAssets();
+            assetManager = getResources().getAssets();
             input = assetManager.open(GEARGlobal.articlePath+articleFilename);
             int size = input.available();
             byte[] buffer = new byte[size];
@@ -408,6 +423,68 @@ public class SuggestedStoriesActivity extends Fragment {
 //            }
 //        };
 //    }
+
+
+
+    /*
+     * Method to read the article and count
+     * total number of words
+     * number of unique words
+     * number of total words in user dictionary
+     * number of total unique words in user dictionary
+     */
+    private String Count(String articleTitle){
+        //Set counters to 0
+        int VocUniqueCount=0;
+        int WordsInUD = 0;
+        int count =0;
+        assetManager = getResources().getAssets();
+        InputStream inputStream;
+        String ArticleText = "";
+        try {
+            inputStream = assetManager.open(GEARGlobal.articlePath+articleTitle);           //Open the passed article for reading
+            int size = inputStream.available();                                             //Get the number of byte to read
+            byte[] buffer = new byte[size];
+            inputStream.read(buffer);                                                       //Read the article
+            inputStream.close();
+            ArticleText = new String(buffer).trim();                                        //Byte buffer into a string
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HashMap<String, Integer> UniqueWordCount = new HashMap<>();                         //Keep track of unique word along with their occurrence
+        userDictionary = dataStorage.loadUserDictionary();
+        BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);             //Set language of break iterator
+        iterator.setText(ArticleText);
+        int start = iterator.first();
+        //Loop through each word in the article
+        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
+                    .next()) {
+            String possibleWord = ArticleText.substring(start, end).toLowerCase();
+            if (Character.isLetter(possibleWord.charAt(0))) {                              //if the word start with letter increment total word count
+                count++;
+                if (UniqueWordCount.containsKey(possibleWord)){
+                    UniqueWordCount.put(possibleWord, UniqueWordCount.get(possibleWord) + 1);   //Word is already contained in map increment it's occurrence by 1
+                }else{
+                    UniqueWordCount.put(possibleWord, 1);                                  //Word is not contained in map add it and set it's occurrence to 1
+                }
+            }
+            if (userDictionary.containsKey(possibleWord)){                                 //Word is in user dictionary increment counter
+                WordsInUD++;
+            }
+        }
+        //Loop through user dictionary to check if word exist in both the dictionary and unique word map
+        for(Map.Entry<String, Word> entry : userDictionary.entrySet()){
+            String key = entry.getKey();
+            if(UniqueWordCount.containsKey(key)){
+                VocUniqueCount++;
+            }
+        }
+        //Set the resulting string to contain all counters
+        String result = String.valueOf(WordsInUD)+"/"+String.valueOf(count)+"\t\t\t"
+                +String.valueOf(VocUniqueCount)+"/"+String.valueOf(UniqueWordCount.size());
+        UniqueWordCount.clear();
+        return result;
+    }
 }
 
 

@@ -7,6 +7,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,9 @@ import com.mit.gear.RSS.RssListListener;
 import com.mit.gear.RSS.RssArticle;
 import com.mit.gear.RSS.RssReader;
 import com.mit.gear.NavDrawer.NavDrawerListAdapter;
+import com.mit.gear.data.DataStorage;
+import com.mit.gear.words.GEARGlobal;
+import com.mit.gear.words.Word;
 
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -30,14 +34,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.text.BreakIterator;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
 
@@ -102,7 +111,13 @@ public class StoriesSelectionActivity extends Fragment {
 
        }
     }
-//    @Override
+
+    @Override
+    public void onResume() {
+        prepareTheList(getNewsFromStorage());
+        super.onResume();
+    }
+    //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_stories_selection);
@@ -378,11 +393,9 @@ public class StoriesSelectionActivity extends Fragment {
         return result;
     }
 
-
     /*
-    * this method updates the nav drawer to indicate the number of news are there
+     * this method updates the nav drawer to indicate the number of news are there
      * attach the list to the layout and sets a click listener
-    *
      */
     private void prepareTheList(List<RssArticle> result){
 
@@ -395,11 +408,70 @@ public class StoriesSelectionActivity extends Fragment {
         MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
         MainActivity.mDrawerList.setItemChecked(0, true);
         MainActivity.mDrawerList.setSelection(0);
-        ArrayAdapter<RssArticle> adapter = new ArrayAdapter<RssArticle>(getActivity(), android.R.layout.simple_list_item_1, result);
+        ArrayAdapter<RssArticle> adapter = new ArrayAdapter<RssArticle>(getActivity(), android.R.layout.simple_list_item_1,result);
         rssItems.setAdapter(adapter);
         rssItems.setOnItemClickListener(new RssListListener(result, getActivity()));
 
     }
+
+    /*
+     * Method to read the article and count
+     * total number of words
+     * number of unique words
+     * number of total words in user dictionary
+     * number of total unique words in user dictionary
+     */
+ /*   private  List<RssArticle> Count(List<RssArticle> result){
+        HashMap<String, Integer> UniqueWordCount = new HashMap<>();                                      //Keep track of unique word along with their occurrence
+        DataStorage dataStorage = new DataStorage(getActivity());
+        HashMap<String, Word> userDictionary = dataStorage.loadUserDictionary();
+        //Set counters to 0
+        int iter = 0;
+        int VocUniqueCount=0;
+        int WordsInUD = 0;
+        for(RssArticle news: result){
+            int count =0;
+            UniqueWordCount.clear();
+            VocUniqueCount=0;
+            WordsInUD = 0;
+            BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);                         //Set language of break iterator
+            iterator.setText(news.getContent());
+            int start = iterator.first();
+            //Loop through each word in the article
+            for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
+                    .next()) {
+                String possibleWord = news.getContent().substring(start, end);
+                if(possibleWord.matches(getResources().getString(R.string.endOfArticleIndicator))){
+                    break;
+                }
+                if (Character.isLetter(possibleWord.charAt(0))) {                                           //if the word start with letter increment total word count
+                    count++;
+                    if (UniqueWordCount.containsKey(possibleWord.toLowerCase())){                          //Word is not contained in map add it and set it's occurrence to 1
+                        UniqueWordCount.put(possibleWord.toLowerCase(), UniqueWordCount.get(possibleWord.toLowerCase()) + 1);
+                    }else{
+                        UniqueWordCount.put(possibleWord.toLowerCase(), 1);                                  //Word is not contained in map add it and set it's occurrence to 1
+                    }
+                }
+                if (userDictionary.containsKey(possibleWord)){
+                    WordsInUD++;
+                }
+            }
+            //Loop through user dictionary to check if word exist in both the dictionary and unique word map
+            for(Map.Entry<String, Word> entry : userDictionary.entrySet()){
+                String key = entry.getKey();
+                if(UniqueWordCount.containsKey(key)){
+                    VocUniqueCount++;
+                }
+            }
+            //Set the result to contain all counters
+            result.get(iter).setTitle(result.get(iter).getTitle()+"\n"+WordsInUD+"/"+count
+                    +"\t\t\t" +VocUniqueCount+"/"+UniqueWordCount.size());
+            iter++;
+        }
+        return result;
+    }*/
+
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -410,8 +482,8 @@ public class StoriesSelectionActivity extends Fragment {
 
 
     /*
-    * this method get today date without time
-    *
+     * this method get today date without time
+     *
      */
 
     private Long getTodayDate(){
