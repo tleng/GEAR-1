@@ -22,6 +22,7 @@ import com.mit.gear.NavDrawer.NavDrawerListAdapter;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
@@ -240,23 +241,29 @@ public class StoriesSelectionActivity extends Fragment {
                     file.delete();                      //deleting old news files
                 }
             }
-            for (int i = 0; i < ListRssArticle.size(); i++) {   //access every article to get content from http request
-                publishProgress(i);                             //update the progress dialog
+            Integer progress = 0;
+            List<RssArticle> articlesToDelete = new ArrayList<>();
+            for (RssArticle rssArticle :ListRssArticle ) {   //access every article to get content from http request
+                publishProgress(++progress);                             //update the progress dialog
                 String content = "";
 
 
                 Document doc;
                 Elements newsHeadlines = null;
                 try {
-                    publishProgress(i);
-                    String link = ListRssArticle.get(i).getLink();
+                    String link = rssArticle.getLink();
                     String link2 = link.substring(0, link.lastIndexOf("."))+"-druck"+link.substring(link.lastIndexOf(".")); //request a printing version
                     doc = Jsoup.connect(link2).get();
                     if (doc != null) {
                         //filter the content
+                        doc.outputSettings(new Document.OutputSettings().prettyPrint(false));//makes html() preserve linebreaks and spacing
+
                         newsHeadlines = doc.select("body");
+                        newsHeadlines.select("div.article-copyright p").prepend(getResources().getString(R.string.endOfArticleIndicator)+" \\n");
+                        newsHeadlines.select("div.article-copyright p").append("\\n\\n" + link);
+
                         newsHeadlines.select("p a").unwrap();
-                        newsHeadlines = newsHeadlines.select("p");
+                        newsHeadlines = newsHeadlines.select("p").prepend("\\n\\n");
                         newsHeadlines.select("b").unwrap();
                         newsHeadlines.select("strong").unwrap();
                         newsHeadlines.select("a").unwrap();
@@ -265,29 +272,42 @@ public class StoriesSelectionActivity extends Fragment {
                         newsHeadlines.select("sub").unwrap();
                         newsHeadlines.select("span").unwrap();
                         newsHeadlines.select("font").unwrap();
+                        if(newsHeadlines.hasClass("obfuscated")){ //this checks if the article is paid article(no full content), then discard it
+                            articlesToDelete.add(rssArticle);
+                            continue;
+                        }
+
 
                     }
                 } catch (HttpStatusException e) {
+                    articlesToDelete.add(rssArticle);
                     continue;
                 } catch (Exception e )  {
+                    articlesToDelete.add(rssArticle);
                     continue;
                 }
 
 
                 if (newsHeadlines != null) {
-                    content= newsHeadlines.html();
-                } else continue;
+                    String s = newsHeadlines.text().replaceAll("\\\\n","\n");
+                    content= Jsoup.clean( s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+
+                } else {
+                    articlesToDelete.add(rssArticle);
+                    continue;
+                }
 
 
                 if (content == null) { //if there is no content
-                    ListRssArticle.remove(i);
+                    articlesToDelete.add(rssArticle);
+                    continue;
                 } else
                 {
-                    ListRssArticle.get(i).setContent(content);
+                    rssArticle.setContent(content);
                 }
                 // saving the news as a file in the internal storage under rssArticles directory
-                String filename = ListRssArticle.get(i).getTitle();
-                String string = ListRssArticle.get(i).getContent();
+                String filename = rssArticle.getTitle();
+                String string = rssArticle.getContent();
 
                 try {
                     File fileWithinMyDir = new File(myDir, filename); //Getting a file within the dir.
@@ -298,6 +318,7 @@ public class StoriesSelectionActivity extends Fragment {
                     e.printStackTrace();
                 }
             }
+            ListRssArticle.removeAll(articlesToDelete);
             return ListRssArticle;
         }
 
@@ -343,7 +364,7 @@ public class StoriesSelectionActivity extends Fragment {
                     while ( readString != null ) {
                         content.append(readString);
                         content.append('\n');
-                        content.append('\n');
+
 
                         readString = bufferedReader.readLine () ;
                     }

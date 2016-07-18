@@ -35,15 +35,13 @@ public class PageFragment extends Fragment {
     private String clickedWord;
     private TextView pageView;
     private static CharSequence articleText;
-    public static Integer fragmentIndex = 0;
-    static PageFragment frag;
-
+    public static Integer fragmentIndex =0 ;
 
     private DefinitionRequest currentDefinitionRequest = null;
 
     public static PageFragment newInstance(CharSequence pageText, int fragmentIndex) {
         articleText = pageText;
-        frag = new PageFragment();
+        PageFragment frag = new PageFragment();
         Bundle args = new Bundle();
         args.putCharSequence(PAGE_TEXT, pageText);
         //saving the fragment index into its args
@@ -101,7 +99,7 @@ public class PageFragment extends Fragment {
         BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);
         iterator.setText(stringText);
         int start = iterator.first();
-
+        Boolean copyRightReachedMulti = false;
         //accessing the hashMap to get the fragment's starting index
         try{
             GEARGlobal.setWordIndex(wordIndexing.get(fragmentIndex));
@@ -112,6 +110,28 @@ public class PageFragment extends Fragment {
         for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
                 .next()) {
             String possibleWord = stringText.substring(start, end);
+            if(possibleWord.matches(getResources().getString(R.string.endOfArticleIndicator))){ //if copyRight text reached
+                ReadArticleActivity.copyRightReachedFirstTime = true;
+                spans.setSpan(new ForegroundColorSpan(Color.TRANSPARENT), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //make copy right indicator to transparent
+                ReadArticleActivity.CopyRightFragmentIndex =fragmentIndex; //set the fragment index of copy right text appearing
+                copyRightReachedMulti = true;
+                continue;
+            }
+            if(ReadArticleActivity.copyRightReachedFirstTime && fragmentIndex >=ReadArticleActivity.CopyRightFragmentIndex && ReadArticleActivity.CopyRightFragmentIndex!=-1){
+                if(fragmentIndex==ReadArticleActivity.CopyRightFragmentIndex){
+
+                    if(copyRightReachedMulti)
+                    {
+                        spans.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.default_word)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        continue;
+                    }
+
+                }
+                else{
+                    spans.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.default_word)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    continue;
+                }
+            }
             if (Character.isLetter(possibleWord.charAt(0))) {
                 //ClickableSpan clickSpan = getClickableSpan(possibleWord);
                 GEARClickableSpan clickSpan = getClickSpan(possibleWord);
@@ -123,8 +143,7 @@ public class PageFragment extends Fragment {
             }
         }
         //putting the next fragment starting index into the hashMap
-        wordIndexing.put(fragmentIndex+1, GEARGlobal.getWordIndex());
-        Log.d("Indexing",wordIndexing.toString());
+        wordIndexing.put(fragmentIndex + 1, GEARGlobal.getWordIndex());
         return pageView;
     }
 

@@ -42,6 +42,8 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="rssLink">http://www.spiegel.de/schlagzeilen/index.rss</string>
+    <!-- indicator if copyRight text is reached in rss content -->
+    <string name="endOfArticleIndicator">GearAppEndOfArticleIndicator</string>
 
 
 </resources>

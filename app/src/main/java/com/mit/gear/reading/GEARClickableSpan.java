@@ -9,7 +9,6 @@ import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.data.DataStorage;
@@ -49,7 +48,8 @@ public class GEARClickableSpan extends ClickableSpan {
 
     @Override
     public void onClick(View widget) {
-        Log.w("onClickIndex",index.toString());
+        readArticleActivity.copyRightReachedFirstTime = false;                      //checks if the copy right text is reached for first time
+        readArticleActivity.CopyRightFragmentIndex =-1;                             //the fragment index which has the copy right text
         readArticleActivity.pagesView.getAdapter().notifyDataSetChanged();         //update the view for all the preloaded fragments (max 3)
         readArticleActivity.setProgressSaved(false);                               //set progressSaved to false to popup the savePopupActivity in case user did not save
         readArticleActivity.menu.getItem(1).setEnabled(true);                      //enable Undo menu option
@@ -128,7 +128,10 @@ public class GEARClickableSpan extends ClickableSpan {
                 if(userDictionary.get(mWord).clicked)
                     ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
                 else{
+                    if(!readArticleActivity.stillInSameSession)     //checks if we are in same session, do not color passed word
                     ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.passed_word));
+                    else
+                        ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));
                 }
             }else{                                                  //else color the rest of the word with the default color
                 ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));

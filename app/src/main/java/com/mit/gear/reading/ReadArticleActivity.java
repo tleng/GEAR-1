@@ -71,7 +71,9 @@ public class ReadArticleActivity extends AppCompatActivity {
     public SharedPreferences sharedPreferences;             //sharedPreferences to get user choice of text coloring/speak choice
     ArrayList<ArrayList<String>> ListLastClickedWords = GEARGlobal.ListLastClickedWords;
     ArrayList<ArrayList<String>> MaximumLastClickedWords = GEARGlobal.MaximumLastClickedWords;
-
+    public static Boolean copyRightReachedFirstTime ;   //checks if the copy right text is reached for first time
+    public static Integer CopyRightFragmentIndex ;       //the fragment index which has the copy right text
+    public static boolean stillInSameSession;           //checks if is still in same session, used to not update passed words if user in same session
     public ReadArticleActivity() {
         instance = this;
     }
@@ -88,6 +90,9 @@ public class ReadArticleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        stillInSameSession = false;
+        copyRightReachedFirstTime = false;
+        CopyRightFragmentIndex =-1;
         GEARGlobal.ListLastClickedWords.clear();
         GEARGlobal.MaximumLastClickedWords.clear();
         GEARGlobal.resetWordIndex();
@@ -219,6 +224,8 @@ public class ReadArticleActivity extends AppCompatActivity {
         switch (id) {
             case R.id.action_clear:
                 try {
+                    copyRightReachedFirstTime = false;
+                    CopyRightFragmentIndex =-1;
                     DataStorage dataStorage = new DataStorage(getApplicationContext());
                     dataStorage.clearUserDictionary();
                     userDictionary = dataStorage.loadUserDictionary();
@@ -251,6 +258,13 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     public void saveProgress(View view) {
+        stillInSameSession = true; //used to not color passed word if user in same session
+        //resetting the undo button
+        GEARGlobal.ListLastClickedWords.clear();
+        GEARGlobal.MaximumLastClickedWords.clear();
+        menu.getItem(1).setEnabled(false);
+        MaximumUndoClicks = 2;
+        UndoClicks = 0;
         //preparing the progressDialog
         progress = new ProgressDialog(view.getContext());
         progress.setMessage("Saving Progress");
@@ -284,6 +298,9 @@ public class ReadArticleActivity extends AppCompatActivity {
                 for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
                         .next()) {
                     String possibleWord = storyText.substring(start, end);
+                    if(possibleWord.matches(getResources().getString(R.string.endOfArticleIndicator))){ //if copyRight text is reached
+                        break;
+                    }
                     if (Character.isLetter(possibleWord.charAt(0))) {
                         if (count >= GEARGlobal.getLastWordClickedIndex()) {
                             break;
@@ -423,6 +440,8 @@ public class ReadArticleActivity extends AppCompatActivity {
     * remove the last clicked word from  ListLastClickedWords and MaximumUndoClicks
      */
     private void Undo() {
+        copyRightReachedFirstTime = false;
+        CopyRightFragmentIndex =-1;
         load();
         DataStorage dataStorage = new DataStorage(this);
         userDictionary = dataStorage.loadUserDictionary();
