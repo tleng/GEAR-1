@@ -35,13 +35,15 @@ public class PageFragment extends Fragment {
     private String clickedWord;
     private TextView pageView;
     private static CharSequence articleText;
-    public static Integer fragmentIndex =0 ;
+    public static Integer fragmentIndex = 0;
+    static PageFragment frag;
+
 
     private DefinitionRequest currentDefinitionRequest = null;
 
     public static PageFragment newInstance(CharSequence pageText, int fragmentIndex) {
         articleText = pageText;
-        PageFragment frag = new PageFragment();
+        frag = new PageFragment();
         Bundle args = new Bundle();
         args.putCharSequence(PAGE_TEXT, pageText);
         //saving the fragment index into its args
@@ -91,7 +93,6 @@ public class PageFragment extends Fragment {
             GEARClickableSpan.clearWidget = pageView;
         }
         //pageView.setText(text);
-
         String stringText = text.toString();
 
         pageView.setMovementMethod(LinkMovementMethod.getInstance());
@@ -100,8 +101,14 @@ public class PageFragment extends Fragment {
         BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);
         iterator.setText(stringText);
         int start = iterator.first();
+
         //accessing the hashMap to get the fragment's starting index
-        GEARGlobal.setWordIndex(wordIndexing.get(fragmentIndex));
+        try{
+            GEARGlobal.setWordIndex(wordIndexing.get(fragmentIndex));
+        }catch (NullPointerException e){
+            return pageView;
+        }
+
         for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
                 .next()) {
             String possibleWord = stringText.substring(start, end);
@@ -116,7 +123,8 @@ public class PageFragment extends Fragment {
             }
         }
         //putting the next fragment starting index into the hashMap
-        wordIndexing.put(fragmentIndex + 1, GEARGlobal.getWordIndex());
+        wordIndexing.put(fragmentIndex+1, GEARGlobal.getWordIndex());
+        Log.d("Indexing",wordIndexing.toString());
         return pageView;
     }
 

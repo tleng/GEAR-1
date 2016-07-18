@@ -1,48 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#fff">
-
-    <include android:id="@+id/app_toolbar"
-        layout="@layout/app_toolbar"/>
+    xmlns:table="http://schemas.android.com/apk/res-auto"
+    xmlns:custom="http://schemas.android.com/tools"
+    android:gravity="center">
 
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Words you looked up:"
-        android:id="@+id/vocabularyTitle"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:padding="10dp"
-        android:textStyle="bold" />
-
-
-    <ScrollView
-        android:id="@+id/SCROLLER_ID"
+    <de.codecrafters.tableview.SortableTableView
+        android:id="@+id/tableView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:fillViewport="false"
-        android:layout_below="@+id/definition_box"
-        android:layout_margin="10dp"
-        android:background="#fff">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text=""
-            android:id="@+id/vocabularyData"
-            android:padding="10dp"/>
-    </ScrollView>
-    <!--android:textAppearance="?android:attr/textApLinearLayoute"-->
-
-
-</LinearLayout>
-
+        android:gravity="center" />
+</RelativeLayout>

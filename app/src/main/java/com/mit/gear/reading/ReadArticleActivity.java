@@ -153,6 +153,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 pageSplitter.append(storyText, textPaint);
                 numberOfPages = pageSplitter.getPages().size(); //getting total number of pages in current atricle
                 pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages()));
+                pagesView.getAdapter().notifyDataSetChanged();
                 pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });

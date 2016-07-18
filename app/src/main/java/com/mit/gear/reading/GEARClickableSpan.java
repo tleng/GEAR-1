@@ -9,6 +9,7 @@ import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.data.DataStorage;
@@ -48,6 +49,7 @@ public class GEARClickableSpan extends ClickableSpan {
 
     @Override
     public void onClick(View widget) {
+        Log.w("onClickIndex",index.toString());
         readArticleActivity.pagesView.getAdapter().notifyDataSetChanged();         //update the view for all the preloaded fragments (max 3)
         readArticleActivity.setProgressSaved(false);                               //set progressSaved to false to popup the savePopupActivity in case user did not save
         readArticleActivity.menu.getItem(1).setEnabled(true);                      //enable Undo menu option
