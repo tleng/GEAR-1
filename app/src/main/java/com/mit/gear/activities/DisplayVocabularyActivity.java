@@ -115,7 +115,7 @@ public class DisplayVocabularyActivity extends Fragment {
         simpleTableHeaderAdapter.setTextColor(getResources().getColor(R.color.table_header_text));           //Set table header column text color
         simpleTableHeaderAdapter.setPaddings(15, 20, 0, 20);
 
-        tableView.setHeaderBackgroundColor(getResources().getColor(R.color.start_activity_color));           //Set table header background color
+        tableView.setHeaderBackgroundColor(getResources().getColor(R.color.table_header));           //Set table header background color
         tableView.setHeaderAdapter(simpleTableHeaderAdapter);
         tableView.setColumnCount(4);                                                                          //Set the number of column
         tableView.setDataRowBackgroundProvider

@@ -16,10 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import com.mattmellor.gear.R;
 import com.mit.gear.NavDrawer.NavDrawerItem;
 import com.mit.gear.NavDrawer.NavDrawerListAdapter;
+import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
 
 /**
@@ -31,6 +34,7 @@ public class MainActivity extends Activity {
 	public static ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
     public static Context context;
+	private MenuItem clearItem;
 
 	// nav drawer title
 	private CharSequence mDrawerTitle;
@@ -141,11 +145,19 @@ public class MainActivity extends Activity {
 		}
 		// Handle action bar actions click
 		switch (item.getItemId()) {
-		case R.id.action_settings:
-			startActivity(new Intent(context, UserSettingsActivity.class));
-
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.action_settings:
+				startActivity(new Intent(context, UserSettingsActivity.class));
+			case R.id.action_clear:
+				try {
+					DataStorage dataStorage = new DataStorage(getApplicationContext());
+					dataStorage.clearUserDictionary();
+					displayView(2);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
@@ -157,6 +169,12 @@ public class MainActivity extends Activity {
 		// if nav drawer is opened, hide the action items
 		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
 		menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
+		clearItem = menu.findItem(R.id.action_clear);
+		if (mTitle.equals("Vocabulary")){
+			clearItem.setVisible(true);
+		}else{
+			clearItem.setVisible(false);
+		}
 		return super.onPrepareOptionsMenu(menu);
 	}
 

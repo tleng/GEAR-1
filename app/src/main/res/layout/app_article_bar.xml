@@ -2,15 +2,17 @@
 <android.support.v7.widget.Toolbar
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-    android:background="#99bbff">
+    android:layout_height="58dp"
+    android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
+    android:background="#303030">
 
 <Button
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="130dp"
+    android:layout_height="37dp"
     android:text="Save Progress"
     android:clickable="true"
-    android:onClick="saveProgress" />
+    android:onClick="saveProgress"
+    android:background="#737373"
+    android:textColor="#FFFFFF"/>
 
 </android.support.v7.widget.Toolbar>

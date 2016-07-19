@@ -52,7 +52,7 @@ public class GEARClickableSpan extends ClickableSpan {
         readArticleActivity.CopyRightFragmentIndex =-1;                             //the fragment index which has the copy right text
         readArticleActivity.pagesView.getAdapter().notifyDataSetChanged();         //update the view for all the preloaded fragments (max 3)
         readArticleActivity.setProgressSaved(false);                               //set progressSaved to false to popup the savePopupActivity in case user did not save
-        readArticleActivity.menu.getItem(1).setEnabled(true);                      //enable Undo menu option
+        readArticleActivity.menu.getItem(0).setEnabled(true);                      //enable Undo menu option
         readArticleActivity.UndoClicks++;
 
         updateLastClickedWord();

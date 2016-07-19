@@ -186,7 +186,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         this.menu = menu;
-        menu.getItem(1).setEnabled(false); //disabling the Undo option
+        menu.getItem(0).setEnabled(false); //disabling the Undo option
         return true;
     }
 
@@ -222,7 +222,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
-            case R.id.action_clear:
+       /*     case R.id.action_clear:
                 try {
                     copyRightReachedFirstTime = false;
                     CopyRightFragmentIndex =-1;
@@ -239,7 +239,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return true;
+                return true;*/
             case R.id.action_undo:
                 Undo();
                 return true;
@@ -262,7 +262,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         //resetting the undo button
         GEARGlobal.ListLastClickedWords.clear();
         GEARGlobal.MaximumLastClickedWords.clear();
-        menu.getItem(1).setEnabled(false);
+        menu.getItem(0).setEnabled(false);
         MaximumUndoClicks = 2;
         UndoClicks = 0;
         //preparing the progressDialog
@@ -478,7 +478,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 }
 
                 if (MaximumUndoClicks == 0) {
-                    menu.getItem(1).setEnabled(false);
+                    menu.getItem(0).setEnabled(false);
                     MaximumUndoClicks = 2;
                 }
             }
@@ -489,7 +489,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 UndoClicks = 0;
                 GEARGlobal.setLastWordClickedIndex(-1);
                 GEARGlobal.setLastWordClicked("None");
-                menu.getItem(1).setEnabled(false);
+                menu.getItem(0).setEnabled(false);
                 ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
                 MaximumLastClickedWords.remove(MaximumLastClickedWords.size() - 1);
                 load();
