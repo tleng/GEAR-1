@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.activities.MainActivity;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.words.DefinitionRequest;
 import com.mit.gear.words.GEARGlobal;
@@ -33,14 +34,18 @@ public class GEARClickableSpan extends ClickableSpan {
     //private DefinitionRequest currentDefinitionRequest;
     //create object to translate words
     private Translator currentDefinitionRequest;
-    private Context context = ReadArticleActivity.getReadArticleActivityInstance().getApplicationContext();
-    private static HashMap<String,Word> userDictionary = ReadArticleActivity.getReadArticleActivityInstance().userDictionary;
+    private Context context =
+			ReadArticleActivity.getReadArticleActivityInstance().getApplicationContext();
+    private static HashMap<String,Word> userDictionary =
+			ReadArticleActivity.getReadArticleActivityInstance().userDictionary;
     static View clearWidget;
     private Integer index;
     public static boolean colorChoice;
     public static boolean speakChoice;
-    private ReadArticleActivity readArticleActivity =ReadArticleActivity.getReadArticleActivityInstance();
+    private ReadArticleActivity readArticleActivity =
+			ReadArticleActivity.getReadArticleActivityInstance();
     private static String lemma;
+
 
     public GEARClickableSpan(String word) {
         mWord = word;
@@ -71,22 +76,30 @@ public class GEARClickableSpan extends ClickableSpan {
         time_place_holder.add("0");
 
         translate();
+		if(Character.isUpperCase(mWord.charAt(0))){
+			MainActivity.CapitalWord.put(mWord,true);
+		}
+		if(Character.isLowerCase(mWord.charAt(0))){
+			Character first = Character.toUpperCase(mWord.charAt(0));
+			String cWord = mWord.replace(mWord.charAt(0),first);
+			MainActivity.CapitalWord.put(cWord,true);
+		}
 
-        Word wordData = new Word(mWord,lemma);
+        Word wordData = new Word(mWord.toLowerCase(),lemma);
         wordData.setClicked(true);
         //get the latest userDictionary to add new words clicked
         userDictionary = readArticleActivity.userDictionary;
-        userDictionary.put(mWord, wordData);
+        userDictionary.put(mWord.toLowerCase(), wordData);
         DataStorage dataStorage = new DataStorage(context);
-        if (readArticleActivity.currentSessionWords.containsKey(mWord)) {
-            Integer count = readArticleActivity.currentSessionWords.get(mWord);
+        if (readArticleActivity.currentSessionWords.containsKey(mWord.toLowerCase())) {
+            Integer count = readArticleActivity.currentSessionWords.get(mWord.toLowerCase());
             count += 1;
-            readArticleActivity.currentSessionWords.put(mWord, count);
+            readArticleActivity.currentSessionWords.put(mWord.toLowerCase(), count);
         } else {
-            readArticleActivity.currentSessionWords.put(mWord, 1);
+            readArticleActivity.currentSessionWords.put(mWord.toLowerCase(), 1);
         }
         try {
-            dataStorage.addToUserDictionary(mWord, lemma, readArticleActivity.currentArticle, true);
+            dataStorage.addToUserDictionary(mWord.toLowerCase(), lemma, readArticleActivity.currentArticle, true);
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -120,12 +133,12 @@ public class GEARClickableSpan extends ClickableSpan {
         ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();         //creating ReadArticleActivity instance to access the currentSessionWords
         if (colorChoice) {         //if the color choice is true(color switch is on)
 
-            if( activityInstance.currentSessionWords.containsKey(mWord)){       //if the word in the currentSessionWords word ( clicked in the current session )
+            if( activityInstance.currentSessionWords.containsKey(mWord.toLowerCase())){       //if the word in the currentSessionWords word ( clicked in the current session )
                 ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
                 ds.bgColor=(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word_background));
             }
-            else if(userDictionary.containsKey(mWord)){             //if the word in the userDictionary check if it is clicked or passed
-                if(userDictionary.get(mWord).clicked)
+            else if(userDictionary.containsKey(mWord.toLowerCase())){             //if the word in the userDictionary check if it is clicked or passed
+                if(userDictionary.get(mWord.toLowerCase()).clicked)
                     ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
                 else{
                     if(!readArticleActivity.stillInSameSession)     //checks if we are in same session, do not color passed word
@@ -140,6 +153,14 @@ public class GEARClickableSpan extends ClickableSpan {
         else{                                                       //if the user turned off the text coloring color with the default color
             ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));
         }
+		if ((MainActivity.CapitalWord.containsKey(mWord)&&MainActivity.CapitalWord.get(mWord))
+				||(MainActivity.CapitalWord.containsKey(mWord.toLowerCase())&&MainActivity.CapitalWord.get(mWord.toLowerCase())) ){
+			ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
+			ds.bgColor=(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word_background));
+		}
+		if ((MainActivity.CapitalWord.containsKey(mWord)&&!MainActivity.CapitalWord.get(mWord))){
+			ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
+		}
     }
 
     public void color(View widget) {
@@ -147,7 +168,7 @@ public class GEARClickableSpan extends ClickableSpan {
         widget.invalidate();
     }
 
-    public static void clear() {
+/*    public static void clear() {
         if (clearWidget != null) {
             //clearing the current session words
             ReadArticleActivity.getReadArticleActivityInstance().currentSessionWords.clear();
@@ -161,7 +182,7 @@ public class GEARClickableSpan extends ClickableSpan {
         GEARGlobal.setLastWordClicked("None");
         //setting the saveProgress to true (do not show the SavePopupActivity)
         ReadArticleActivity.getReadArticleActivityInstance().setProgressSaved(true);
-    }
+    }*/
 
     public void setIndex(Integer i) {
         index = i;

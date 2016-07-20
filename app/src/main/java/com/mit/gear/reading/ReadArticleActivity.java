@@ -21,6 +21,7 @@ import android.view.ViewTreeObserver;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.activities.DisplayVocabularyActivity;
+import com.mit.gear.activities.MainActivity;
 import com.mit.gear.activities.SavePopupActivity;
 import com.mit.gear.activities.StartActivity;
 import com.mit.gear.data.DataStorage;
@@ -310,11 +311,11 @@ public class ReadArticleActivity extends AppCompatActivity {
                             break;
                         }
                         //try {
-                        if (currentSessionWords.containsKey(possibleWord)) {
-                            Integer sessionCount = currentSessionWords.get(possibleWord);
+                        if (currentSessionWords.containsKey(possibleWord.toLowerCase())) {
+                            Integer sessionCount = currentSessionWords.get(possibleWord.toLowerCase());
                             if (sessionCount > 0) {
                                 sessionCount -= 1;
-                                currentSessionWords.put(possibleWord, sessionCount);
+                                currentSessionWords.put(possibleWord.toLowerCase(), sessionCount);
                                 continue;
                             }
                         }
@@ -323,12 +324,12 @@ public class ReadArticleActivity extends AppCompatActivity {
                         wordArrayList.add(currentArticle);
                         wordArrayList.add(false);
                         Integer wordCount = 1;
-                        if (wordsToSave.containsKey(possibleWord)) {
-                            wordCount = (Integer) wordsToSave.get(possibleWord).get(3) + 1;
+                        if (wordsToSave.containsKey(possibleWord.toLowerCase())) {
+                            wordCount = (Integer) wordsToSave.get(possibleWord.toLowerCase()).get(3) + 1;
                         }
                         wordArrayList.add(wordCount);
-                        if (!currentSessionWords.containsKey(possibleWord)) {
-                            wordsToSave.put(possibleWord, wordArrayList);
+                        if (!currentSessionWords.containsKey(possibleWord.toLowerCase())) {
+                            wordsToSave.put(possibleWord.toLowerCase(), wordArrayList);
                             //dataStorage.addToUserDictionary(possibleWord, "None", currentArticle, false);
                             newWords += 1;
 
@@ -399,6 +400,9 @@ public class ReadArticleActivity extends AppCompatActivity {
         Long timeSpent = endTime - startTime;
         UserDataCollection.setTimeSpentOnArticle(currentArticle, timeSpent);
 		SendUserDictionary();
+        for (Map.Entry<String, Boolean> entry : MainActivity.CapitalWord.entrySet()) {
+			MainActivity.CapitalWord.put(entry.getKey(),false);
+        }
         super.onPause();
     }
 
@@ -531,14 +535,17 @@ public class ReadArticleActivity extends AppCompatActivity {
         if (vocabulary.isEmpty()) {
             vocabString = " ";
         }
-        // list vocabulary words
+        //Loop through user dictionary and list vocabulary words
         for (Map.Entry<String, Word> entry : vocabulary.entrySet()) {
             String key = entry.getKey();
             Word word = entry.getValue();
             if(word.getLemma().equals("None"))
-                vocabString += key +", Clicked: " + Integer.toString(word.totalWordClicks()) + ", Passed: " + Integer.toString(word.totalWordPasses()) + "\n";
+                vocabString += key +", Clicked: " + Integer.toString(word.totalWordClicks()) +
+						", Passed: " + Integer.toString(word.totalWordPasses()) + "\n";
             else
-                vocabString += key + ", "+word.getLemma()+", Clicked: " + Integer.toString(word.totalWordClicks()) + ", Passed: " + Integer.toString(word.totalWordPasses()) + "\n";
+                vocabString += key + ", "+word.getLemma()+", Clicked: "
+						+ Integer.toString(word.totalWordClicks()) +
+						", Passed: " + Integer.toString(word.totalWordPasses()) + "\n";
         }
         return vocabString;
     }

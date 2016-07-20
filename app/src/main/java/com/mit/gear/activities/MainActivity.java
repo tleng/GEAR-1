@@ -19,11 +19,14 @@ import android.widget.ListView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import com.mattmellor.gear.R;
 import com.mit.gear.NavDrawer.NavDrawerItem;
 import com.mit.gear.NavDrawer.NavDrawerListAdapter;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
+import com.mit.gear.reading.GEARClickableSpan;
 
 /**
  * Activity that represents the starting screen of the app
@@ -35,6 +38,7 @@ public class MainActivity extends Activity {
 	private ActionBarDrawerToggle mDrawerToggle;
     public static Context context;
 	private MenuItem clearItem;
+	public static HashMap<String,Boolean> CapitalWord = new HashMap<>();
 
 	// nav drawer title
 	private CharSequence mDrawerTitle;
@@ -147,10 +151,12 @@ public class MainActivity extends Activity {
 		switch (item.getItemId()) {
 			case R.id.action_settings:
 				startActivity(new Intent(context, UserSettingsActivity.class));
+				return true;
 			case R.id.action_clear:
 				try {
-					DataStorage dataStorage = new DataStorage(getApplicationContext());
+					DataStorage dataStorage = new DataStorage(context);
 					dataStorage.clearUserDictionary();
+					CapitalWord.clear();
 					displayView(2);
 				} catch (IOException e) {
 					e.printStackTrace();
