@@ -149,18 +149,18 @@ public class GEARClickableSpan extends ClickableSpan {
             }else{                                                  //else color the rest of the word with the default color
                 ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));
             }
+            if ((MainActivity.CapitalWord.containsKey(mWord)&&MainActivity.CapitalWord.get(mWord))
+                    ||(MainActivity.CapitalWord.containsKey(mWord.toLowerCase())&&MainActivity.CapitalWord.get(mWord.toLowerCase())) ){
+                ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
+                ds.bgColor=(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word_background));
+            }
+            if ((MainActivity.CapitalWord.containsKey(mWord)&&!MainActivity.CapitalWord.get(mWord))){
+                ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
+            }
         }
         else{                                                       //if the user turned off the text coloring color with the default color
             ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));
         }
-		if ((MainActivity.CapitalWord.containsKey(mWord)&&MainActivity.CapitalWord.get(mWord))
-				||(MainActivity.CapitalWord.containsKey(mWord.toLowerCase())&&MainActivity.CapitalWord.get(mWord.toLowerCase())) ){
-			ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
-			ds.bgColor=(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word_background));
-		}
-		if ((MainActivity.CapitalWord.containsKey(mWord)&&!MainActivity.CapitalWord.get(mWord))){
-			ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
-		}
     }
 
     public void color(View widget) {
