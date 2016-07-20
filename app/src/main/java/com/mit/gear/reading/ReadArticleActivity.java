@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,7 @@ import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
 import com.mit.gear.words.DefinitionRequest;
 import com.mit.gear.words.GEARGlobal;
+import com.mit.gear.words.MailSender;
 import com.mit.gear.words.Word;
 
 import org.json.JSONException;
@@ -35,6 +38,7 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import android.os.Handler;
 import android.widget.Toast;
@@ -394,6 +398,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         Long endTime = System.currentTimeMillis();         // updates user data with time spent
         Long timeSpent = endTime - startTime;
         UserDataCollection.setTimeSpentOnArticle(currentArticle, timeSpent);
+		SendUserDictionary();
         super.onPause();
     }
 
@@ -514,5 +519,49 @@ public class ReadArticleActivity extends AppCompatActivity {
     private void load(){
         ListLastClickedWords = GEARGlobal.ListLastClickedWords;
         MaximumLastClickedWords = GEARGlobal.MaximumLastClickedWords;
+    }
+
+	/*
+	 * Method to generate vocabulary string by reading user dictionary
+	 */
+    private String getVocabularyString() {
+        DataStorage dataStorage = new DataStorage(getApplicationContext());
+        HashMap<String, Word> vocabulary = dataStorage.loadUserDictionary();
+        String vocabString = "";
+        if (vocabulary.isEmpty()) {
+            vocabString = " ";
+        }
+        // list vocabulary words
+        for (Map.Entry<String, Word> entry : vocabulary.entrySet()) {
+            String key = entry.getKey();
+            Word word = entry.getValue();
+            if(word.getLemma().equals("None"))
+                vocabString += key +", Clicked: " + Integer.toString(word.totalWordClicks()) + ", Passed: " + Integer.toString(word.totalWordPasses()) + "\n";
+            else
+                vocabString += key + ", "+word.getLemma()+", Clicked: " + Integer.toString(word.totalWordClicks()) + ", Passed: " + Integer.toString(word.totalWordPasses()) + "\n";
+        }
+        return vocabString;
+    }
+
+	/*
+	 * Method to get device id and serial number
+	 * Call MailSender to send data
+	 */
+    private void SendUserDictionary(){
+        String android_id = Settings.Secure.getString(getApplicationContext().getContentResolver(),  	//Get device id
+                Settings.Secure.ANDROID_ID);
+        String android_serial = Build.SERIAL;                                                          //Get device serial nember
+        String message = "Device ID: "+android_id+"\t\t\tDevice Serial Number: "+android_serial +"\n"; //Prepare mail content to send
+        message += getVocabularyString();
+		if(getVocabularyString().equals(" ")){                     										//If Vocabulary list is empty
+			return;
+		}
+		//Create new mail sender object and set sender mail and password, receiver mail, message to send
+        try {
+            MailSender sender = new MailSender("gearmit16@gmail.com", "GEARmit2016");
+            sender.sendMail("UserDictionary "+android_id, message, "gearmit16@gmail.com", "gearmit16@gmail.com");
+        } catch (Exception e) {
+            Log.e("SendMail", e.getMessage(), e);
+        }
     }
 }
