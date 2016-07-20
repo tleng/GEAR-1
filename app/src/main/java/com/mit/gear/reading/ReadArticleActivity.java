@@ -459,6 +459,9 @@ public class ReadArticleActivity extends AppCompatActivity {
             dataStorage.deleteFromWordFile(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0), "None", dataStorage.USERDICTIONARY, currentArticle, true);
             currentSessionWords.remove(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
             ListLastClickedWords = GEARGlobal.ListLastClickedWords;
+			Character first = Character.toUpperCase(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).charAt(0));
+			String cWord = first+ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).substring(1);
+			MainActivity.CapitalWord.remove(cWord);
             pagesView.getAdapter().notifyDataSetChanged();
             userDictionary = dataStorage.loadUserDictionary();
         } catch (JSONException e) {

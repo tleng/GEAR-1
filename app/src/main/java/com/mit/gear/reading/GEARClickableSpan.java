@@ -83,7 +83,7 @@ public class GEARClickableSpan extends ClickableSpan {
 		}
 		if(Character.isLowerCase(mWord.charAt(0))){
 			Character first = Character.toUpperCase(mWord.charAt(0));
-			String cWord = mWord.replace(mWord.charAt(0),first);
+			String cWord = first+mWord.substring(1);
 			MainActivity.CapitalWord.put(cWord,true);
 		}
 
@@ -208,15 +208,15 @@ public class GEARClickableSpan extends ClickableSpan {
     public void updateLastClickedWord(){
         if(GEARGlobal.getLastWordClickedIndex()<index) {
             GEARGlobal.setLastWordClickedIndex(index);
-            GEARGlobal.setLastWordClicked(mWord);
+            GEARGlobal.setLastWordClicked(mWord.toLowerCase());
             ArrayList<String> word = new ArrayList<String>();
-            word.add(mWord);
+            word.add(mWord.toLowerCase());
             word.add(String.valueOf(index));
             GEARGlobal.MaximumLastClickedWords.add(word);
         }
         if (GEARGlobal.ListLastClickedWords.size() < GEARGlobal.undoThreshold){
             ArrayList<String> word = new ArrayList<String>();
-            word.add(mWord);
+            word.add(mWord.toLowerCase());
             word.add(String.valueOf(index));
             GEARGlobal.ListLastClickedWords.add(word);
         }
@@ -224,7 +224,7 @@ public class GEARClickableSpan extends ClickableSpan {
             GEARGlobal.ListLastClickedWords.remove(0);
 
             ArrayList<String> word = new ArrayList<String>();
-            word.add(mWord);
+            word.add(mWord.toLowerCase());
             word.add(String.valueOf(index));
             GEARGlobal.ListLastClickedWords.add(word);
         }
