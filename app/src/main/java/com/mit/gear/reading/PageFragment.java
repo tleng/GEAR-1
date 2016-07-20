@@ -117,7 +117,7 @@ public class PageFragment extends Fragment {
                 copyRightReachedMulti = true;
                 continue;
             }
-            if(ReadArticleActivity.copyRightReachedFirstTime && fragmentIndex >=ReadArticleActivity.CopyRightFragmentIndex && ReadArticleActivity.CopyRightFragmentIndex!=-1){
+            if(ReadArticleActivity.copyRightReachedFirstTime && Math.abs(fragmentIndex-ReadArticleActivity.CopyRightFragmentIndex)>=0 && ReadArticleActivity.CopyRightFragmentIndex!=-1){
                 if(fragmentIndex==ReadArticleActivity.CopyRightFragmentIndex){
 
                     if(copyRightReachedMulti)
@@ -127,10 +127,15 @@ public class PageFragment extends Fragment {
                     }
 
                 }
-                else{
+                else if (fragmentIndex>ReadArticleActivity.CopyRightFragmentIndex){
                     spans.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.default_word)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     continue;
                 }
+
+//                else{
+//                    spans.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.default_word)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                    continue;
+//                }
             }
             if (Character.isLetter(possibleWord.charAt(0))) {
                 //ClickableSpan clickSpan = getClickableSpan(possibleWord);

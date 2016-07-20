@@ -24,6 +24,7 @@ import com.mit.gear.activities.DisplayVocabularyActivity;
 import com.mit.gear.activities.MainActivity;
 import com.mit.gear.activities.SavePopupActivity;
 import com.mit.gear.activities.StartActivity;
+import com.mit.gear.activities.StoriesSelectionActivity;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
 import com.mit.gear.words.DefinitionRequest;
@@ -229,8 +230,8 @@ public class ReadArticleActivity extends AppCompatActivity {
         switch (id) {
        /*     case R.id.action_clear:
                 try {
-                    copyRightReachedFirstTime = false;
-                    CopyRightFragmentIndex =-1;
+                    //copyRightReachedFirstTime = false;
+                    //CopyRightFragmentIndex =-1;
                     DataStorage dataStorage = new DataStorage(getApplicationContext());
                     dataStorage.clearUserDictionary();
                     userDictionary = dataStorage.loadUserDictionary();
@@ -240,6 +241,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                     menu.getItem(1).setEnabled(false);
                     MaximumUndoClicks = 2;
                     UndoClicks = 0;
+                    StoriesSelectionActivity.needsToScore=true;
                     //setPagesView();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -263,6 +265,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     public void saveProgress(View view) {
+        StoriesSelectionActivity.needsToScore=true;
         stillInSameSession = true; //used to not color passed word if user in same session
         //resetting the undo button
         GEARGlobal.ListLastClickedWords.clear();
@@ -449,8 +452,6 @@ public class ReadArticleActivity extends AppCompatActivity {
     * remove the last clicked word from  ListLastClickedWords and MaximumUndoClicks
      */
     private void Undo() {
-        copyRightReachedFirstTime = false;
-        CopyRightFragmentIndex =-1;
         load();
         DataStorage dataStorage = new DataStorage(this);
         userDictionary = dataStorage.loadUserDictionary();

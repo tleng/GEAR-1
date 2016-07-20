@@ -9,9 +9,11 @@ import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.activities.MainActivity;
+import com.mit.gear.activities.StoriesSelectionActivity;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.words.DefinitionRequest;
 import com.mit.gear.words.GEARGlobal;
@@ -53,8 +55,8 @@ public class GEARClickableSpan extends ClickableSpan {
 
     @Override
     public void onClick(View widget) {
-        readArticleActivity.copyRightReachedFirstTime = false;                      //checks if the copy right text is reached for first time
-        readArticleActivity.CopyRightFragmentIndex =-1;                             //the fragment index which has the copy right text
+        StoriesSelectionActivity.needsToScore=true;
+        Log.w("onClickIndex",index.toString());
         readArticleActivity.pagesView.getAdapter().notifyDataSetChanged();         //update the view for all the preloaded fragments (max 3)
         readArticleActivity.setProgressSaved(false);                               //set progressSaved to false to popup the savePopupActivity in case user did not save
         readArticleActivity.menu.getItem(0).setEnabled(true);                      //enable Undo menu option

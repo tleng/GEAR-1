@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,12 +16,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.RSS.RssListAdapter;
 import com.mit.gear.RSS.RssListListener;
 import com.mit.gear.RSS.RssArticle;
 import com.mit.gear.RSS.RssReader;
 import com.mit.gear.NavDrawer.NavDrawerListAdapter;
 import com.mit.gear.data.DataStorage;
-import com.mit.gear.words.GEARGlobal;
+import com.mit.gear.miscellaneous.MapUtil;
 import com.mit.gear.words.Word;
 
 import org.jsoup.HttpStatusException;
@@ -47,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static com.mattmellor.gear.R.id.app_article_bar;
 
@@ -58,8 +61,12 @@ public class StoriesSelectionActivity extends Fragment {
     private StoriesSelectionActivity local;
     static public Context context;
     public static ProgressDialog progress;
-    private List<RssArticle> ListRssArticle;
+    public static List<RssArticle> ListRssArticle;
     private SharedPreferences sharedPreferences;
+    private static Map<RssArticle,Double> articleAndScoreMap = new HashMap<>(); // hashmap tp map the article and its score
+    DataStorage dataStorage;
+    HashMap<String,Word> userDictionary;
+    public static boolean needsToScore = false; //boolean indicate if we need to score the news
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,11 +74,21 @@ public class StoriesSelectionActivity extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if(needsToScore){  //check if we need to score again (if new words are clicked/saves)
+            scoreArticles();
+        }
+    }
+
+
+    @Override
     public void onActivityCreated( Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         View view = getView();
         toolbar = (android.support.v7.widget.Toolbar) view.findViewById(app_article_bar);
         context = getActivity();
+        dataStorage= new DataStorage(getActivity().getApplicationContext());
         //setSupportActionBar(toolbar);
         // try {
         //    generateRecommendationButtons();
@@ -101,10 +118,21 @@ public class StoriesSelectionActivity extends Fragment {
             }
 
            else{    //if today date is not after the last update date
-                prepareTheList(getNewsFromStorage()); //get news from storage and view them
+                if(ListRssArticle==null){ //open app for first time
+                    prepareTheList(getNewsFromStorage()); //get news from storage and view them
+                    needsToScore=true;
+                }
+
+                else {   //the news list are already loaded
+                    prepareTheList(ListRssArticle);
+                }
+
+                if(needsToScore){
+                    scoreArticles();
+                }
             }
        }
-        else{                                   //if news was previously generated, get them from the bundle
+        else{                                   //if news were previously generated, get them from the bundle
 
             ListRssArticle= (List<RssArticle>) savedInstanceState.getSerializable("RssArticle");
             prepareTheList(ListRssArticle);
@@ -112,11 +140,7 @@ public class StoriesSelectionActivity extends Fragment {
        }
     }
 
-    @Override
-    public void onResume() {
-        prepareTheList(getNewsFromStorage());
-        super.onResume();
-    }
+
     //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
@@ -241,6 +265,7 @@ public class StoriesSelectionActivity extends Fragment {
 
         @Override
         protected List<RssArticle> doInBackground(String... urls) {
+            articleAndScoreMap.clear();
             ListRssArticle = getRssArticles(urls[0]);
 
             if(ListRssArticle==null)
@@ -306,7 +331,8 @@ public class StoriesSelectionActivity extends Fragment {
                 if (newsHeadlines != null) {
                     String s = newsHeadlines.text().replaceAll("\\\\n","\n");
                     content= Jsoup.clean( s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
-
+                    content=content.replaceAll("&amp;", "&");                       //for some reason the clean method don't convert ALL &amp; special character to & symbol
+                    content=content.replaceAll("&nbsp;", " ");
                 } else {
                     articlesToDelete.add(rssArticle);
                     continue;
@@ -345,6 +371,7 @@ public class StoriesSelectionActivity extends Fragment {
                 prepareTheList(ListRssArticle);
                 getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
                 progress.dismiss();
+                scoreArticles();
             }
 
         }
@@ -408,7 +435,7 @@ public class StoriesSelectionActivity extends Fragment {
         MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
         MainActivity.mDrawerList.setItemChecked(0, true);
         MainActivity.mDrawerList.setSelection(0);
-        ArrayAdapter<RssArticle> adapter = new ArrayAdapter<RssArticle>(getActivity(), android.R.layout.simple_list_item_1,result);
+        ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item, ListRssArticle, articleAndScoreMap);
         rssItems.setAdapter(adapter);
         rssItems.setOnItemClickListener(new RssListListener(result, getActivity()));
 
@@ -514,5 +541,113 @@ public class StoriesSelectionActivity extends Fragment {
         return false;
     }
 
+
+    /*
+        This method is the same as the one in SuggestedStoriesActivity  but altered for news use
+     */
+
+    private List<RssArticle> recommendKArticles2() {
+
+        List<RssArticle> listOfArticleAssets = ListRssArticle ;
+        articleAndScoreMap.clear();
+        for(RssArticle article: listOfArticleAssets){
+            Double fraction = getScore(article);
+            articleAndScoreMap.put(article,fraction);
+        }
+        articleAndScoreMap = MapUtil.sortByValue(articleAndScoreMap);
+        Set<RssArticle> sortedArticles = articleAndScoreMap.keySet();
+        List<RssArticle> sortedArticleList = new ArrayList<>();
+       // this.articlesWithRatings.putAll(articleAndScoreMap);
+        for(RssArticle article: sortedArticles){
+            sortedArticleList.add(article);
+            //This just returns the keyset as a list???
+        }
+        int n = sortedArticles.size();
+        List<RssArticle> recommendedArticles = new ArrayList<>();
+
+        // check if there are sortedArticles
+        if (n>0) {
+            for (int i = n - 1; i >= 0; i--) {
+                recommendedArticles.add(sortedArticleList.get(i));
+            }
+        }
+        ListRssArticle=recommendedArticles;
+        return ListRssArticle;
     }
+
+    /*
+    This method is the same as the one in SuggestedStoriesActivity  but altered for news use
+     */
+
+    private Double getScore(RssArticle rssArticle) {
+        userDictionary = dataStorage.loadUserDictionary();
+        String articleText;
+        try {
+
+            articleText= rssArticle.getContent();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            articleText = "Error Occurred";  // better - signal error differently
+        }
+
+        String[] articleWords = articleText.split("[\\p{Punct}\\s]+");
+
+        Double counter=1.0;
+        for(String word: articleWords){
+            if(userDictionary.containsKey(word)){
+                counter *= 1-userDictionary.get(word).score;
+            } else {
+                // word has never been encountered before
+                counter *= 0.5;
+            }
+        }
+
+        return counter;
+
+    }
+
+
+/*
+ * this class generate the recommended Articles and call prepareTheList method on the sorted list
+ *
+ */
+
+    private class rankTheNews extends AsyncTask<String, Void, List<RssArticle>> {
+
+        @Override
+        protected List<RssArticle> doInBackground(String... params) {
+
+            return recommendKArticles2();
+        }
+
+        @Override
+        protected void onPostExecute(List<RssArticle> result) {
+            if(result!=null)
+            {
+                ListRssArticle = result;
+                prepareTheList(ListRssArticle);
+            }
+            progress.dismiss();
+        }
+    }
+
+
+    /*
+     *This method prepare the progress dialog and execute the task to rank articles
+     * sets the needsToScore flag to false
+     */
+
+    private void scoreArticles() {
+        progress = new ProgressDialog(getActivity());
+        progress.setMessage("Ranking the news for you");
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.setIndeterminate(true);
+        progress.setCancelable(false);
+        progress.show();
+        new rankTheNews().execute();
+        needsToScore=false;
+    }
+
+}
 

@@ -154,7 +154,8 @@ public class MainActivity extends Activity {
 				return true;
 			case R.id.action_clear:
 				try {
-					DataStorage dataStorage = new DataStorage(context);
+                    StoriesSelectionActivity.needsToScore=true;
+                    DataStorage dataStorage = new DataStorage(context);
 					dataStorage.clearUserDictionary();
 					CapitalWord.clear();
 					displayView(2);
