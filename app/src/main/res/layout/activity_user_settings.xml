@@ -46,7 +46,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_below="@id/BarLayout">
+        android:layout_below="@id/BarLayout"
+        android:id="@+id/linearLayout2">
 
         <Switch
             android:layout_width="wrap_content"
@@ -70,5 +71,16 @@
             android:layout_gravity="center_horizontal"
             android:textSize="20dp"
             />
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Debug mode      "
+            android:id="@+id/debug"
+            android:layout_below="@+id/linearLayout2"
+            android:layout_centerHorizontal="true"
+            android:textSize="20dp"
+            android:checked="false" />
     </LinearLayout>
+
 </RelativeLayout>

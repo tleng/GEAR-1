@@ -2,6 +2,7 @@ package com.mit.gear.activities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -172,12 +173,20 @@ public class SuggestedStoriesActivity extends Fragment {
         //making variables as final to access it from inner thread
         final List<StoryItem> listStoryItem = new ArrayList<>();
         int articleNumber = 0;
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        Boolean debugChoice = sharedPreferences.getBoolean("debug", false);
         for (String article:articles) {
             final StoryItem StoryItem =new StoryItem();
             Double rating = articlesWithRatings.get(article) * 100;
             int suggestNumber = rating.intValue();
             String ratingString = " "+articleAndScoreMap.get(article)+" ";
-            String title = article +"\t"+ratingString+"\n"+Count(article);
+            String title;
+            if(debugChoice) {           //show the article score (debug mode is on)
+                title = article + "\t" + ratingString + "\n" + Count(article);
+            }else{                     //do not show the article score (debug mode is off)
+                title = article + "\n" + Count(article);
+            }
+
             articleNumber += 1;
             StoryItem.setTitle(title);
             StoryItem.setContentDescription(article);

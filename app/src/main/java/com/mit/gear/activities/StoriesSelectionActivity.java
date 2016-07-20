@@ -435,8 +435,16 @@ public class StoriesSelectionActivity extends Fragment {
         MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
         MainActivity.mDrawerList.setItemChecked(0, true);
         MainActivity.mDrawerList.setSelection(0);
-        ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item, ListRssArticle, articleAndScoreMap);
-        rssItems.setAdapter(adapter);
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        Boolean debugChoice = sharedPreferences.getBoolean("debug", false);
+        if(debugChoice){           //show the article score (debug mode is on)
+            ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item, ListRssArticle, articleAndScoreMap);
+            rssItems.setAdapter(adapter);
+        }
+        else{                     //do not show the article score (debug mode is off)
+            ArrayAdapter<RssArticle> adapter = new ArrayAdapter<RssArticle>(getActivity(),android.R.layout.simple_list_item_1, ListRssArticle);
+            rssItems.setAdapter(adapter);
+        }
         rssItems.setOnItemClickListener(new RssListListener(result, getActivity()));
 
     }
