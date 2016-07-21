@@ -11,7 +11,6 @@ import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.Menu;
@@ -20,10 +19,8 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 
 import com.mattmellor.gear.R;
-import com.mit.gear.activities.DisplayVocabularyActivity;
 import com.mit.gear.activities.MainActivity;
 import com.mit.gear.activities.SavePopupActivity;
-import com.mit.gear.activities.StartActivity;
 import com.mit.gear.activities.StoriesSelectionActivity;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
@@ -43,6 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import android.os.Handler;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -166,6 +164,8 @@ public class ReadArticleActivity extends AppCompatActivity {
                 pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages()));
                 pagesView.getAdapter().notifyDataSetChanged();
                 pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                TextView pageIndicator = (TextView) getReadArticleActivityInstance().findViewById(R.id.pageIndicator);
+                pageIndicator.setText("Page " + String.valueOf(1) + " of " + numberOfPages);
             }
         });
         pagesView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -176,6 +176,8 @@ public class ReadArticleActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 fragmentIndex = position; //update the fragment index to current page position
+                TextView pageIndicator = (TextView) getReadArticleActivityInstance().findViewById(R.id.pageIndicator);
+                pageIndicator.setText("Page " + String.valueOf(fragmentIndex + 1) + " of " + numberOfPages);
             }
 
             @Override

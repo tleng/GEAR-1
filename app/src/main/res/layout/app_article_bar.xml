@@ -2,7 +2,7 @@
 <android.support.v7.widget.Toolbar
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="58dp"
+    android:layout_height="55dp"
     android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
     android:background="#303030">
 
