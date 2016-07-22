@@ -1,6 +1,8 @@
 package com.mit.gear.RSS;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.reading.ReadArticleActivity;
 
 import java.util.List;
 import java.util.Map;
@@ -25,31 +28,64 @@ import java.util.Map;
 public class RssListAdapter extends ArrayAdapter<RssArticle> {
     List<RssArticle> listRssArticle;
     Map<RssArticle,Double> articleAndScoreMap;
+    boolean debugMode;
+
+    /*
+     *This constructor is used if debug mode was on (show the article score)
+     */
 
     public RssListAdapter(Context context, int resource, List<RssArticle> ListRssArticle, Map<RssArticle,Double> ArticleAndScoreMap) {
         super(context, resource, ListRssArticle);
         listRssArticle = ListRssArticle;
         articleAndScoreMap=ArticleAndScoreMap;
+        debugMode =true;
+    }
+
+    /*
+     *This constructor is used if debug mode was off (Don't show the article score)
+    */
+
+    public RssListAdapter(Context context, int resource, List<RssArticle> ListRssArticle) {
+        super(context, resource, ListRssArticle);
+        listRssArticle = ListRssArticle;
+        articleAndScoreMap=null;
+        debugMode=false;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view = convertView;
-        if (view == null) {
+        View view ;
+        if(!debugMode){
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.rss_list_item, null);
+        }else{
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.rss_list_item_debug_mode, null);
         }
-        RssArticle article = listRssArticle.get(position);
-        Double score = articleAndScoreMap.get(article);
-        if (article != null) {
-            TextView btd = (TextView) view.findViewById(R.id.title);
-            btd.setText(article.getTitle());
-            TextView btd2 = (TextView) view.findViewById(R.id.rate);
 
-            if(score==null) //if rss news just generated and not ranked yet
-                btd2.setText("");
-            else
-                btd2.setText(String.valueOf(score*100));
+        RssArticle article = listRssArticle.get(position);
+
+        if (article != null) {
+            TextView titleTextView = (TextView) view.findViewById(R.id.title);
+            titleTextView.setText(article.getTitle());
+
+            if(ReadArticleActivity.articlesOpened.contains(article.getTitle())){
+                titleTextView.setTextColor(Color.GRAY);
+            }
+            else {
+                titleTextView.setTextColor(Color.BLACK);
+            }
+
+            if(debugMode) {
+                Double score = articleAndScoreMap.get(article);
+                TextView scoreTextView = (TextView) view.findViewById(R.id.rate);
+
+                if(score==null){           //if rss news just generated and not ranked yet
+                        scoreTextView.setText("");
+                } else{
+                        scoreTextView.setText(String.valueOf(score*100));
+                }
+            }
         }
 
         return view;

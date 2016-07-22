@@ -13,6 +13,15 @@ public class StoryItem {
 
     private String title;
     private String contentDescription;
+    private String storyCount;
+
+    public String getStoryCount() {
+        return storyCount;
+    }
+
+    public void setStoryCount(String storyCount) {
+        this.storyCount = storyCount;
+    }
 
     public String getTitle() {
         return title;

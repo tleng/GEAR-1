@@ -23,6 +23,7 @@ import com.mit.gear.RSS.RssReader;
 import com.mit.gear.NavDrawer.NavDrawerListAdapter;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.miscellaneous.MapUtil;
+import com.mit.gear.reading.ReadArticleActivity;
 import com.mit.gear.words.Word;
 
 import org.jsoup.HttpStatusException;
@@ -46,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -78,6 +80,8 @@ public class StoriesSelectionActivity extends Fragment {
         super.onResume();
         if(needsToScore){  //check if we need to score again (if new words are clicked/saves)
             scoreArticles();
+        }else{
+            prepareTheList(ListRssArticle);
         }
     }
 
@@ -85,6 +89,7 @@ public class StoriesSelectionActivity extends Fragment {
     @Override
     public void onActivityCreated( Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        loadTheOpenedArticles();
         View view = getView();
         toolbar = (android.support.v7.widget.Toolbar) view.findViewById(app_article_bar);
         context = getActivity();
@@ -438,11 +443,11 @@ public class StoriesSelectionActivity extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
         Boolean debugChoice = sharedPreferences.getBoolean("debug", false);
         if(debugChoice){           //show the article score (debug mode is on)
-            ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item, ListRssArticle, articleAndScoreMap);
+            ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item_debug_mode, ListRssArticle, articleAndScoreMap);
             rssItems.setAdapter(adapter);
         }
         else{                     //do not show the article score (debug mode is off)
-            ArrayAdapter<RssArticle> adapter = new ArrayAdapter<RssArticle>(getActivity(),android.R.layout.simple_list_item_1, ListRssArticle);
+            ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item, ListRssArticle);
             rssItems.setAdapter(adapter);
         }
         rssItems.setOnItemClickListener(new RssListListener(result, getActivity()));
@@ -655,6 +660,17 @@ public class StoriesSelectionActivity extends Fragment {
         progress.show();
         new rankTheNews().execute();
         needsToScore=false;
+    }
+
+
+    /*
+     * This method loads the opened articles set from shared preference
+     */
+
+    public void loadTheOpenedArticles(){
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        ReadArticleActivity.articlesOpened=  new HashSet<String> (sharedPreferences.getStringSet("openedArticles", new HashSet<String>()));
+
     }
 
 }

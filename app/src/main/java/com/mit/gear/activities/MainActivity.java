@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.ListView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.NavDrawer.NavDrawerItem;
@@ -155,6 +157,12 @@ public class MainActivity extends Activity {
 				return true;
 			case R.id.action_clear:
 				try {
+                    //resetting the openedArticles set
+                    SharedPreferences sharedPreferences;
+                    sharedPreferences = this.getSharedPreferences("Settings", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor =  sharedPreferences.edit();
+                    editor.putStringSet("openedArticles", new HashSet<String>());
+                    editor.commit();
                     StoriesSelectionActivity.needsToScore=true;
                     DataStorage dataStorage = new DataStorage(context);
 					dataStorage.clearUserDictionary();

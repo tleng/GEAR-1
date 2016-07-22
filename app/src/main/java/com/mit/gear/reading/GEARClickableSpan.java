@@ -208,7 +208,7 @@ public class GEARClickableSpan extends ClickableSpan {
     * the ListLastClickedWords list keeps track of the last 3 clicked words
     * */
     public void updateLastClickedWord(){
-        if(GEARGlobal.getLastWordClickedIndex()<index) {
+        if(GEARGlobal.getLastWordClickedIndex()<=index) {
             GEARGlobal.setLastWordClickedIndex(index);
             GEARGlobal.setLastWordClicked(mWord.toLowerCase());
             ArrayList<String> word = new ArrayList<String>();
@@ -216,12 +216,6 @@ public class GEARClickableSpan extends ClickableSpan {
             word.add(String.valueOf(index));
             GEARGlobal.MaximumLastClickedWords.add(word);
         }
-        if (GEARGlobal.getLastWordClickedIndex()==index){
-			ArrayList<String> word = new ArrayList<String>();
-			word.add(mWord.toLowerCase());
-			word.add(String.valueOf(index));
-			GEARGlobal.MaximumLastClickedWords.add(word);
-		}
         if (GEARGlobal.ListLastClickedWords.size() < GEARGlobal.undoThreshold){
             ArrayList<String> word = new ArrayList<String>();
             word.add(mWord.toLowerCase());

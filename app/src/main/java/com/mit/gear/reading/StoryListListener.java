@@ -25,7 +25,8 @@ public class StoryListListener implements OnItemClickListener  {
     }
 
     public void onItemClick(AdapterView parent, View view, int pos, long id) {
-		Log.d(TAG,"Story opened: "+listItems.get(pos).getContentDescription());
+        ReadArticleActivity.articlesOpened.add(listItems.get(pos).getTitle());
+        Log.d(TAG,"Story opened: "+listItems.get(pos).getContentDescription());
         Intent intent = new Intent(SuggestedStoriesActivity.context, ReadArticleActivity.class);
         intent.putExtra("title", GEARGlobal.articlePath + listItems.get(pos).getContentDescription());
         activity.startActivity(intent);

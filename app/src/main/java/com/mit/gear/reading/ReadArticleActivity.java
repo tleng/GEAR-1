@@ -36,8 +36,11 @@ import java.io.InputStream;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import android.os.Handler;
 import android.widget.TextView;
@@ -79,7 +82,8 @@ public class ReadArticleActivity extends AppCompatActivity {
     public static Integer CopyRightFragmentIndex ;       //the fragment index which has the copy right text
     public static boolean stillInSameSession;           //checks if is still in same session, used to not update passed words if user in same session
     public static TextView UndoView;
-	public ReadArticleActivity() {
+    public static Set<String> articlesOpened;
+    public ReadArticleActivity() {
         instance = this;
     }
 
@@ -181,7 +185,7 @@ public class ReadArticleActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 fragmentIndex = position; //update the fragment index to current page position
                 TextView pageIndicator = (TextView) getReadArticleActivityInstance().findViewById(R.id.pageIndicator);
-				Log.d(TAG,"Page Chnaged to: "+String.valueOf(fragmentIndex + 1));
+                Log.d(TAG, "Page Chnaged to: " + String.valueOf(fragmentIndex + 1));
                 pageIndicator.setText("Page " + String.valueOf(fragmentIndex + 1) + " of " + numberOfPages);
             }
 
@@ -191,7 +195,7 @@ public class ReadArticleActivity extends AppCompatActivity {
             }
         });
 		pagesView.setOffscreenPageLimit(1);         //limiting the preloading to one page per side
-		UndoView.setTextColor(getResources().getColor(R.color.passed_word));
+        UndoView.setTextColor(getResources().getColor(R.color.passed_word));
 	}
 
 
@@ -278,9 +282,9 @@ public class ReadArticleActivity extends AppCompatActivity {
         stillInSameSession = true; //used to not color passed word if user in same session
         //resetting the undo button
         GEARGlobal.ListLastClickedWords.clear();
-        GEARGlobal.MaximumLastClickedWords.clear();
+        //GEARGlobal.MaximumLastClickedWords.clear();
         //menu.getItem(0).setEnabled(false);
-		UndoView.setTextColor(getResources().getColor(R.color.table_header));
+        UndoView.setTextColor(getResources().getColor(R.color.table_header));
         MaximumUndoClicks = 2;
         UndoClicks = 0;
         //preparing the progressDialog
@@ -325,12 +329,12 @@ public class ReadArticleActivity extends AppCompatActivity {
                         }
                         //try {
                         if (currentSessionWords.containsKey(possibleWord.toLowerCase())) {
-                            Integer sessionCount = currentSessionWords.get(possibleWord.toLowerCase());
-                            if (sessionCount > 0) {
-                                sessionCount -= 1;
-                                currentSessionWords.put(possibleWord.toLowerCase(), sessionCount);
+                            //Integer sessionCount = currentSessionWords.get(possibleWord.toLowerCase());
+//                            if (sessionCount > 0) {
+//                                sessionCount -= 1;
+//                                currentSessionWords.put(possibleWord.toLowerCase(), sessionCount);
                                 continue;
-                            }
+                            //}
                         }
                         ArrayList<Object> wordArrayList = new ArrayList<>();
                         wordArrayList.add("None");
@@ -391,6 +395,8 @@ public class ReadArticleActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+
+        SaveOpenedArticles();
         Log.i("On pause", String.valueOf(fragmentIndex) + " / " + String.valueOf(numberOfPages));
         //fragment index starts from zero
         if (fragmentIndex == numberOfPages - 1) {
@@ -464,17 +470,36 @@ public class ReadArticleActivity extends AppCompatActivity {
     public void Undo(View view) {
         load();
         DataStorage dataStorage = new DataStorage(this);
-        userDictionary = dataStorage.loadUserDictionary();
+        //userDictionary = dataStorage.loadUserDictionary();
 		if(UndoView.getCurrentTextColor()==getResources().getColor(R.color.table_header_text)){
 			try {
 				dataStorage.deleteFromWordFile(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0), "None", dataStorage.USERDICTIONARY, currentArticle, true);
-				currentSessionWords.remove(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
+                HashMap<String, Word> userDictionaryNEW = dataStorage.loadUserDictionary();
+
+                //check if the undo word is still exist in the new dictionary
+                if(userDictionaryNEW.containsKey(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0))){
+                    if(!userDictionaryNEW.get(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0)).clicked){
+                        userDictionary.get(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0)).setClicked(false);
+                    }
+                }else{ //if does not exist, delete it from the un updated dictionary
+                    userDictionary.remove(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
+                }
+
+                //check if the word clicked more than once and decrement one or remove it from current session
+                Integer numOfClicks =currentSessionWords.get(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
+                if(numOfClicks==1)
+                    currentSessionWords.remove(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
+                else if (numOfClicks>1){
+                    numOfClicks--;
+                    currentSessionWords.put(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0),numOfClicks);
+                }
+
 				ListLastClickedWords = GEARGlobal.ListLastClickedWords;
 				Character first = Character.toUpperCase(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).charAt(0));
 				String cWord = first+ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).substring(1);
 				MainActivity.CapitalWord.remove(cWord);
 				pagesView.getAdapter().notifyDataSetChanged();
-				userDictionary = dataStorage.loadUserDictionary();
+				//userDictionary = dataStorage.loadUserDictionary();
 			} catch (JSONException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -590,5 +615,18 @@ public class ReadArticleActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e("SendMail", e.getMessage(), e);
         }
+    }
+
+    /*
+     *
+     * This method saves the open articles set into shared prefrence
+     * This method is called onDestroy ReadArticleActivity
+     *
+     */
+    private void SaveOpenedArticles(){
+        sharedPreferences = this.getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor =  sharedPreferences.edit();
+        editor.putStringSet("openedArticles", articlesOpened);
+        editor.commit();
     }
 }

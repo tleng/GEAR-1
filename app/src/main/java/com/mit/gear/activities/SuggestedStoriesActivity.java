@@ -14,10 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.reading.ReadArticleActivity;
 import com.mit.gear.reading.StoryItem;
+import com.mit.gear.reading.StoryListAdapter;
 import com.mit.gear.reading.StoryListListener;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.miscellaneous.MapUtil;
@@ -32,6 +35,7 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,6 +60,7 @@ public class SuggestedStoriesActivity extends Fragment {
     DataStorage dataStorage;
     HashMap<String,Word> userDictionary;
     AssetManager assetManager;
+     ArrayAdapter<StoryItem> adapter;
 
 
 
@@ -68,6 +73,7 @@ public class SuggestedStoriesActivity extends Fragment {
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        loadTheOpenedArticles();
         View v = getView();
         final Activity activity =  getActivity();
         context = getActivity();
@@ -182,13 +188,15 @@ public class SuggestedStoriesActivity extends Fragment {
             String ratingString = " "+articleAndScoreMap.get(article)+" ";
             String title;
             if(debugChoice) {           //show the article score (debug mode is on)
-                title = article + "\t" + ratingString + "\n" + Count(article);
+                StoryItem.setStoryCount( Count(article)+"\t"+ ratingString);
+                //title = article + "\t" + ratingString + "\n" + Count(article);
             }else{                     //do not show the article score (debug mode is off)
-                title = article + "\n" + Count(article);
+                StoryItem.setStoryCount(Count(article));
+                //title = article + "\n" + Count(article);
             }
 
             articleNumber += 1;
-            StoryItem.setTitle(title);
+            StoryItem.setTitle(article);
             StoryItem.setContentDescription(article);
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -201,22 +209,28 @@ public class SuggestedStoriesActivity extends Fragment {
             }
         }
         final ListView lv = (ListView) getActivity().findViewById(R.id.listView2);
-        final ArrayAdapter<StoryItem> adapter = new ArrayAdapter<StoryItem>(getActivity(), android.R.layout.simple_list_item_1, listStoryItem);
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                lv.setAdapter(adapter);
-            }
-        });
+             adapter = new StoryListAdapter(getActivity(), R.layout.rss_list_item_debug_mode, listStoryItem);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    lv.setAdapter(adapter);
+                }
+            });
+
 
         lv.setOnItemClickListener(new StoryListListener(listStoryItem, getActivity()));
         if ((this.progress != null) && this.progress.isShowing())        //dismissing the progressDialog if it was shown
             this.progress.dismiss();
     }
 
-
-   /* @Override
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(adapter!= null)
+            adapter.notifyDataSetChanged();
+    }
+/* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 
@@ -494,6 +508,18 @@ public class SuggestedStoriesActivity extends Fragment {
         UniqueWordCount.clear();
         return result;
     }
+
+
+    /*
+     * This method loads the opened articles set from shared preference
+     */
+
+    public void loadTheOpenedArticles(){
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        ReadArticleActivity.articlesOpened=  new HashSet<String>(sharedPreferences.getStringSet("openedArticles", new HashSet<String>()));
+
+    }
+
 }
 
 
