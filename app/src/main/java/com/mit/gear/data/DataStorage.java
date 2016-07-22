@@ -76,9 +76,9 @@ public class DataStorage {
                 in.close();
                 loadingFile = new Gson().fromJson(buf.toString(), new TypeToken<HashMap<String, Word>>() {
                 }.getType());
-                Log.d(file,loadingFile.toString());
+                //Log.d(file,loadingFile.toString());
             }
-            Log.d(file,"null");
+            //Log.d(file,"null");
 
         } catch (java.io.FileNotFoundException e) {
             Log.d("Dictionary","No dictionary file found.");
@@ -178,6 +178,9 @@ public class DataStorage {
         Word userData;
         if (dictionary.containsKey(word)) {
             userData = dictionary.get(word);
+			if (userData.getLemma().equals("None")){
+				userData.setLemma(lemma);
+			}
             userData.update(article, click);
             userData.scoreWord(click, true);
         } else {

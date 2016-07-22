@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
@@ -15,6 +16,7 @@ import com.mattmellor.gear.R;
  */
 
 public class UserSettingsActivity extends AppCompatActivity {
+    private String TAG = "UserSettings";
     //create sharedPreferences to save user choice of text coloring
     private SharedPreferences sharedPreferences;
     private Switch colorSwitch;
@@ -46,6 +48,7 @@ public class UserSettingsActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("color", isChecked);
+                Log.d(TAG,"colorSwitch turned "+isChecked);
                 editor.commit();
 
             }
@@ -55,6 +58,7 @@ public class UserSettingsActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("speak", isChecked);
+                Log.d(TAG,"speakSwitch turned "+isChecked);
                 editor.commit();
 
             }
@@ -64,6 +68,7 @@ public class UserSettingsActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("debug", isChecked);
+                Log.d(TAG,"debugSwitch turned "+isChecked);
                 editor.commit();
 
             }

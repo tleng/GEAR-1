@@ -41,9 +41,6 @@ public class RssListAdapter extends ArrayAdapter<RssArticle> {
         }
         RssArticle article = listRssArticle.get(position);
         Double score = articleAndScoreMap.get(article);
-
-
-
         if (article != null) {
             TextView btd = (TextView) view.findViewById(R.id.title);
             btd.setText(article.getTitle());

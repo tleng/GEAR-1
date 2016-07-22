@@ -6,7 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.mattmellor.gear.R;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+
 import de.codecrafters.tableview.TableDataAdapter;
 
 /**
@@ -31,7 +35,6 @@ public class WordTableAdapter extends TableDataAdapter<Word> {
                 break;
             case 1:
                 if(word.getLemma().equals("None")){
-                    renderedView = renderString("");
                     break;
                 }else{
                     renderedView = renderString(word.getLemma());
@@ -43,6 +46,15 @@ public class WordTableAdapter extends TableDataAdapter<Word> {
             case 3:
                 renderedView = renderString(String.valueOf(word.totalWordPasses()));
                 break;
+            case 4:
+				SimpleDateFormat sdf = new SimpleDateFormat("h:mm:ss a");
+				Date resultdate = new Date(word.getCkickTime());
+				if(word.getLemma().equals("None")){
+					break;
+				}else{
+					renderedView = renderString(sdf.format(resultdate));
+					break;
+				}
         }
         return renderedView;
     }
@@ -56,7 +68,7 @@ public class WordTableAdapter extends TableDataAdapter<Word> {
         textView.setGravity(Gravity.LEFT);
         textView.setTextColor(getResources().getColor(R.color.default_word));
         textView.setPadding(20, 10, 20, 10);
-        textView.setTextSize(17);
+        textView.setTextSize(15);
         return textView;
     }
 }

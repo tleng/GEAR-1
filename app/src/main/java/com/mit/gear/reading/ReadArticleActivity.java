@@ -47,9 +47,9 @@ import android.widget.Toast;
  * Activity where user reads article
  */
 public class ReadArticleActivity extends AppCompatActivity {
-    private static String LOG_APP_TAG = "ReadArticleActivity-tag";
+    private String TAG = "ReadArticleActivity";
     private static ReadArticleActivity instance;
-    private android.support.v7.widget.Toolbar toolbar;
+    //private android.support.v7.widget.Toolbar toolbar;
     public static HashMap<String, ArrayList<String>> offlineDictionary;
     public HashMap<String, Word> userDictionary;
     private DefinitionRequest currentDefinitionRequest;
@@ -78,7 +78,8 @@ public class ReadArticleActivity extends AppCompatActivity {
     public static Boolean copyRightReachedFirstTime ;   //checks if the copy right text is reached for first time
     public static Integer CopyRightFragmentIndex ;       //the fragment index which has the copy right text
     public static boolean stillInSameSession;           //checks if is still in same session, used to not update passed words if user in same session
-    public ReadArticleActivity() {
+    public static TextView UndoView;
+	public ReadArticleActivity() {
         instance = this;
     }
 
@@ -93,6 +94,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         stillInSameSession = false;
         copyRightReachedFirstTime = false;
@@ -104,16 +106,18 @@ public class ReadArticleActivity extends AppCompatActivity {
         GEARGlobal.setLastWordClicked("None");
         if (definition_scroll) {
             setContentView(R.layout.pages_scrolling_definition);
+			UndoView = (TextView)findViewById(R.id.UndotextViewScrolling);
         } else {
             setContentView(R.layout.pages);
+			UndoView = (TextView)findViewById(R.id.UndotextView);
         }
-        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
-        setSupportActionBar(toolbar);
+   //     toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
+     //   setSupportActionBar(toolbar);
         offlineDictionary = GEARGlobal.getOfflineDictionary(getApplicationContext());
         userDictionary = new DataStorage(getApplicationContext()).loadUserDictionary();
         currentDefinitionRequest = null;
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false);    // Getting rid of title for the action bar
+//        getSupportActionBar().setDisplayShowTitleEnabled(false);    // Getting rid of title for the action bar
         startTime = System.currentTimeMillis();                     // Log start time for when user opened article
         setPagesView();
         initTextToSpeech();
@@ -177,6 +181,7 @@ public class ReadArticleActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 fragmentIndex = position; //update the fragment index to current page position
                 TextView pageIndicator = (TextView) getReadArticleActivityInstance().findViewById(R.id.pageIndicator);
+				Log.d(TAG,"Page Chnaged to: "+String.valueOf(fragmentIndex + 1));
                 pageIndicator.setText("Page " + String.valueOf(fragmentIndex + 1) + " of " + numberOfPages);
             }
 
@@ -185,18 +190,19 @@ public class ReadArticleActivity extends AppCompatActivity {
 
             }
         });
-        pagesView.setOffscreenPageLimit(1);         //limiting the preloading to one page per side
-    }
+		pagesView.setOffscreenPageLimit(1);         //limiting the preloading to one page per side
+		UndoView.setTextColor(getResources().getColor(R.color.passed_word));
+	}
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    //@Override
+/*    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         this.menu = menu;
         menu.getItem(0).setEnabled(false); //disabling the Undo option
         return true;
-    }
+    }*/
 
 
     /**
@@ -250,7 +256,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 }
                 return true;*/
             case R.id.action_undo:
-                Undo();
+                //Undo();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -267,12 +273,14 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     public void saveProgress(View view) {
+		Log.d(TAG,"Save progress clicked");
         StoriesSelectionActivity.needsToScore=true;
         stillInSameSession = true; //used to not color passed word if user in same session
         //resetting the undo button
         GEARGlobal.ListLastClickedWords.clear();
         GEARGlobal.MaximumLastClickedWords.clear();
-        menu.getItem(0).setEnabled(false);
+        //menu.getItem(0).setEnabled(false);
+		UndoView.setTextColor(getResources().getColor(R.color.table_header));
         MaximumUndoClicks = 2;
         UndoClicks = 0;
         //preparing the progressDialog
@@ -290,7 +298,7 @@ public class ReadArticleActivity extends AppCompatActivity {
             progress.show();
         }
         setProgressSaved(true);
-        Log.d("Save Progress", "Clicked index " + GEARGlobal.getLastWordClickedIndex().toString());
+        Log.d(TAG,"Progress saved on word index " + GEARGlobal.getLastWordClickedIndex().toString());
         //Toast toast = Toast.makeText(getApplicationContext(), "Saving work...", Toast.LENGTH_LONG);
         //toast.show();
         final DataStorage dataStorage = new DataStorage(getApplicationContext());
@@ -453,78 +461,84 @@ public class ReadArticleActivity extends AppCompatActivity {
     * keeps track of undoClicks
     * remove the last clicked word from  ListLastClickedWords and MaximumUndoClicks
      */
-    private void Undo() {
+    public void Undo(View view) {
         load();
         DataStorage dataStorage = new DataStorage(this);
         userDictionary = dataStorage.loadUserDictionary();
-        try {
-            dataStorage.deleteFromWordFile(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0), "None", dataStorage.USERDICTIONARY, currentArticle, true);
-            currentSessionWords.remove(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
-            ListLastClickedWords = GEARGlobal.ListLastClickedWords;
-			Character first = Character.toUpperCase(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).charAt(0));
-			String cWord = first+ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).substring(1);
-			MainActivity.CapitalWord.remove(cWord);
-            pagesView.getAdapter().notifyDataSetChanged();
-            userDictionary = dataStorage.loadUserDictionary();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+		if(UndoView.getCurrentTextColor()==getResources().getColor(R.color.table_header_text)){
+			try {
+				dataStorage.deleteFromWordFile(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0), "None", dataStorage.USERDICTIONARY, currentArticle, true);
+				currentSessionWords.remove(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
+				ListLastClickedWords = GEARGlobal.ListLastClickedWords;
+				Character first = Character.toUpperCase(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).charAt(0));
+				String cWord = first+ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).substring(1);
+				MainActivity.CapitalWord.remove(cWord);
+				pagesView.getAdapter().notifyDataSetChanged();
+				userDictionary = dataStorage.loadUserDictionary();
+			} catch (JSONException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
-        if (UndoClicks >= 3) {
-            if (MaximumUndoClicks > 0) {
-                MaximumUndoClicks--;
-                int l1size = Integer.valueOf(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(1));
-                int l2size = Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1));
-                if (l1size - l2size == 0) {
-                    int listSize = ListLastClickedWords.size();
-                    ListLastClickedWords.remove(listSize - 1);
-                    load();
-                    listSize = MaximumLastClickedWords.size();
-                    MaximumLastClickedWords.remove(listSize - 1);
-                    load();
-                    listSize = MaximumLastClickedWords.size();
-                    GEARGlobal.setLastWordClickedIndex(Integer.valueOf(MaximumLastClickedWords.get(listSize - 1).get(1)));
-                    GEARGlobal.setLastWordClicked(MaximumLastClickedWords.get(listSize - 1).get(0));
-                } else {
-                    ListLastClickedWords.remove(GEARGlobal.ListLastClickedWords.size() - 1);
-                    load();
-                }
+			if (UndoClicks >= 3) {
+				if (MaximumUndoClicks > 0) {
+					MaximumUndoClicks--;
+					int l1size = Integer.valueOf(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(1));
+					int l2size = Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1));
+					if (l1size - l2size == 0) {
+						int listSize = ListLastClickedWords.size();
+						ListLastClickedWords.remove(listSize - 1);
+						load();
+						listSize = MaximumLastClickedWords.size();
+						MaximumLastClickedWords.remove(listSize - 1);
+						load();
+						listSize = MaximumLastClickedWords.size();
+						GEARGlobal.setLastWordClickedIndex(Integer.valueOf(MaximumLastClickedWords.get(listSize - 1).get(1)));
+						GEARGlobal.setLastWordClicked(MaximumLastClickedWords.get(listSize - 1).get(0));
+					} else {
+						ListLastClickedWords.remove(GEARGlobal.ListLastClickedWords.size() - 1);
+						load();
+					}
 
-                if (MaximumUndoClicks == 0) {
-                    menu.getItem(0).setEnabled(false);
-                    MaximumUndoClicks = 2;
-                }
-            }
-        }
-        //if clicked for the first one/two times
-        else {
-            if (ListLastClickedWords.size() == 1) {
-                UndoClicks = 0;
-                GEARGlobal.setLastWordClickedIndex(-1);
-                GEARGlobal.setLastWordClicked("None");
-                menu.getItem(0).setEnabled(false);
-                ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
-                MaximumLastClickedWords.remove(MaximumLastClickedWords.size() - 1);
-                load();
-                progressSaved=true;
-            } else {
-                int l1size = Integer.valueOf(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(1));
-                int l2size = Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1));
-                if (l1size - l2size == 0) {
-                    ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
-                    MaximumLastClickedWords.remove(MaximumLastClickedWords.size() - 1);
-                    load();
-                    GEARGlobal.setLastWordClickedIndex(Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1)));
-                    GEARGlobal.setLastWordClicked(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(0));
-                } else {
-                    ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
-                    load();
-                }
-                UndoClicks = 1;
-            }
-        }
+					if (MaximumUndoClicks == 0) {
+						//menu.getItem(0).setEnabled(false);
+						UndoView.setTextColor(getResources().getColor(R.color.passed_word));
+						MaximumUndoClicks = 2;
+					}
+				}
+			}
+			//if clicked for the first one/two times
+			else {
+				if (ListLastClickedWords.size() == 1) {
+					UndoClicks = 0;
+					GEARGlobal.setLastWordClickedIndex(-1);
+					GEARGlobal.setLastWordClicked("None");
+					//menu.getItem(0).setEnabled(false);
+					UndoView.setTextColor(getResources().getColor(R.color.passed_word));
+					ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
+					MaximumLastClickedWords.remove(MaximumLastClickedWords.size() - 1);
+					load();
+					progressSaved=true;
+				} else {
+					int l1size = Integer.valueOf(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(1));
+					int l2size = Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1));
+					if (l1size - l2size == 0) {
+						ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
+						MaximumLastClickedWords.remove(MaximumLastClickedWords.size() - 1);
+						load();
+						GEARGlobal.setLastWordClickedIndex(Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1)));
+						GEARGlobal.setLastWordClicked(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(0));
+					} else {
+						ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
+						load();
+					}
+					UndoClicks = 1;
+				}
+			}
+		}else {
+			Toast.makeText(this, "Cannot undo, only two undoes allowed", Toast.LENGTH_LONG).show();
+		}
     }
     private void load(){
         ListLastClickedWords = GEARGlobal.ListLastClickedWords;

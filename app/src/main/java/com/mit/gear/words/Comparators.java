@@ -28,6 +28,10 @@ public final class Comparators {
         return new ClicksComparator();
     }
 
+	public static Comparator<Word> SetTimesComparator() {
+		return new TimeComparator();
+	}
+
     /*
     * Inner classes to override compare method
     */
@@ -61,6 +65,15 @@ public final class Comparators {
         public int compare(final Word word1, final Word word2) {
             if (word1.totalWordClicks() > word2.totalWordClicks()) return -1;
             if (word1.totalWordClicks() < word2.totalWordClicks()) return 1;
+            return 0;
+        }
+    }
+
+    private static class TimeComparator implements Comparator<Word> {
+        @Override
+        public int compare(final Word word1, final Word word2) {
+            if (word1.getCkickTime() > word2.getCkickTime()) return -1;
+            if (word1.getCkickTime() < word2.getCkickTime()) return 1;
             return 0;
         }
     }

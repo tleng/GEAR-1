@@ -33,6 +33,7 @@ import com.mit.gear.reading.GEARClickableSpan;
  */
 
 public class MainActivity extends Activity {
+	private String TAG = "MainActivity";
 	private DrawerLayout mDrawerLayout;
 	public static ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -193,12 +194,15 @@ public class MainActivity extends Activity {
 		Fragment fragment = null;
 		switch (position) {
 		case 0:
+			Log.d(TAG,"News Tab Opened");
 			fragment = new StoriesSelectionActivity();
 			break;
 		case 1:
+			Log.d(TAG,"Stories Tab Opened");
 			fragment = new SuggestedStoriesActivity();
 			break;
 		case 2:
+			Log.d(TAG,"Vocabulary Tab Opened");
 			fragment = new DisplayVocabularyActivity();
 			break;
 

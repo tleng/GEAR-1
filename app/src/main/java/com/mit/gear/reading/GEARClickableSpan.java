@@ -31,6 +31,7 @@ import java.util.Locale;
  * Created by Michael on 4/6/16.
  */
 public class GEARClickableSpan extends ClickableSpan {
+	private String TAG = "GEARClickableSpan";
     final String mWord;
     private TextPaint textPaint;
     //private DefinitionRequest currentDefinitionRequest;
@@ -56,11 +57,12 @@ public class GEARClickableSpan extends ClickableSpan {
     @Override
     public void onClick(View widget) {
         StoriesSelectionActivity.needsToScore=true;
-        Log.w("onClickIndex",index.toString());
+        Log.w(TAG,"onClickIndex: "+index.toString());
         readArticleActivity.pagesView.getAdapter().notifyDataSetChanged();         //update the view for all the preloaded fragments (max 3)
         readArticleActivity.setProgressSaved(false);                               //set progressSaved to false to popup the savePopupActivity in case user did not save
-        readArticleActivity.menu.getItem(0).setEnabled(true);                      //enable Undo menu option
-        readArticleActivity.UndoClicks++;
+        //readArticleActivity.menu.getItem(0).setEnabled(true);                      //enable Undo menu option
+		readArticleActivity.UndoView.setTextColor(readArticleActivity.getResources().getColor(R.color.table_header_text));
+		readArticleActivity.UndoClicks++;
 
         updateLastClickedWord();
 
@@ -73,7 +75,7 @@ public class GEARClickableSpan extends ClickableSpan {
         Log.d("View2", clearWidget.toString());
 
         Log.d("No cancel", "current definition request not cancelled");
-        Log.d("tapped on:", mWord);
+        Log.d(TAG,"tapped on: "+ mWord);
         ArrayList<String> time_place_holder = new ArrayList<>();
         time_place_holder.add("0");
 
@@ -143,10 +145,10 @@ public class GEARClickableSpan extends ClickableSpan {
                 if(userDictionary.get(mWord.toLowerCase()).clicked)
                     ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.clicked_word));
                 else{
-                    if(!readArticleActivity.stillInSameSession)     //checks if we are in same session, do not color passed word
+                    //if(!readArticleActivity.stillInSameSession)     //checks if we are in same session, do not color passed word
                     ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.passed_word));
-                    else
-                        ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));
+                    //else
+                      // ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));
                 }
             }else{                                                  //else color the rest of the word with the default color
                 ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources().getColor(R.color.default_word));
@@ -214,6 +216,12 @@ public class GEARClickableSpan extends ClickableSpan {
             word.add(String.valueOf(index));
             GEARGlobal.MaximumLastClickedWords.add(word);
         }
+        if (GEARGlobal.getLastWordClickedIndex()==index){
+			ArrayList<String> word = new ArrayList<String>();
+			word.add(mWord.toLowerCase());
+			word.add(String.valueOf(index));
+			GEARGlobal.MaximumLastClickedWords.add(word);
+		}
         if (GEARGlobal.ListLastClickedWords.size() < GEARGlobal.undoThreshold){
             ArrayList<String> word = new ArrayList<String>();
             word.add(mWord.toLowerCase());

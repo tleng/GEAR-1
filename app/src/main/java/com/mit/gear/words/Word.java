@@ -2,6 +2,7 @@ package com.mit.gear.words;
 
 import android.util.Log;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,9 +15,10 @@ public class Word {
 
     // the word user looked up
     private final String word;
-    private final String lemma;
+	private  String lemma;
     public double score;
     public boolean clicked;
+	private Long ckickTime;
     public HashMap<String,ArrayList<Long>> articleClicks;
     public HashMap<String,ArrayList<Long>> articlePasses;
 
@@ -31,6 +33,7 @@ public class Word {
     public Word(String word, String lemma) {
         this.word = word;
         this.lemma = lemma;
+		ckickTime = System.currentTimeMillis();
         timestamps.add(System.currentTimeMillis());
         Log.d("Word", "Created Word for " + word + " " + lemma);
         score = 0.0; // just to test, set to 1
@@ -43,6 +46,7 @@ public class Word {
         this.word = word;
         this.lemma = "None";
         timestamps.add(System.currentTimeMillis());
+		ckickTime = System.currentTimeMillis();
         clicked = false;
         Log.d("Word", "Created Word without lemma for " + word + " " + lemma);
         articleClicks = new HashMap<>();
@@ -61,7 +65,7 @@ public class Word {
             score = clicked/2;
         }
 
-        Log.d("Word Score", word + ":" + "p: " + Double.toString(p) + "np: " + Double.toString(np) + "score: " + Double.toString(score));
+        //Log.d("Word Score", word + ":" + "p: " + Double.toString(p) + "np: " + Double.toString(np) + "score: " + Double.toString(score));
     }
 
     public int totalWordClicks() {
@@ -85,6 +89,7 @@ public class Word {
     public void update(String article, boolean click) {
         Long lookupTime = System.currentTimeMillis();
         timestamps.add(lookupTime);
+		ckickTime = System.currentTimeMillis();
         if (click) {
             clicked = click;
             if (!articleClicks.containsKey(article)) {
@@ -125,7 +130,11 @@ public class Word {
             return true;
     }
 
-    /**
+	public Long getCkickTime() {
+		return ckickTime;
+	}
+
+	/**
      * @return the word the Word structure stores information for
      */
     public String getWord() {
@@ -151,4 +160,7 @@ public class Word {
         clicked = click;
     }
 
+	public void setLemma(String lemma) {
+		this.lemma = lemma;
+	}
 }

@@ -111,25 +111,26 @@ public class DisplayVocabularyActivity extends Fragment {
         final int rowEvenColor = getResources().getColor(R.color.table_data_row_even);
         final int rowOddColor = getResources().getColor(R.color.table_data_row_odd);
         final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter
-                (getActivity().getApplicationContext(), "Word","Definition","Clicked","Passed");             //Set table header column
+                (getActivity().getApplicationContext(), "Word","Definition","Clicks","Seen","Time");             //Set table header column
         simpleTableHeaderAdapter.setTextColor(getResources().getColor(R.color.table_header_text));           //Set table header column text color
         simpleTableHeaderAdapter.setPaddings(15, 20, 0, 20);
 
         tableView.setHeaderBackgroundColor(getResources().getColor(R.color.table_header));           //Set table header background color
         tableView.setHeaderAdapter(simpleTableHeaderAdapter);
-        tableView.setColumnCount(4);                                                                          //Set the number of column
+        tableView.setColumnCount(5);                                                                          //Set the number of column
         tableView.setDataRowBackgroundProvider
                 (TableDataRowBackgroundProviders.alternatingRowColors(rowEvenColor, rowOddColor));            //Set row color alternating even odd color
         tableView.setHeaderSortStateViewProvider(SortStateViewProviders.brightArrows());                      //Set header sorting arrows style
         tableView.setColumnWeight(0,2);                                                                       //Set the width of the word column to be twice the size
-        tableView.setColumnWeight(1,2);                                                                       //Set the width of the word column to be twice the size
-        tableView.setClickable(false);
+		tableView.setColumnWeight(1,2);                                                                       //Set the width of the word column to be twice the size
+		tableView.setClickable(false);
 
         //Set each column comparator
         tableView.setColumnComparator(0, Comparators.SetWordComparator());
         tableView.setColumnComparator(1, Comparators.SetLemmaComparator());
         tableView.setColumnComparator(2, Comparators.SetClicksComparator());
         tableView.setColumnComparator(3, Comparators.SetPassesComparator());
+        tableView.setColumnComparator(4, Comparators.SetTimesComparator());
         tableView.setDataAdapter(new WordTableAdapter(getActivity().getApplicationContext(),VocList));         //World table adapter to set the table data to the words in the array list
     }
 

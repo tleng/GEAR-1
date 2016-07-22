@@ -9,19 +9,47 @@
     android:weightSum="1"
     android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="55dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:background="#303030"
         android:id="@+id/linearLayoutBar">
 
-        <include android:id="@+id/app_article_bar"
-            layout = "@layout/app_article_bar" />
+        <Button
+            android:layout_width="130dp"
+            android:layout_height="37dp"
+            android:text="Save Progress"
+            android:clickable="true"
+            android:onClick="saveProgress"
+            android:background="#737373"
+            android:textColor="#FFFFFF"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="25dp"
+            android:layout_marginStart="25dp"
+            android:id="@+id/button5"/>
 
-    </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Undo"
+            android:id="@+id/UndotextView"
+            android:textSize="20dp"
+            android:textColor="#FFFFFF"
+            android:layout_marginRight="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:textStyle="bold"
+            android:onClick="Undo"/>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:orientation="vertical"
