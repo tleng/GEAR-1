@@ -60,7 +60,7 @@ public class SuggestedStoriesActivity extends Fragment {
     DataStorage dataStorage;
     HashMap<String,Word> userDictionary;
     AssetManager assetManager;
-     ArrayAdapter<StoryItem> adapter;
+    ArrayAdapter<StoryItem> adapter;
 
 
 
@@ -185,16 +185,12 @@ public class SuggestedStoriesActivity extends Fragment {
             final StoryItem StoryItem =new StoryItem();
             Double rating = articlesWithRatings.get(article) * 100;
             int suggestNumber = rating.intValue();
-            String ratingString = " "+articleAndScoreMap.get(article)+" ";
+            String ratingString = articleAndScoreMap.get(article)+" ";
             String title;
             if(debugChoice) {           //show the article score (debug mode is on)
-                StoryItem.setStoryCount( Count(article)+"\t"+ ratingString);
+                StoryItem.setStoryCount( Count(article)+"\n"+ ratingString);
                 //title = article + "\t" + ratingString + "\n" + Count(article);
-            }else{                     //do not show the article score (debug mode is off)
-                StoryItem.setStoryCount(Count(article));
-                //title = article + "\n" + Count(article);
             }
-
             articleNumber += 1;
             StoryItem.setTitle(article);
             StoryItem.setContentDescription(article);

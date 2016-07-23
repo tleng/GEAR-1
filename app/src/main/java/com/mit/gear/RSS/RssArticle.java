@@ -13,6 +13,7 @@ public class RssArticle implements Serializable{
     private String title;
     private String link;
     private String content;
+    private String count;
 
     public String getContent() {
         return content;
@@ -38,4 +39,11 @@ public class RssArticle implements Serializable{
     public String toString() {
         return title;
     }
+	public void setCount(String count) {
+		this.count = count;
+	}
+
+	public String getCount() {
+		return count;
+	}
 }

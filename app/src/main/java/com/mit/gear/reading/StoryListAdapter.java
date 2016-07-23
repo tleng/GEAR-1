@@ -55,16 +55,17 @@ public class StoryListAdapter extends ArrayAdapter<StoryItem> {
 
         if (storyItem != null) {
             TextView titleTextView = (TextView) view.findViewById(R.id.title);
+            TextView scoreTextView = (TextView) view.findViewById(R.id.rate);
             titleTextView.setText(storyItem.getTitle());
 
-            if(ReadArticleActivity.articlesOpened.contains(storyItem.getTitle())){
-                titleTextView.setTextColor(Color.GRAY);
-            }
-            else {
-                titleTextView.setTextColor(Color.BLACK);
-            }
-
-            TextView scoreTextView = (TextView) view.findViewById(R.id.rate);
+			if(ReadArticleActivity.articlesOpened.contains(storyItem.getTitle())){
+				titleTextView.setTextColor(Color.GRAY);
+				scoreTextView.setTextColor(Color.GRAY);
+			}
+			else {
+				titleTextView.setTextColor(Color.BLACK);
+				scoreTextView.setTextColor(Color.BLACK);
+			}
             scoreTextView.setText(storyItem.getStoryCount());
 
         }

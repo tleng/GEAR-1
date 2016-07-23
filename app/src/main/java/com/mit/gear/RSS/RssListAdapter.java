@@ -67,23 +67,28 @@ public class RssListAdapter extends ArrayAdapter<RssArticle> {
 
         if (article != null) {
             TextView titleTextView = (TextView) view.findViewById(R.id.title);
+            TextView scoreTextView = (TextView) view.findViewById(R.id.rate);
             titleTextView.setText(article.getTitle());
 
             if(ReadArticleActivity.articlesOpened.contains(article.getTitle())){
                 titleTextView.setTextColor(Color.GRAY);
+                if(debugMode){
+                    scoreTextView.setTextColor(Color.GRAY);
+                }
             }
             else {
                 titleTextView.setTextColor(Color.BLACK);
+                if(debugMode){
+                    scoreTextView.setTextColor(Color.BLACK);
+                }
             }
 
             if(debugMode) {
                 Double score = articleAndScoreMap.get(article);
-                TextView scoreTextView = (TextView) view.findViewById(R.id.rate);
-
                 if(score==null){           //if rss news just generated and not ranked yet
-                        scoreTextView.setText("");
+                    scoreTextView.setText(article.getCount());
                 } else{
-                        scoreTextView.setText(String.valueOf(score*100));
+                    scoreTextView.setText(article.getCount()+"\n"+String.valueOf(score*100));
                 }
             }
         }

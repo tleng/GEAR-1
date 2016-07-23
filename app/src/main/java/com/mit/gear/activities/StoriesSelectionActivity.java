@@ -454,64 +454,6 @@ public class StoriesSelectionActivity extends Fragment {
 
     }
 
-    /*
-     * Method to read the article and count
-     * total number of words
-     * number of unique words
-     * number of total words in user dictionary
-     * number of total unique words in user dictionary
-     */
- /*   private  List<RssArticle> Count(List<RssArticle> result){
-        HashMap<String, Integer> UniqueWordCount = new HashMap<>();                                      //Keep track of unique word along with their occurrence
-        DataStorage dataStorage = new DataStorage(getActivity());
-        HashMap<String, Word> userDictionary = dataStorage.loadUserDictionary();
-        //Set counters to 0
-        int iter = 0;
-        int VocUniqueCount=0;
-        int WordsInUD = 0;
-        for(RssArticle news: result){
-            int count =0;
-            UniqueWordCount.clear();
-            VocUniqueCount=0;
-            WordsInUD = 0;
-            BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);                         //Set language of break iterator
-            iterator.setText(news.getContent());
-            int start = iterator.first();
-            //Loop through each word in the article
-            for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
-                    .next()) {
-                String possibleWord = news.getContent().substring(start, end);
-                if(possibleWord.matches(getResources().getString(R.string.endOfArticleIndicator))){
-                    break;
-                }
-                if (Character.isLetter(possibleWord.charAt(0))) {                                           //if the word start with letter increment total word count
-                    count++;
-                    if (UniqueWordCount.containsKey(possibleWord.toLowerCase())){                          //Word is not contained in map add it and set it's occurrence to 1
-                        UniqueWordCount.put(possibleWord.toLowerCase(), UniqueWordCount.get(possibleWord.toLowerCase()) + 1);
-                    }else{
-                        UniqueWordCount.put(possibleWord.toLowerCase(), 1);                                  //Word is not contained in map add it and set it's occurrence to 1
-                    }
-                }
-                if (userDictionary.containsKey(possibleWord)){
-                    WordsInUD++;
-                }
-            }
-            //Loop through user dictionary to check if word exist in both the dictionary and unique word map
-            for(Map.Entry<String, Word> entry : userDictionary.entrySet()){
-                String key = entry.getKey();
-                if(UniqueWordCount.containsKey(key)){
-                    VocUniqueCount++;
-                }
-            }
-            //Set the result to contain all counters
-            result.get(iter).setTitle(result.get(iter).getTitle()+"\n"+WordsInUD+"/"+count
-                    +"\t\t\t" +VocUniqueCount+"/"+UniqueWordCount.size());
-            iter++;
-        }
-        return result;
-    }*/
-
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -565,7 +507,9 @@ public class StoriesSelectionActivity extends Fragment {
         articleAndScoreMap.clear();
         for(RssArticle article: listOfArticleAssets){
             Double fraction = getScore(article);
+			String count = getCount(article);
             articleAndScoreMap.put(article,fraction);
+			article.setCount(count);
         }
         articleAndScoreMap = MapUtil.sortByValue(articleAndScoreMap);
         Set<RssArticle> sortedArticles = articleAndScoreMap.keySet();
@@ -671,6 +615,52 @@ public class StoriesSelectionActivity extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
         ReadArticleActivity.articlesOpened=  new HashSet<String> (sharedPreferences.getStringSet("openedArticles", new HashSet<String>()));
 
+    }
+
+    /*
+     * Method to read the article and count
+     * total number of words
+     * number of unique words
+     * number of total words in user dictionary
+     * number of total unique words in user dictionary
+     */
+    private  String getCount(RssArticle rssArticle){
+        int VocUniqueCount=0;
+        int WordsInUD = 0;
+        int count =0;
+        HashMap<String, Integer> UniqueWordCount = new HashMap<>();                         //Keep track of unique word along with their occurrence
+        userDictionary = dataStorage.loadUserDictionary();
+        BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);             //Set language of break iterator
+        iterator.setText(rssArticle.getContent());
+        int start = iterator.first();
+        //Loop through each word in the article
+        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
+                .next()) {
+            String possibleWord = rssArticle.getContent().substring(start, end).toLowerCase();
+            if (Character.isLetter(possibleWord.charAt(0))) {                              //if the word start with letter increment total word count
+                count++;
+                if (UniqueWordCount.containsKey(possibleWord)){
+                    UniqueWordCount.put(possibleWord, UniqueWordCount.get(possibleWord) + 1);   //Word is already contained in map increment it's occurrence by 1
+                }else{
+                    UniqueWordCount.put(possibleWord, 1);                                  //Word is not contained in map add it and set it's occurrence to 1
+                }
+            }
+            if (userDictionary.containsKey(possibleWord)){                                 //Word is in user dictionary increment counter
+                WordsInUD++;
+            }
+        }
+        //Loop through user dictionary to check if word exist in both the dictionary and unique word map
+        for(Map.Entry<String, Word> entry : userDictionary.entrySet()){
+            String key = entry.getKey();
+            if(UniqueWordCount.containsKey(key)){
+                VocUniqueCount++;
+            }
+        }
+        //Set the resulting string to contain all counters
+        String result = String.valueOf(WordsInUD)+"/"+String.valueOf(count)+"\t\t\t"
+                +String.valueOf(VocUniqueCount)+"/"+String.valueOf(UniqueWordCount.size());
+        UniqueWordCount.clear();
+        return result;
     }
 
 }
