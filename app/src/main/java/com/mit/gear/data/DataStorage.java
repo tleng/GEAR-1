@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mattmellor.gear.R;
+import com.mit.gear.activities.MainActivity;
 import com.mit.gear.words.Word;
 
 import org.json.JSONException;
@@ -18,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Michael on 12/12/15.
@@ -134,8 +136,8 @@ public class DataStorage {
         out.close();
     }
 
-    public void addToUserDictionary(String word, String lemma, String article, boolean click) throws JSONException, IOException {
-        addToWordsFile(word, lemma, USERDICTIONARY, article, click);
+    public void addToUserDictionary(String word, String lemma,String wordSmall ,String article, boolean click) throws JSONException, IOException {
+        addToWordsFile(word, lemma, wordSmall, USERDICTIONARY, article, click);
     }
 
     //The ArrayList is made up of String Lemma, String Article, Boolean Click
@@ -172,7 +174,7 @@ public class DataStorage {
         out.close();
     }
 
-    public void addToWordsFile(String word, String lemma, String file, String article, boolean click) throws JSONException, IOException {
+    public void addToWordsFile(String word, String lemma, String wordSmall,String file, String article, boolean click) throws JSONException, IOException {
         HashMap<String, Word> dictionary = loadWordsFile(file);
         Log.d(file, dictionary.toString());
         Word userData;
@@ -180,6 +182,9 @@ public class DataStorage {
             userData = dictionary.get(word);
 			if (userData.getLemma().equals("None")){
 				userData.setLemma(lemma);
+			}
+            if(!wordSmall.equals("None")){
+				userData.setWord(wordSmall);
 			}
             userData.update(article, click);
             userData.scoreWord(click, true);
@@ -207,8 +212,18 @@ public class DataStorage {
 
     public void deleteFromWordFile(String word, String lemma, String file, String article, boolean click) throws JSONException, IOException {
         HashMap<String, Word> dictionary = loadWordsFile(file);
-        Word userData;
+		Word userData;
+		for (Map.Entry<String, Word> entry : dictionary.entrySet()) {
+			Log.d("dictionary","String " +entry.getKey());
+			Word w = entry.getValue();
+			if (word.equals(w)){
+				word = w.getWord();
+				break;
+			}
+		}
+		Log.d("userDataWord ", word);
         userData = dictionary.get(word);
+		Log.d("userData", String.valueOf(userData));
         boolean KeepInDictionary = userData.RemoveUpdate(article, click); //update the word clicks (decrement)
         if(KeepInDictionary){
             dictionary.put(word, userData); //update the word if clicked or passed

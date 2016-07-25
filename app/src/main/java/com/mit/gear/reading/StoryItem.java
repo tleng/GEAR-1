@@ -13,14 +13,14 @@ public class StoryItem {
 
     private String title;
     private String contentDescription;
-    private String storyCount;
+    private String count;
 
-    public String getStoryCount() {
-        return storyCount;
+    public String getCount() {
+        return count;
     }
 
-    public void setStoryCount(String storyCount) {
-        this.storyCount = storyCount;
+    public void setCount(String storyCount) {
+        this.count = storyCount;
     }
 
     public String getTitle() {
@@ -49,4 +49,5 @@ public class StoryItem {
     public String toString() {
         return title;
     }
+
 }

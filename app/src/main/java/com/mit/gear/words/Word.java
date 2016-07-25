@@ -14,11 +14,11 @@ import java.util.HashSet;
 public class Word {
 
     // the word user looked up
-    private final String word;
-	private  String lemma;
+    private String word;
+	private String lemma;
     public double score;
     public boolean clicked;
-	private Long ckickTime;
+	private Long clickTime;
     public HashMap<String,ArrayList<Long>> articleClicks;
     public HashMap<String,ArrayList<Long>> articlePasses;
 
@@ -33,7 +33,7 @@ public class Word {
     public Word(String word, String lemma) {
         this.word = word;
         this.lemma = lemma;
-		ckickTime = System.currentTimeMillis();
+		clickTime = System.currentTimeMillis();
         timestamps.add(System.currentTimeMillis());
         Log.d("Word", "Created Word for " + word + " " + lemma);
         score = 0.0; // just to test, set to 1
@@ -46,7 +46,7 @@ public class Word {
         this.word = word;
         this.lemma = "None";
         timestamps.add(System.currentTimeMillis());
-		ckickTime = System.currentTimeMillis();
+		clickTime = System.currentTimeMillis();
         clicked = false;
         Log.d("Word", "Created Word without lemma for " + word + " " + lemma);
         articleClicks = new HashMap<>();
@@ -89,7 +89,7 @@ public class Word {
     public void update(String article, boolean click) {
         Long lookupTime = System.currentTimeMillis();
         timestamps.add(lookupTime);
-		ckickTime = System.currentTimeMillis();
+		clickTime = System.currentTimeMillis();
         if (click) {
             clicked = click;
             if (!articleClicks.containsKey(article)) {
@@ -130,8 +130,8 @@ public class Word {
             return true;
     }
 
-	public Long getCkickTime() {
-		return ckickTime;
+	public Long getClickTime() {
+		return clickTime;
 	}
 
 	/**
@@ -162,5 +162,9 @@ public class Word {
 
 	public void setLemma(String lemma) {
 		this.lemma = lemma;
+	}
+
+	public void setWord(String word) {
+		this.word = word;
 	}
 }

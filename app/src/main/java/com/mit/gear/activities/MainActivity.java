@@ -41,7 +41,8 @@ public class MainActivity extends Activity {
 	private ActionBarDrawerToggle mDrawerToggle;
     public static Context context;
 	private MenuItem clearItem;
-	public static HashMap<String,Boolean> CapitalWord = new HashMap<>();
+	public static HashMap<String,Boolean> WordToColor = new HashMap<>();
+
 
 	// nav drawer title
 	private CharSequence mDrawerTitle;
@@ -166,7 +167,7 @@ public class MainActivity extends Activity {
                     StoriesSelectionActivity.needsToScore=true;
                     DataStorage dataStorage = new DataStorage(context);
 					dataStorage.clearUserDictionary();
-					CapitalWord.clear();
+					WordToColor.clear();
 					displayView(2);
 				} catch (IOException e) {
 					e.printStackTrace();

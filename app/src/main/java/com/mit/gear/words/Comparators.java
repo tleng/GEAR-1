@@ -72,8 +72,8 @@ public final class Comparators {
     private static class TimeComparator implements Comparator<Word> {
         @Override
         public int compare(final Word word1, final Word word2) {
-            if (word1.getCkickTime() > word2.getCkickTime()) return -1;
-            if (word1.getCkickTime() < word2.getCkickTime()) return 1;
+            if (word1.getClickTime() > word2.getClickTime()) return -1;
+            if (word1.getClickTime() < word2.getClickTime()) return 1;
             return 0;
         }
     }

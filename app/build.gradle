@@ -44,4 +44,5 @@ dependencies {
     compile files('libs/additionnal.jar')
     compile files('libs/mail.jar')
     compile 'de.codecrafters.tableview:tableview:2.1.0'
+    compile files('libs/jsoup-1.9.2.jar')
 }

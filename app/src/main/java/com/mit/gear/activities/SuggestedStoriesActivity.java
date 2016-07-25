@@ -188,7 +188,7 @@ public class SuggestedStoriesActivity extends Fragment {
             String ratingString = articleAndScoreMap.get(article)+" ";
             String title;
             if(debugChoice) {           //show the article score (debug mode is on)
-                StoryItem.setStoryCount( Count(article)+"\n"+ ratingString);
+                StoryItem.setCount( Count(article)+"\n"+ ratingString);
                 //title = article + "\t" + ratingString + "\n" + Count(article);
             }
             articleNumber += 1;
@@ -478,13 +478,14 @@ public class SuggestedStoriesActivity extends Fragment {
         //Loop through each word in the article
         for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
                     .next()) {
-            String possibleWord = ArticleText.substring(start, end).toLowerCase();
+            String possibleWord = ArticleText.substring(start, end);
             if (Character.isLetter(possibleWord.charAt(0))) {                              //if the word start with letter increment total word count
                 count++;
-                if (UniqueWordCount.containsKey(possibleWord)){
-                    UniqueWordCount.put(possibleWord, UniqueWordCount.get(possibleWord) + 1);   //Word is already contained in map increment it's occurrence by 1
+                if (UniqueWordCount.containsKey(possibleWord.toLowerCase())){
+                    UniqueWordCount.put(possibleWord.toLowerCase(),
+                            UniqueWordCount.get(possibleWord.toLowerCase()) + 1);   //Word is already contained in map increment it's occurrence by 1
                 }else{
-                    UniqueWordCount.put(possibleWord, 1);                                  //Word is not contained in map add it and set it's occurrence to 1
+                    UniqueWordCount.put(possibleWord.toLowerCase(), 1);                                  //Word is not contained in map add it and set it's occurrence to 1
                 }
             }
             if (userDictionary.containsKey(possibleWord)){                                 //Word is in user dictionary increment counter

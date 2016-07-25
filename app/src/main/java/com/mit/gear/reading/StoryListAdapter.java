@@ -66,7 +66,7 @@ public class StoryListAdapter extends ArrayAdapter<StoryItem> {
 				titleTextView.setTextColor(Color.BLACK);
 				scoreTextView.setTextColor(Color.BLACK);
 			}
-            scoreTextView.setText(storyItem.getStoryCount());
+            scoreTextView.setText(storyItem.getCount());
 
         }
 

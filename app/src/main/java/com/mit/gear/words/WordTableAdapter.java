@@ -48,7 +48,7 @@ public class WordTableAdapter extends TableDataAdapter<Word> {
                 break;
             case 4:
 				SimpleDateFormat sdf = new SimpleDateFormat("h:mm:ss a");
-				Date resultdate = new Date(word.getCkickTime());
+				Date resultdate = new Date(word.getClickTime());
 				if(word.getLemma().equals("None")){
 					break;
 				}else{

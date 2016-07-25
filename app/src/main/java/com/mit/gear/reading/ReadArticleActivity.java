@@ -198,17 +198,6 @@ public class ReadArticleActivity extends AppCompatActivity {
         UndoView.setTextColor(getResources().getColor(R.color.passed_word));
 	}
 
-
-    //@Override
-/*    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        this.menu = menu;
-        menu.getItem(0).setEnabled(false); //disabling the Undo option
-        return true;
-    }*/
-
-
     /**
      * Stores relevant data
      *
@@ -222,7 +211,7 @@ public class ReadArticleActivity extends AppCompatActivity {
             UserDataCollection.addWord(word, definition, lemma);
             DataStorage dataStorage = new DataStorage(getApplicationContext());
             try {
-                dataStorage.addToUserDictionary(word, lemma, article, click);
+                dataStorage.addToUserDictionary(word, lemma,"None" ,article, click);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -231,42 +220,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         }
     }
 
-    /*
-     Handle action bar item clicks here. The action bar will
-     automatically handle clicks on the Home/Up button, so long
-     as you specify a parent activity in AndroidManifest.xml.
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-       /*     case R.id.action_clear:
-                try {
-                    //copyRightReachedFirstTime = false;
-                    //CopyRightFragmentIndex =-1;
-                    DataStorage dataStorage = new DataStorage(getApplicationContext());
-                    dataStorage.clearUserDictionary();
-                    userDictionary = dataStorage.loadUserDictionary();
-                    GEARClickableSpan.clear();
-                    GEARGlobal.ListLastClickedWords.clear();
-                    GEARGlobal.MaximumLastClickedWords.clear();
-                    menu.getItem(1).setEnabled(false);
-                    MaximumUndoClicks = 2;
-                    UndoClicks = 0;
-                    StoriesSelectionActivity.needsToScore=true;
-                    //setPagesView();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return true;*/
-            case R.id.action_undo:
-                //Undo();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
 
-    }
 
 
     public void onClickUpPopWindow(View view) {
@@ -280,21 +234,8 @@ public class ReadArticleActivity extends AppCompatActivity {
 		Log.d(TAG,"Save progress clicked");
         StoriesSelectionActivity.needsToScore=true;
         stillInSameSession = true; //used to not color passed word if user in same session
-        //resetting the undo button
-        GEARGlobal.ListLastClickedWords.clear();
-        //GEARGlobal.MaximumLastClickedWords.clear();
-        //menu.getItem(0).setEnabled(false);
-        UndoView.setTextColor(getResources().getColor(R.color.table_header));
-        MaximumUndoClicks = 2;
-        UndoClicks = 0;
-        //preparing the progressDialog
-        progress = new ProgressDialog(view.getContext());
-        progress.setMessage("Saving Progress");
-        progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progress.setProgress(0);
-        progress.setCancelable(false);
-        //setting the progressDialog to the last clicked word index
-        progress.setMax(GEARGlobal.getLastWordClickedIndex());
+		ResetUndo();
+		PrepareProgressBar(view);
         if (progressSaved) {
             Toast.makeText(this, "No progress to save", Toast.LENGTH_LONG).show();
             return;
@@ -303,90 +244,102 @@ public class ReadArticleActivity extends AppCompatActivity {
         }
         setProgressSaved(true);
         Log.d(TAG,"Progress saved on word index " + GEARGlobal.getLastWordClickedIndex().toString());
-        //Toast toast = Toast.makeText(getApplicationContext(), "Saving work...", Toast.LENGTH_LONG);
-        //toast.show();
         final DataStorage dataStorage = new DataStorage(getApplicationContext());
-
         new Thread(new Runnable() {
             @Override
             public void run() {
-                HashMap<String, ArrayList<Object>> wordsToSave = new HashMap<String, ArrayList<Object>>();
-                //userDictionary = dataStorage.loadUserDictionary();
-                BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);
-                iterator.setText(storyText);
-                int start = iterator.first();
-                Integer count = 0;
-                Integer newWords = 0;
-                for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
-                        .next()) {
-                    String possibleWord = storyText.substring(start, end);
-                    if(possibleWord.matches(getResources().getString(R.string.endOfArticleIndicator))){ //if copyRight text is reached
-                        break;
-                    }
-                    if (Character.isLetter(possibleWord.charAt(0))) {
-                        if (count >= GEARGlobal.getLastWordClickedIndex()) {
-                            break;
-                        }
-                        //try {
-                        if (currentSessionWords.containsKey(possibleWord.toLowerCase())) {
-                            //Integer sessionCount = currentSessionWords.get(possibleWord.toLowerCase());
-//                            if (sessionCount > 0) {
-//                                sessionCount -= 1;
-//                                currentSessionWords.put(possibleWord.toLowerCase(), sessionCount);
-                                continue;
-                            //}
-                        }
-                        ArrayList<Object> wordArrayList = new ArrayList<>();
-                        wordArrayList.add("None");
-                        wordArrayList.add(currentArticle);
-                        wordArrayList.add(false);
-                        Integer wordCount = 1;
-                        if (wordsToSave.containsKey(possibleWord.toLowerCase())) {
-                            wordCount = (Integer) wordsToSave.get(possibleWord.toLowerCase()).get(3) + 1;
-                        }
-                        wordArrayList.add(wordCount);
-                        if (!currentSessionWords.containsKey(possibleWord.toLowerCase())) {
-                            wordsToSave.put(possibleWord.toLowerCase(), wordArrayList);
-                            //dataStorage.addToUserDictionary(possibleWord, "None", currentArticle, false);
-                            newWords += 1;
-
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-                            count += 1;
-                        }
-                    }
-                    try {
-                        //sleep the thread for user interface experience
-                        Thread.sleep(5);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    final Integer finalCount = count;
-                    progressBarHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            //updating the progress with words count
-                            progress.setProgress(finalCount);
-                        }
-                    });
-                }
-
-                try {
-                    dataStorage.addGroupToUserDictionary(wordsToSave);
-                    //dismiss the progress and finish the SavePopupActivity if exist
-                    progress.dismiss();
-                    if (SavePopupActivity.savePopupActivity != null) {
-                        SavePopupActivity.savePopupActivity.finish();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+				HashMap<String, ArrayList<Object>> wordsToSave = new HashMap<String, ArrayList<Object>>();
+				//userDictionary = dataStorage.loadUserDictionary();
+				BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);
+				iterator.setText(storyText);
+				int start = iterator.first();
+				Integer count = 0;
+				Integer newWords = 0;
+				for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
+						.next()) {
+					String possibleWord = storyText.substring(start, end);
+					Character first = Character.toUpperCase(possibleWord.charAt(0));
+					String WordToCheck = first + possibleWord.substring(1);
+					if (possibleWord.matches(getResources().getString(R.string.endOfArticleIndicator))) { //if copyRight text is reached
+						break;
+					}
+					if (Character.isLetter(possibleWord.charAt(0))) {
+						if (count >= GEARGlobal.getLastWordClickedIndex()) {
+							break;
+						}
+						if (currentSessionWords.containsKey(possibleWord) ||
+								MainActivity.WordToColor.containsKey(possibleWord)) {
+							continue;
+						}
+						ArrayList<Object> wordArrayList = new ArrayList<>();
+						wordArrayList.add("None");
+						wordArrayList.add(currentArticle);
+						wordArrayList.add(false);
+						Integer wordCount = 1;
+						if (wordsToSave.containsKey(possibleWord)) {
+							wordCount = (Integer) wordsToSave.get(possibleWord).get(3) + 1;
+						}
+						if (Character.isUpperCase(possibleWord.charAt(0))) {
+							if (wordsToSave.containsKey(possibleWord.toLowerCase())) {
+								wordCount = (Integer) wordsToSave.get
+										(possibleWord.toLowerCase()).get(3) + 1;
+							}
+						}
+						if (Character.isLowerCase(possibleWord.charAt(0))) {
+							if (wordsToSave.containsKey(WordToCheck)) {
+								wordCount = (Integer) wordsToSave.get
+										(WordToCheck).get(3) + 1;
+							}
+						}
+						wordArrayList.add(wordCount);
+						if (!currentSessionWords.containsKey(possibleWord)) {
+							if (Character.isUpperCase(possibleWord.charAt(0))){
+								if (wordsToSave.containsKey(possibleWord.toLowerCase())){
+									wordsToSave.put(possibleWord.toLowerCase(), wordArrayList);
+								}else{
+									wordsToSave.put(possibleWord, wordArrayList);
+								}
+							}else if(Character.isLowerCase(possibleWord.charAt(0))){
+								if (wordsToSave.containsKey(WordToCheck)){
+									wordsToSave.remove(WordToCheck);
+									wordsToSave.put(possibleWord, wordArrayList);
+								}else{
+									wordsToSave.put(possibleWord, wordArrayList);
+								}
+							}
+							//wordsToSave.put(possibleWord, wordArrayList);
+							newWords += 1;
+							count += 1;
+						}
+					}
+					try {
+						//sleep the thread for user interface experience
+						Thread.sleep(5);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					final Integer finalCount = count;
+					progressBarHandler.post(new Runnable() {
+						@Override
+						public void run() {
+							//updating the progress with words count
+							progress.setProgress(finalCount);
+						}
+					});
+				}
+				try {
+					dataStorage.addGroupToUserDictionary(wordsToSave);
+					//dismiss the progress and finish the SavePopupActivity if exist
+					progress.dismiss();
+					if (SavePopupActivity.savePopupActivity != null) {
+						SavePopupActivity.savePopupActivity.finish();
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
         }).start();
         //Toast endToast = Toast.makeText(getApplicationContext(), "Updated " + newWords.toString() + " unclicked words.", Toast.LENGTH_SHORT);
         //endToast.show();
@@ -419,8 +372,8 @@ public class ReadArticleActivity extends AppCompatActivity {
         Long timeSpent = endTime - startTime;
         UserDataCollection.setTimeSpentOnArticle(currentArticle, timeSpent);
 		SendUserDictionary();
-        for (Map.Entry<String, Boolean> entry : MainActivity.CapitalWord.entrySet()) {
-			MainActivity.CapitalWord.put(entry.getKey(),false);
+        for (Map.Entry<String, Boolean> entry : MainActivity.WordToColor.entrySet()) {
+            MainActivity.WordToColor.put(entry.getKey(),false);
         }
         super.onPause();
     }
@@ -473,6 +426,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         //userDictionary = dataStorage.loadUserDictionary();
 		if(UndoView.getCurrentTextColor()==getResources().getColor(R.color.table_header_text)){
 			try {
+				Log.d("UndoWord",ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
 				dataStorage.deleteFromWordFile(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0), "None", dataStorage.USERDICTIONARY, currentArticle, true);
                 HashMap<String, Word> userDictionaryNEW = dataStorage.loadUserDictionary();
 
@@ -483,6 +437,18 @@ public class ReadArticleActivity extends AppCompatActivity {
                     }
                 }else{ //if does not exist, delete it from the un updated dictionary
                     userDictionary.remove(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
+					String WordToDelete = ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0);
+					if(Character.isUpperCase(WordToDelete.charAt(0))){
+						if(MainActivity.WordToColor.containsKey(WordToDelete.toLowerCase())){
+							MainActivity.WordToColor.remove(WordToDelete.toLowerCase());
+						}
+					}else if(Character.isLowerCase(WordToDelete.charAt(0))) {
+						Character first = Character.toUpperCase(WordToDelete.charAt(0));
+						WordToDelete = first+WordToDelete.substring(1);
+						if (MainActivity.WordToColor.containsKey(WordToDelete)) {
+							MainActivity.WordToColor.remove(WordToDelete);
+						}
+					}
                 }
 
                 //check if the word clicked more than once and decrement one or remove it from current session
@@ -497,7 +463,6 @@ public class ReadArticleActivity extends AppCompatActivity {
 				ListLastClickedWords = GEARGlobal.ListLastClickedWords;
 				Character first = Character.toUpperCase(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).charAt(0));
 				String cWord = first+ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).substring(1);
-				MainActivity.CapitalWord.remove(cWord);
 				pagesView.getAdapter().notifyDataSetChanged();
 				//userDictionary = dataStorage.loadUserDictionary();
 			} catch (JSONException e) {
@@ -565,6 +530,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 			Toast.makeText(this, "Cannot undo, only two undoes allowed", Toast.LENGTH_LONG).show();
 		}
     }
+
     private void load(){
         ListLastClickedWords = GEARGlobal.ListLastClickedWords;
         MaximumLastClickedWords = GEARGlobal.MaximumLastClickedWords;
@@ -618,10 +584,8 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     /*
-     *
      * This method saves the open articles set into shared prefrence
      * This method is called onDestroy ReadArticleActivity
-     *
      */
     private void SaveOpenedArticles(){
         sharedPreferences = this.getSharedPreferences("Settings", Context.MODE_PRIVATE);
@@ -629,4 +593,23 @@ public class ReadArticleActivity extends AppCompatActivity {
         editor.putStringSet("openedArticles", articlesOpened);
         editor.commit();
     }
+
+	private void ResetUndo(){
+		GEARGlobal.ListLastClickedWords.clear();
+		UndoView.setTextColor(getResources().getColor(R.color.table_header));
+		MaximumUndoClicks = 2;
+		UndoClicks = 0;
+	}
+
+	private void PrepareProgressBar(View view){
+		progress = new ProgressDialog(view.getContext());
+		progress.setMessage("Saving Progress");
+		progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		progress.setProgress(0);
+		progress.setCancelable(false);
+		//setting the progressDialog to the last clicked word index
+		progress.setMax(GEARGlobal.getLastWordClickedIndex());
+
+	}
+
 }

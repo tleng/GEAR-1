@@ -636,13 +636,14 @@ public class StoriesSelectionActivity extends Fragment {
         //Loop through each word in the article
         for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
                 .next()) {
-            String possibleWord = rssArticle.getContent().substring(start, end).toLowerCase();
+            String possibleWord = rssArticle.getContent().substring(start, end);
             if (Character.isLetter(possibleWord.charAt(0))) {                              //if the word start with letter increment total word count
                 count++;
-                if (UniqueWordCount.containsKey(possibleWord)){
-                    UniqueWordCount.put(possibleWord, UniqueWordCount.get(possibleWord) + 1);   //Word is already contained in map increment it's occurrence by 1
+                if (UniqueWordCount.containsKey(possibleWord.toLowerCase())){
+                    UniqueWordCount.put(possibleWord.toLowerCase(),
+                            UniqueWordCount.get(possibleWord.toLowerCase()) + 1);   //Word is already contained in map increment it's occurrence by 1
                 }else{
-                    UniqueWordCount.put(possibleWord, 1);                                  //Word is not contained in map add it and set it's occurrence to 1
+                    UniqueWordCount.put(possibleWord.toLowerCase(), 1);                                  //Word is not contained in map add it and set it's occurrence to 1
                 }
             }
             if (userDictionary.containsKey(possibleWord)){                                 //Word is in user dictionary increment counter
