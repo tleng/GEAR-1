@@ -213,17 +213,20 @@ public class DataStorage {
     public void deleteFromWordFile(String word, String lemma, String file, String article, boolean click) throws JSONException, IOException {
         HashMap<String, Word> dictionary = loadWordsFile(file);
 		Word userData;
-		for (Map.Entry<String, Word> entry : dictionary.entrySet()) {
-			Log.d("dictionary","String " +entry.getKey());
-			Word w = entry.getValue();
-			if (word.equals(w)){
-				word = w.getWord();
-				break;
-			}
-		}
-		Log.d("userDataWord ", word);
+        Log.d("userDataWord 1 ", word);
         userData = dictionary.get(word);
-		Log.d("userData", String.valueOf(userData));
+        if(userData == null){
+            if(Character.isUpperCase(word.charAt(0))){
+                word = word.toLowerCase();
+                userData = dictionary.get(word);
+            }else if(Character.isLowerCase(word.charAt(0))){
+                Character first = Character.toUpperCase(word.charAt(0));
+                word = first+word.substring(1);
+                userData = dictionary.get(word);
+            }
+        }
+        Log.d("userDataWord 2 ", word);
+        Log.d("userData", String.valueOf(userData));
         boolean KeepInDictionary = userData.RemoveUpdate(article, click); //update the word clicks (decrement)
         if(KeepInDictionary){
             dictionary.put(word, userData); //update the word if clicked or passed

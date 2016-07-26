@@ -425,6 +425,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     public void Undo(View view) {
         load();
         DataStorage dataStorage = new DataStorage(this);
+		Integer numOfClicks = 0;
         //userDictionary = dataStorage.loadUserDictionary();
 		if(UndoView.getCurrentTextColor()==getResources().getColor(R.color.table_header_text)){
 			try {
@@ -444,17 +445,29 @@ public class ReadArticleActivity extends AppCompatActivity {
 						if(MainActivity.WordToColor.containsKey(WordToDelete.toLowerCase())){
 							MainActivity.WordToColor.remove(WordToDelete.toLowerCase());
 						}
+						if(currentSessionWords.containsKey(WordToDelete)){
+							numOfClicks = currentSessionWords.get(WordToDelete);
+							Log.d("numOfClicks1", String.valueOf(numOfClicks));
+						}else{
+							numOfClicks = currentSessionWords.get(WordToDelete.toLowerCase());
+							Log.d("numOfClicks2", String.valueOf(numOfClicks));
+						}
 					}else if(Character.isLowerCase(WordToDelete.charAt(0))) {
 						Character first = Character.toUpperCase(WordToDelete.charAt(0));
 						WordToDelete = first+WordToDelete.substring(1);
 						if (MainActivity.WordToColor.containsKey(WordToDelete)) {
 							MainActivity.WordToColor.remove(WordToDelete);
 						}
+						if(currentSessionWords.containsKey(WordToDelete)){
+							numOfClicks = currentSessionWords.get(WordToDelete);
+							Log.d("numOfClicks3", String.valueOf(numOfClicks));
+						}else{
+							numOfClicks = currentSessionWords.get(WordToDelete.toLowerCase());
+							Log.d("numOfClicks4", String.valueOf(numOfClicks));
+						}
 					}
                 }
-
                 //check if the word clicked more than once and decrement one or remove it from current session
-                Integer numOfClicks =currentSessionWords.get(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
                 if(numOfClicks==1)
                     currentSessionWords.remove(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
                 else if (numOfClicks>1){
