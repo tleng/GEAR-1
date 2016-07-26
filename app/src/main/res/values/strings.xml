@@ -29,6 +29,7 @@
         <item>News</item>
         <item>Stories</item>
         <item>Vocabulary</item>
+        <item>Lite News</item>
     </string-array>
 
     <!-- Nav Drawer List Item Icons -->
@@ -36,6 +37,7 @@
         <item>@mipmap/allstories</item>
         <item>@mipmap/stories</item>
         <item>@mipmap/vocab</item>
+        <item>@mipmap/allstories</item>
 
     </array>
 

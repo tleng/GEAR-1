@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.activities.LiteNewsFragment;
 import com.mit.gear.activities.MainActivity;
 import com.mit.gear.activities.SavePopupActivity;
 import com.mit.gear.activities.StoriesSelectionActivity;
@@ -233,6 +234,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     public void saveProgress(View view) {
 		Log.d(TAG,"Save progress clicked");
         StoriesSelectionActivity.needsToScore=true;
+        LiteNewsFragment.needsToScore=true;
         stillInSameSession = true; //used to not color passed word if user in same session
 		ResetUndo();
 		PrepareProgressBar(view);

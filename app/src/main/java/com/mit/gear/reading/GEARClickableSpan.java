@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.activities.LiteNewsFragment;
 import com.mit.gear.activities.MainActivity;
 import com.mit.gear.activities.StoriesSelectionActivity;
 import com.mit.gear.data.DataStorage;
@@ -56,6 +57,7 @@ public class GEARClickableSpan extends ClickableSpan {
     @Override
     public void onClick(View widget) {
         StoriesSelectionActivity.needsToScore=true;
+        LiteNewsFragment.needsToScore=true;
         Log.w(TAG,"onClickIndex: "+index.toString());
         readArticleActivity.pagesView.getAdapter().notifyDataSetChanged();         //update the view for all the preloaded fragments (max 3)
         readArticleActivity.setProgressSaved(false);                               //set progressSaved to false to popup the savePopupActivity in case user did not save

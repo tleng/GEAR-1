@@ -86,6 +86,9 @@ public class MainActivity extends Activity {
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
 		// vocab
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
+		//Lite Stories
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
+
 
 		// Recycle the typed array
 		navMenuIcons.recycle();
@@ -166,7 +169,8 @@ public class MainActivity extends Activity {
                     editor.putStringSet("openedArticles", new HashSet<String>());
                     editor.commit();
                     StoriesSelectionActivity.needsToScore=true;
-                    DataStorage dataStorage = new DataStorage(context);
+					LiteNewsFragment.needsToScore=true;
+					DataStorage dataStorage = new DataStorage(context);
 					dataStorage.clearUserDictionary();
 					WordToColor.clear();
 					displayView(2);
@@ -215,6 +219,12 @@ public class MainActivity extends Activity {
 			Log.d(TAG,"Vocabulary Tab Opened");
 			fragment = new DisplayVocabularyActivity();
 			break;
+        case 3:
+            Log.d(TAG,"Lite News Tab Opened");
+            fragment = new LiteNewsFragment();
+            break;
+
+
 
 		default:
 			break;
