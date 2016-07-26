@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ExpandableListView;
 
 
 import com.mit.gear.activities.StoriesSelectionActivity;
@@ -18,28 +19,33 @@ import com.mit.gear.reading.ReadArticleActivity;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
-public class RssListListener implements OnItemClickListener {
+public class RssListListener implements ExpandableListView.OnChildClickListener {
     private String TAG = "RssListListener";
-    List<RssArticle> listItems;
+    Map<String,List<RssArticle>> listItems;
+    List<String> headersList;
     Activity activity;
-    public RssListListener(List<RssArticle> aListItems, Activity anActivity) {
+    public RssListListener(List<String> headers,Map<String,List<RssArticle>> aListItems, Activity anActivity) {
+        headersList=headers;
         listItems = aListItems;
         activity  = anActivity;
     }
 
-    public void onItemClick(AdapterView parent, View view, int pos, long id) {
-		Log.d(TAG,"News opened: "+listItems.get(pos).getTitle());
-        Intent intent = new Intent(StoriesSelectionActivity.context, ReadArticleActivity.class);
 
-        ReadArticleActivity.articlesOpened.add(listItems.get(pos).getTitle());
-        Log.i("article opened", listItems.get(pos).getTitle());
 
-        intent.putExtra("title", listItems.get(pos).getTitle());
-        intent.putExtra("content", listItems.get(pos).getContent());
+    @Override
+    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+		Log.d(TAG,"News opened: "+listItems.get(headersList.get(groupPosition)).get(childPosition).getTitle());
+
+        Intent intent = new Intent(activity, ReadArticleActivity.class);
+        listItems.get(headersList.get(groupPosition)).get(childPosition).getTitle();
+        ReadArticleActivity.articlesOpened.add(listItems.get(headersList.get(groupPosition)).get(childPosition).getTitle());
+        intent.putExtra("title", listItems.get(headersList.get(groupPosition)).get(childPosition).getTitle());
+        intent.putExtra("content", listItems.get(headersList.get(groupPosition)).get(childPosition).getContent());
         activity.startActivity(intent);
+        return false;
     }
-
 }

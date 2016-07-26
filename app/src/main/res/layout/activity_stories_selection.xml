@@ -1,30 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:background="#fff">
+    android:background="#f4f4f4" >
 
-    <ListView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/listView"
-        android:layout_gravity="center_horizontal" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <LinearLayout
-        android:id="@+id/allStoriesLinearLayout"
-        android:layout_width="match_parent"
+    <ExpandableListView
+        android:id="@+id/lvExp"
         android:layout_height="match_parent"
-        android:layout_above="@+id/app_article_bar"
-        android:orientation="vertical"
-        android:fillViewport="false">
-    </LinearLayout>
-    </ScrollView>
-
-
+        android:layout_width="match_parent"/>
 
 </LinearLayout>
+

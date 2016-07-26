@@ -14,6 +14,15 @@ public class RssArticle implements Serializable{
     private String link;
     private String content;
     private String count;
+    private String category;
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
     public String getContent() {
         return content;

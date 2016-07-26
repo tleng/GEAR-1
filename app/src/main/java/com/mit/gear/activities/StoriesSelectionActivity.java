@@ -13,10 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 
 import com.mattmellor.gear.R;
-import com.mit.gear.RSS.RssListAdapter;
+import com.mit.gear.RSS.ExpandableListAdapter;
 import com.mit.gear.RSS.RssListListener;
 import com.mit.gear.RSS.RssArticle;
 import com.mit.gear.RSS.RssReader;
@@ -69,7 +70,11 @@ public class StoriesSelectionActivity extends Fragment {
     DataStorage dataStorage;
     HashMap<String,Word> userDictionary;
     public static boolean needsToScore = false; //boolean indicate if we need to score the news
-
+    ExpandableListAdapter listAdapter;
+    ExpandableListView expListView;
+    List<String> listDataHeader = new ArrayList<String>();
+    Map<String, List<RssArticle>> listDataChild;
+    public static Map<String,List<RssArticle>> mappingCategory= new HashMap<>();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_stories_selection, container, false);
@@ -79,9 +84,9 @@ public class StoriesSelectionActivity extends Fragment {
     public void onResume() {
         super.onResume();
         if(needsToScore){  //check if we need to score again (if new words are clicked/saves)
-            scoreArticles();
-        }else{
-            prepareTheList(ListRssArticle);
+            scoreArticles(getNewsFromStorage());
+        }else if(ListRssArticle!= null){
+            prepareTheList(mappingCategory);
         }
     }
 
@@ -124,23 +129,27 @@ public class StoriesSelectionActivity extends Fragment {
 
            else{    //if today date is not after the last update date
                 if(ListRssArticle==null){ //open app for first time
-                    prepareTheList(getNewsFromStorage()); //get news from storage and view them
-                    needsToScore=true;
+                    scoreArticles(getNewsFromStorage());
+                   // prepareTheList(); //get news from storage and view them
+                   // needsToScore=true;
                 }
 
                 else {   //the news list are already loaded
-                    prepareTheList(ListRssArticle);
+                    if(mappingCategory!=null)
+                    prepareTheList(mappingCategory);
                 }
 
-                if(needsToScore){
-                    scoreArticles();
-                }
+//                if(needsToScore){
+//                    ;
+//                }
             }
        }
         else{                                   //if news were previously generated, get them from the bundle
 
             ListRssArticle= (List<RssArticle>) savedInstanceState.getSerializable("RssArticle");
-            prepareTheList(ListRssArticle);
+            mappingCategory = (Map<String, List<RssArticle>>) savedInstanceState.getSerializable("mappingCategory");
+            //scoreArticles(ListRssArticle);
+            prepareTheList(mappingCategory);
 
        }
     }
@@ -353,7 +362,7 @@ public class StoriesSelectionActivity extends Fragment {
                 }
                 // saving the news as a file in the internal storage under rssArticles directory
                 String filename = rssArticle.getTitle();
-                String string = rssArticle.getContent();
+                String string = rssArticle.getCategory()+"\n"+rssArticle.getContent();
 
                 try {
                     File fileWithinMyDir = new File(myDir, filename); //Getting a file within the dir.
@@ -373,10 +382,10 @@ public class StoriesSelectionActivity extends Fragment {
             if(result!= null)
             {
                 ListRssArticle = result;
-                prepareTheList(ListRssArticle);
                 getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
                 progress.dismiss();
-                scoreArticles();
+                scoreArticles(ListRssArticle);
+               // prepareTheList(ListRssArticle);
             }
 
         }
@@ -407,7 +416,9 @@ public class StoriesSelectionActivity extends Fragment {
                     InputStreamReader isr = new InputStreamReader ( fIn ) ;
                     BufferedReader bufferedReader = new BufferedReader ( isr ) ;
 
-                    String readString = bufferedReader.readLine () ;
+                    String readString = bufferedReader.readLine () ; //the first line is the article's category
+                    rssArticle.setCategory(readString);
+                    readString = bufferedReader.readLine () ;
                     while ( readString != null ) {
                         content.append(readString);
                         content.append('\n');
@@ -429,36 +440,161 @@ public class StoriesSelectionActivity extends Fragment {
      * this method updates the nav drawer to indicate the number of news are there
      * attach the list to the layout and sets a click listener
      */
-    private void prepareTheList(List<RssArticle> result){
+    private void prepareTheList(Map<String,List<RssArticle>> result){
+        mappingCategory = result;
+        int firstVisibleItem = 0;
+        if( expListView!=null)
+            firstVisibleItem =expListView.getFirstVisiblePosition();
 
-        ListRssArticle = result;
-        ListView rssItems = (ListView) getActivity().findViewById(R.id.listView);
+        // get the listview
+        expListView = (ExpandableListView) getActivity().findViewById(R.id.lvExp);
+
+       // preparing list data
+        listDataHeader.clear();
+
+        listDataHeader.addAll(mappingCategory.keySet());
+        listDataChild=mappingCategory;
+
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        Boolean debugChoice = sharedPreferences.getBoolean("debug", false);
+        if(debugChoice) {
+            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,articleAndScoreMap);
+        }
+
+        else {
+            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild);
+        }
+
+        // setting list adapter
+        expListView.setAdapter(listAdapter);
+
+        // Listview Group click listener
+        expListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v,
+                                        int groupPosition, long id) {
+                return false;
+            }
+        });
+
+        // Listview Group expanded listener
+        expListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+
+            @Override
+            public void onGroupExpand(int groupPosition) {
+
+            }
+        });
+
+        // Listview Group collasped listener
+        expListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+
+            @Override
+            public void onGroupCollapse(int groupPosition) {
+
+
+            }
+        });
+
+        // Listview on child click listener
+
+
+
+        //ListRssArticle = result;
+
+        expListView.setOnChildClickListener(new RssListListener(listDataHeader, listDataChild, getActivity()));
+
+        for(int i=0; i < listAdapter.getGroupCount(); i++)
+            expListView.expandGroup(i);
+
+        if (firstVisibleItem != 0)
+            expListView.setSelection(firstVisibleItem);
+        //ListView rssItems = (ListView) getActivity().findViewById(R.id.listView);
         MainActivity.navDrawerItems.get(0).setCounterVisibility(true);
-        MainActivity.navDrawerItems.get(0).setCount(String.valueOf(result.size()));
+        MainActivity.navDrawerItems.get(0).setCount(String.valueOf(ListRssArticle.size()));
         MainActivity.adapter = new NavDrawerListAdapter(MainActivity.context,
                 MainActivity.navDrawerItems);
         MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
         MainActivity.mDrawerList.setItemChecked(0, true);
         MainActivity.mDrawerList.setSelection(0);
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
-        Boolean debugChoice = sharedPreferences.getBoolean("debug", false);
-        if(debugChoice){           //show the article score (debug mode is on)
-            ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item_debug_mode, ListRssArticle, articleAndScoreMap);
-            rssItems.setAdapter(adapter);
-        }
-        else{                     //do not show the article score (debug mode is off)
-            ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item, ListRssArticle);
-            rssItems.setAdapter(adapter);
-        }
-        rssItems.setOnItemClickListener(new RssListListener(result, getActivity()));
+
+//        if(debugChoice){           //show the article score (debug mode is on)
+//            ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item_debug_mode, ListRssArticle, articleAndScoreMap);
+//            rssItems.setAdapter(adapter);
+//        }
+//        else{                     //do not show the article score (debug mode is off)
+//            ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item, ListRssArticle);
+//            rssItems.setAdapter(adapter);
+//        }
+//        rssItems.setOnItemClickListener(new RssListListener(result, getActivity()));
 
     }
+
+    /*
+     * Method to read the article and count
+     * total number of words
+     * number of unique words
+     * number of total words in user dictionary
+     * number of total unique words in user dictionary
+     */
+ /*   private  List<RssArticle> Count(List<RssArticle> result){
+        HashMap<String, Integer> UniqueWordCount = new HashMap<>();                                      //Keep track of unique word along with their occurrence
+        DataStorage dataStorage = new DataStorage(getActivity());
+        HashMap<String, Word> userDictionary = dataStorage.loadUserDictionary();
+        //Set counters to 0
+        int iter = 0;
+        int VocUniqueCount=0;
+        int WordsInUD = 0;
+        for(RssArticle news: result){
+            int count =0;
+            UniqueWordCount.clear();
+            VocUniqueCount=0;
+            WordsInUD = 0;
+            BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);                         //Set language of break iterator
+            iterator.setText(news.getContent());
+            int start = iterator.first();
+            //Loop through each word in the article
+            for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
+                    .next()) {
+                String possibleWord = news.getContent().substring(start, end);
+                if(possibleWord.matches(getResources().getString(R.string.endOfArticleIndicator))){
+                    break;
+                }
+                if (Character.isLetter(possibleWord.charAt(0))) {                                           //if the word start with letter increment total word count
+                    count++;
+                    if (UniqueWordCount.containsKey(possibleWord.toLowerCase())){                          //Word is not contained in map add it and set it's occurrence to 1
+                        UniqueWordCount.put(possibleWord.toLowerCase(), UniqueWordCount.get(possibleWord.toLowerCase()) + 1);
+                    }else{
+                        UniqueWordCount.put(possibleWord.toLowerCase(), 1);                                  //Word is not contained in map add it and set it's occurrence to 1
+                    }
+                }
+                if (userDictionary.containsKey(possibleWord)){
+                    WordsInUD++;
+                }
+            }
+            //Loop through user dictionary to check if word exist in both the dictionary and unique word map
+            for(Map.Entry<String, Word> entry : userDictionary.entrySet()){
+                String key = entry.getKey();
+                if(UniqueWordCount.containsKey(key)){
+                    VocUniqueCount++;
+                }
+            }
+            //Set the result to contain all counters
+            result.get(iter).setTitle(result.get(iter).getTitle()+"\n"+WordsInUD+"/"+count
+                    +"\t\t\t" +VocUniqueCount+"/"+UniqueWordCount.size());
+            iter++;
+        }
+        return result;
+    }*/
+
 
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("RssArticle", (Serializable) ListRssArticle);
+        outState.putSerializable("mappingCategory", (Serializable) mappingCategory);
 
     }
 
@@ -501,9 +637,9 @@ public class StoriesSelectionActivity extends Fragment {
         This method is the same as the one in SuggestedStoriesActivity  but altered for news use
      */
 
-    private List<RssArticle> recommendKArticles2() {
+    private Map<String,List<RssArticle>> recommendKArticles2(List<RssArticle> articles) {
 
-        List<RssArticle> listOfArticleAssets = ListRssArticle ;
+        List<RssArticle> listOfArticleAssets = articles ;
         articleAndScoreMap.clear();
         for(RssArticle article: listOfArticleAssets){
             Double fraction = getScore(article);
@@ -521,15 +657,23 @@ public class StoriesSelectionActivity extends Fragment {
         }
         int n = sortedArticles.size();
         List<RssArticle> recommendedArticles = new ArrayList<>();
-
+        mappingCategory= new HashMap<>();
         // check if there are sortedArticles
         if (n>0) {
+            List<RssArticle> childList;
             for (int i = n - 1; i >= 0; i--) {
-                recommendedArticles.add(sortedArticleList.get(i));
+                if(mappingCategory.containsKey(sortedArticleList.get(i).getCategory())){
+                    childList=mappingCategory.get(sortedArticleList.get(i).getCategory());
+                }else{
+                    childList = new ArrayList<RssArticle>();
+                }
+                childList.add(sortedArticleList.get(i));
+                mappingCategory.put(sortedArticleList.get(i).getCategory(), childList);
+               recommendedArticles.add(sortedArticleList.get(i));
             }
         }
         ListRssArticle=recommendedArticles;
-        return ListRssArticle;
+        return mappingCategory;
     }
 
     /*
@@ -570,20 +714,19 @@ public class StoriesSelectionActivity extends Fragment {
  *
  */
 
-    private class rankTheNews extends AsyncTask<String, Void, List<RssArticle>> {
+    private class rankTheNews extends AsyncTask< List<RssArticle>, Void, Map<String,List<RssArticle>>> {
 
         @Override
-        protected List<RssArticle> doInBackground(String... params) {
-
-            return recommendKArticles2();
+        protected Map<String, List<RssArticle>> doInBackground(List<RssArticle>... params) {
+            return recommendKArticles2(params[0]);
         }
 
         @Override
-        protected void onPostExecute(List<RssArticle> result) {
+        protected void onPostExecute(Map<String,List<RssArticle>> result) {
             if(result!=null)
             {
-                ListRssArticle = result;
-                prepareTheList(ListRssArticle);
+                mappingCategory = result;
+                prepareTheList(mappingCategory);
             }
             progress.dismiss();
         }
@@ -595,14 +738,14 @@ public class StoriesSelectionActivity extends Fragment {
      * sets the needsToScore flag to false
      */
 
-    private void scoreArticles() {
+    private void scoreArticles(List<RssArticle> unscoredList) {
         progress = new ProgressDialog(getActivity());
         progress.setMessage("Ranking the news for you");
         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progress.setIndeterminate(true);
         progress.setCancelable(false);
         progress.show();
-        new rankTheNews().execute();
+        new rankTheNews().execute(unscoredList);
         needsToScore=false;
     }
 

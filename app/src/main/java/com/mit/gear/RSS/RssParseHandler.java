@@ -27,6 +27,8 @@ public class RssParseHandler extends DefaultHandler  {
     private boolean parsingTitle;
     // Parsing link indicator
     private boolean parsingLink;
+    // Parsing category indicator
+    private boolean parsingCategory;
 
     private boolean parsingContent;
     //public String content;
@@ -49,6 +51,8 @@ public class RssParseHandler extends DefaultHandler  {
             parsingTitle = true;
         } else if ("link".equals(qName)) {
             parsingLink = true;
+        }else if("category".equals(qName)){
+            parsingCategory=true;
         }
         buf.setLength(0);
     }
@@ -69,7 +73,11 @@ public class RssParseHandler extends DefaultHandler  {
                 currentItem.setLink(buf.toString().trim());
             }
             parsingLink = false;
-
+        }else if (parsingCategory) {
+            if (currentItem != null) {
+                currentItem.setCategory(buf.toString().trim());
+            }
+            parsingCategory = false;
         }
         buf.setLength(0);
 
