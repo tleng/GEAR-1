@@ -14,6 +14,8 @@ import com.memetix.mst.language.Language;
 import com.memetix.mst.translate.Translate;
 import com.mit.gear.reading.ReadArticleActivity;
 
+import java.util.ArrayList;
+
 /**
  * Created on 6/17/16.
  * Class used to translate words using Microsoft's (Bing) translator
@@ -22,6 +24,7 @@ import com.mit.gear.reading.ReadArticleActivity;
 public class Translator extends AsyncTask<Void, Void, String> {
     public String translatedText = "";
     private String mWord ;
+
 
     public Translator(String mWord) {
         this.mWord = mWord;
@@ -43,18 +46,26 @@ public class Translator extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         ReadArticleActivity activityInstance = ReadArticleActivity.getReadArticleActivityInstance();
-        final TextView readingDictionary = (TextView) activityInstance.findViewById(R.id.definition_box);
-        String definitionResult = mWord+" " ;
+        final TextView readingDictionary = activityInstance.readingDictionary;
+		ArrayList<String> WordDefinition = new ArrayList<>();
+		WordDefinition.add(mWord);
         if (result != null) {
-            definitionResult = definitionResult +",\t"+ result;
-
-            if (activityInstance.definition_scroll){
+			WordDefinition.add(result);
+			activityInstance.DefinitionBoxList.add(WordDefinition);
+			Log.d("DefinitionBoxList",activityInstance.DefinitionBoxList.toString());
+          if (activityInstance.definition_scroll){
                 if(readingDictionary.getText().toString().isEmpty())
-                    readingDictionary.setText(definitionResult);
+					readingDictionary.setText(activityInstance.DefinitionBoxList.get(
+							activityInstance.DefinitionBoxList.size()-1).get(0)+" ,\t "+
+							activityInstance.DefinitionBoxList.get(activityInstance.DefinitionBoxList.size()-1).get(1));
                 else
-                readingDictionary.setText(readingDictionary.getText().toString() + "\n" +definitionResult);
+					readingDictionary.setText(readingDictionary.getText().toString() + "\n" +
+							activityInstance.DefinitionBoxList.get(activityInstance.DefinitionBoxList.size()-1).get(0)+
+							" ,\t "+activityInstance.DefinitionBoxList.get(activityInstance.DefinitionBoxList.size()-1).get(1));
             } else {
-                readingDictionary.setText(definitionResult);
+			  readingDictionary.setText(activityInstance.DefinitionBoxList.get(
+					  activityInstance.DefinitionBoxList.size()-1).get(0)+" ,\t "+activityInstance.DefinitionBoxList.get(
+					  activityInstance.DefinitionBoxList.size()-1).get(1));
             }
             final ScrollView scrollview = (ScrollView) activityInstance.findViewById(R.id.definition_scroll);
             scrollview.post(new Runnable() {
@@ -64,7 +75,6 @@ public class Translator extends AsyncTask<Void, Void, String> {
                     scrollview.fullScroll(View.FOCUS_DOWN);             //scroll the definition box to the bottom whenever word translation added
                 }
             });
-
             super.onPostExecute(result);
         }else{
             readingDictionary.setText("");             //If no translation found

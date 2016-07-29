@@ -41,7 +41,6 @@ public class MainActivity extends Activity {
 	private ActionBarDrawerToggle mDrawerToggle;
     public static Context context;
 	private MenuItem clearItem;
-	public static HashMap<String,Boolean> WordToColor = new HashMap<>();
 
 
 	// nav drawer title
@@ -172,7 +171,7 @@ public class MainActivity extends Activity {
 					LiteNewsFragment.needsToScore=true;
 					DataStorage dataStorage = new DataStorage(context);
 					dataStorage.clearUserDictionary();
-					WordToColor.clear();
+					dataStorage.clearColorFile();
 					displayView(2);
 				} catch (IOException e) {
 					e.printStackTrace();

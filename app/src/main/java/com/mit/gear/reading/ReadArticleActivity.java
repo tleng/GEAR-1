@@ -84,6 +84,8 @@ public class ReadArticleActivity extends AppCompatActivity {
     public static boolean stillInSameSession;           //checks if is still in same session, used to not update passed words if user in same session
     public static TextView UndoView;
     public static Set<String> articlesOpened;
+	public static ArrayList<ArrayList<String>> DefinitionBoxList = new ArrayList<>();
+	public static TextView readingDictionary;
     public ReadArticleActivity() {
         instance = this;
     }
@@ -116,6 +118,7 @@ public class ReadArticleActivity extends AppCompatActivity {
             setContentView(R.layout.pages);
 			UndoView = (TextView)findViewById(R.id.UndotextView);
         }
+		readingDictionary = (TextView)findViewById(R.id.definition_box);
    //     toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
      //   setSupportActionBar(toolbar);
         offlineDictionary = GEARGlobal.getOfflineDictionary(getApplicationContext());
@@ -247,6 +250,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         setProgressSaved(true);
         Log.d(TAG,"Progress saved on word index " + GEARGlobal.getLastWordClickedIndex().toString());
         final DataStorage dataStorage = new DataStorage(getApplicationContext());
+		final HashMap<String, Boolean> WordToColor = dataStorage.loadColorFile();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -269,8 +273,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 						if (count >= GEARGlobal.getLastWordClickedIndex()) {
 							break;
 						}
-						if (currentSessionWords.containsKey(possibleWord) ||
-								MainActivity.WordToColor.containsKey(possibleWord)) {
+						if (currentSessionWords.containsKey(possibleWord) || WordToColor.containsKey(possibleWord)) {
 							continue;
 						}
 						ArrayList<Object> wordArrayList = new ArrayList<>();
@@ -298,12 +301,26 @@ public class ReadArticleActivity extends AppCompatActivity {
 							if (Character.isUpperCase(possibleWord.charAt(0))){
 								if (wordsToSave.containsKey(possibleWord.toLowerCase())){
 									wordsToSave.put(possibleWord.toLowerCase(), wordArrayList);
+									try {
+										dataStorage.addToColorFile(WordToCheck,false);
+									} catch (JSONException e) {
+										e.printStackTrace();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
 								}else{
 									wordsToSave.put(possibleWord, wordArrayList);
 								}
 							}else if(Character.isLowerCase(possibleWord.charAt(0))){
 								if (wordsToSave.containsKey(WordToCheck)){
 									wordsToSave.remove(WordToCheck);
+									try {
+										dataStorage.addToColorFile(WordToCheck,false);
+									} catch (JSONException e) {
+										e.printStackTrace();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
 									wordsToSave.put(possibleWord, wordArrayList);
 								}else{
 									wordsToSave.put(possibleWord, wordArrayList);
@@ -352,6 +369,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     protected void onPause() {
 
         SaveOpenedArticles();
+		DefinitionBoxList.clear();
         Log.i("On pause", String.valueOf(fragmentIndex) + " / " + String.valueOf(numberOfPages));
         //fragment index starts from zero
         if (fragmentIndex == numberOfPages - 1) {
@@ -374,9 +392,17 @@ public class ReadArticleActivity extends AppCompatActivity {
         Long timeSpent = endTime - startTime;
         UserDataCollection.setTimeSpentOnArticle(currentArticle, timeSpent);
 		SendUserDictionary();
-        for (Map.Entry<String, Boolean> entry : MainActivity.WordToColor.entrySet()) {
-            MainActivity.WordToColor.put(entry.getKey(),false);
-        }
+		DataStorage dataStorage = new DataStorage(this);
+		HashMap<String, Boolean> WordToColor = dataStorage.loadColorFile();
+		for (Map.Entry<String, Boolean> entry : WordToColor.entrySet()) {
+			try {
+				dataStorage.addToColorFile(entry.getKey(),false);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
         super.onPause();
     }
 
@@ -425,122 +451,82 @@ public class ReadArticleActivity extends AppCompatActivity {
     public void Undo(View view) {
         load();
         DataStorage dataStorage = new DataStorage(this);
-		Integer numOfClicks = 0;
         //userDictionary = dataStorage.loadUserDictionary();
+		Log.d("DictionaryBeforeRemove", userDictionary.toString());
+		String def ="";
 		if(UndoView.getCurrentTextColor()==getResources().getColor(R.color.table_header_text)){
+			DefinitionBoxList.remove(DefinitionBoxList.size()-1);
+			for(ArrayList<String> list: DefinitionBoxList){
+				def = def +"\n"+list.get(0)+",\t"+list.get(1);
+			}
+			readingDictionary.setText(def);
 			try {
 				Log.d("UndoWord",ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
-				dataStorage.deleteFromWordFile(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0), "None", dataStorage.USERDICTIONARY, currentArticle, true);
+				String WordToUndo = ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0);
+				Log.d("UndoWord",WordToUndo);
+				dataStorage.deleteFromWordFile(WordToUndo, "None", dataStorage.USERDICTIONARY, currentArticle, true);
                 HashMap<String, Word> userDictionaryNEW = dataStorage.loadUserDictionary();
-
+				Log.d("New dictionary", userDictionaryNEW.toString());
                 //check if the undo word is still exist in the new dictionary
-                if(userDictionaryNEW.containsKey(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0))){
-                    if(!userDictionaryNEW.get(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0)).clicked){
-                        userDictionary.get(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0)).setClicked(false);
+                if(userDictionaryNEW.containsKey(WordToUndo)){
+					Log.d("UndoWord",WordToUndo + " exist in the new dictionary");
+                    if(!userDictionaryNEW.get(WordToUndo).clicked){
+                        userDictionary.get(WordToUndo).setClicked(false);
                     }
-                }else{ //if does not exist, delete it from the un updated dictionary
-                    userDictionary.remove(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
-					String WordToDelete = ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0);
-					if(Character.isUpperCase(WordToDelete.charAt(0))){
-						if(MainActivity.WordToColor.containsKey(WordToDelete.toLowerCase())){
-							MainActivity.WordToColor.remove(WordToDelete.toLowerCase());
-						}
-						if(currentSessionWords.containsKey(WordToDelete)){
-							numOfClicks = currentSessionWords.get(WordToDelete);
-							Log.d("numOfClicks1", String.valueOf(numOfClicks));
-						}else{
-							numOfClicks = currentSessionWords.get(WordToDelete.toLowerCase());
-							Log.d("numOfClicks2", String.valueOf(numOfClicks));
-						}
-					}else if(Character.isLowerCase(WordToDelete.charAt(0))) {
-						Character first = Character.toUpperCase(WordToDelete.charAt(0));
-						WordToDelete = first+WordToDelete.substring(1);
-						if (MainActivity.WordToColor.containsKey(WordToDelete)) {
-							MainActivity.WordToColor.remove(WordToDelete);
-						}
-						if(currentSessionWords.containsKey(WordToDelete)){
-							numOfClicks = currentSessionWords.get(WordToDelete);
-							Log.d("numOfClicks3", String.valueOf(numOfClicks));
-						}else{
-							numOfClicks = currentSessionWords.get(WordToDelete.toLowerCase());
-							Log.d("numOfClicks4", String.valueOf(numOfClicks));
-						}
+                }
+				//else check if the small version of undo word is still exist in the new dictionary
+				else if(userDictionaryNEW.containsKey(WordToUndo.toLowerCase())){
+					Log.d("UndoWord",WordToUndo+" small exist in the new dictionary "+WordToUndo.toLowerCase());
+					WordToUndo = WordToUndo.toLowerCase();
+					if(!userDictionaryNEW.get(WordToUndo).clicked){
+						userDictionary.get(WordToUndo).setClicked(false);
 					}
                 }
-                //check if the word clicked more than once and decrement one or remove it from current session
+				//else it does not exist, delete it from the un updated dictionary
+				else{
+					Log.d("UndoWord",WordToUndo+" not in new dictionary");
+					userDictionary.remove(WordToUndo);
+				}
+				Log.d("UndoWord1",WordToUndo);
+				Integer numOfClicks = currentSessionWords.get(WordToUndo);
+				if(numOfClicks == null){
+					if(Character.isUpperCase(WordToUndo.charAt(0))){
+					numOfClicks =currentSessionWords.get(WordToUndo.toLowerCase());
+					WordToUndo = WordToUndo.toLowerCase();
+					}else{
+						Character first = Character.toUpperCase(WordToUndo.charAt(0));
+						String WordToCheck = first+WordToUndo.substring(1);
+						numOfClicks = currentSessionWords.get(WordToCheck);
+						WordToUndo=WordToCheck;
+					}
+				}
                 if(numOfClicks==1)
-                    currentSessionWords.remove(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
+                    currentSessionWords.remove(WordToUndo);
                 else if (numOfClicks>1){
                     numOfClicks--;
-                    currentSessionWords.put(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0),numOfClicks);
+                    currentSessionWords.put(WordToUndo,numOfClicks);
                 }
-
+				Log.d("UndoWord2",WordToUndo);
+				Log.d("currentSessionNewLast", currentSessionWords.toString());
+				/*if(currentSessionWords.isEmpty()){
+					if(Character.isUpperCase(WordToUndo.charAt(0))){
+						MainActivity.WordToColor.remove(WordToUndo.toLowerCase());
+					}else{
+						Character first = Character.toUpperCase(WordToUndo.charAt(0));
+						String WordToCheck = first+WordToUndo.substring(1);
+						MainActivity.WordToColor.remove(WordToCheck);
+					}
+				}*/
 				ListLastClickedWords = GEARGlobal.ListLastClickedWords;
-				Character first = Character.toUpperCase(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).charAt(0));
-				String cWord = first+ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0).substring(1);
 				pagesView.getAdapter().notifyDataSetChanged();
-				//userDictionary = dataStorage.loadUserDictionary();
+				userDictionary = dataStorage.loadUserDictionary();
+				Log.d("DictionaryAfterRemove", userDictionary.toString());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
-			if (UndoClicks >= 3) {
-				if (MaximumUndoClicks > 0) {
-					MaximumUndoClicks--;
-					int l1size = Integer.valueOf(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(1));
-					int l2size = Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1));
-					if (l1size - l2size == 0) {
-						int listSize = ListLastClickedWords.size();
-						ListLastClickedWords.remove(listSize - 1);
-						load();
-						listSize = MaximumLastClickedWords.size();
-						MaximumLastClickedWords.remove(listSize - 1);
-						load();
-						listSize = MaximumLastClickedWords.size();
-						GEARGlobal.setLastWordClickedIndex(Integer.valueOf(MaximumLastClickedWords.get(listSize - 1).get(1)));
-						GEARGlobal.setLastWordClicked(MaximumLastClickedWords.get(listSize - 1).get(0));
-					} else {
-						ListLastClickedWords.remove(GEARGlobal.ListLastClickedWords.size() - 1);
-						load();
-					}
-
-					if (MaximumUndoClicks == 0) {
-						//menu.getItem(0).setEnabled(false);
-						UndoView.setTextColor(getResources().getColor(R.color.passed_word));
-						MaximumUndoClicks = 2;
-					}
-				}
-			}
-			//if clicked for the first one/two times
-			else {
-				if (ListLastClickedWords.size() == 1) {
-					UndoClicks = 0;
-					GEARGlobal.setLastWordClickedIndex(-1);
-					GEARGlobal.setLastWordClicked("None");
-					//menu.getItem(0).setEnabled(false);
-					UndoView.setTextColor(getResources().getColor(R.color.passed_word));
-					ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
-					MaximumLastClickedWords.remove(MaximumLastClickedWords.size() - 1);
-					load();
-					progressSaved=true;
-				} else {
-					int l1size = Integer.valueOf(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(1));
-					int l2size = Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1));
-					if (l1size - l2size == 0) {
-						ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
-						MaximumLastClickedWords.remove(MaximumLastClickedWords.size() - 1);
-						load();
-						GEARGlobal.setLastWordClickedIndex(Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1)));
-						GEARGlobal.setLastWordClicked(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(0));
-					} else {
-						ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
-						load();
-					}
-					UndoClicks = 1;
-				}
-			}
+			UpdateUndoList();
 		}else {
 			Toast.makeText(this, "Cannot undo, only two undoes allowed", Toast.LENGTH_LONG).show();
 		}
@@ -625,6 +611,64 @@ public class ReadArticleActivity extends AppCompatActivity {
 		//setting the progressDialog to the last clicked word index
 		progress.setMax(GEARGlobal.getLastWordClickedIndex());
 
+	}
+
+	private void UpdateUndoList(){
+		if (UndoClicks >= 3) {
+			if (MaximumUndoClicks > 0) {
+				MaximumUndoClicks--;
+				int l1size = Integer.valueOf(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(1));
+				int l2size = Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1));
+				if (l1size - l2size == 0) {
+					int listSize = ListLastClickedWords.size();
+					ListLastClickedWords.remove(listSize - 1);
+					load();
+					listSize = MaximumLastClickedWords.size();
+					MaximumLastClickedWords.remove(listSize - 1);
+					load();
+					listSize = MaximumLastClickedWords.size();
+					GEARGlobal.setLastWordClickedIndex(Integer.valueOf(MaximumLastClickedWords.get(listSize - 1).get(1)));
+					GEARGlobal.setLastWordClicked(MaximumLastClickedWords.get(listSize - 1).get(0));
+				} else {
+					ListLastClickedWords.remove(GEARGlobal.ListLastClickedWords.size() - 1);
+					load();
+				}
+
+				if (MaximumUndoClicks == 0) {
+					//menu.getItem(0).setEnabled(false);
+					UndoView.setTextColor(getResources().getColor(R.color.passed_word));
+					MaximumUndoClicks = 2;
+				}
+			}
+		}
+		//if clicked for the first one/two times
+		else {
+			if (ListLastClickedWords.size() == 1) {
+				UndoClicks = 0;
+				GEARGlobal.setLastWordClickedIndex(-1);
+				GEARGlobal.setLastWordClicked("None");
+				//menu.getItem(0).setEnabled(false);
+				UndoView.setTextColor(getResources().getColor(R.color.passed_word));
+				ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
+				MaximumLastClickedWords.remove(MaximumLastClickedWords.size() - 1);
+				load();
+				progressSaved=true;
+			} else {
+				int l1size = Integer.valueOf(ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(1));
+				int l2size = Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1));
+				if (l1size - l2size == 0) {
+					ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
+					MaximumLastClickedWords.remove(MaximumLastClickedWords.size() - 1);
+					load();
+					GEARGlobal.setLastWordClickedIndex(Integer.valueOf(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(1)));
+					GEARGlobal.setLastWordClicked(MaximumLastClickedWords.get(MaximumLastClickedWords.size() - 1).get(0));
+				} else {
+					ListLastClickedWords.remove(ListLastClickedWords.size() - 1);
+					load();
+				}
+				UndoClicks = 1;
+			}
+		}
 	}
 
 }
