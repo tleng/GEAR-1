@@ -16,4 +16,5 @@
     <color name="table_data_row_even">#F3F3F3</color>
     <color name="table_data_row_odd">#E6E6E6</color>
     <color name="table_header">#303030</color>
+    <color name="manualBackground">#F2000000</color>
 </resources>

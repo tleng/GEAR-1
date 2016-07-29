@@ -44,8 +44,11 @@ import java.util.Map;
 import java.util.Set;
 
 import android.os.Handler;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 /**
  * Activity where user reads article
@@ -86,6 +89,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     public static Set<String> articlesOpened;
 	public static ArrayList<ArrayList<String>> DefinitionBoxList = new ArrayList<>();
 	public static TextView readingDictionary;
+    private boolean needsUserManual;
     public ReadArticleActivity() {
         instance = this;
     }
@@ -130,6 +134,20 @@ public class ReadArticleActivity extends AppCompatActivity {
         setPagesView();
         initTextToSpeech();
         getUserSettings();
+
+        // if there are clicked/passed words, show user manual for different color meaning
+        if(!userDictionary.isEmpty()) {
+            new MaterialShowcaseView.Builder(this)
+                    .setTarget(pagesView)
+                    .setTitleText(getResources().getString(R.string.UserManualTitle))
+                    .setDismissText(getResources().getString(R.string.UserManualDismissText))
+                    .setContentText(getResources().getString(R.string.UserManualWordColoring))
+                    .setMaskColour(getResources().getColor(R.color.manualBackground))
+                    .setShapePadding(-150)
+                    .setFadeDuration(300)
+                    .singleUse("colorWords")
+                    .show();
+        }
 
     }
 
@@ -235,6 +253,26 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     public void saveProgress(View view) {
+
+        Button saveProgressButton = (Button)findViewById(R.id.button5);
+        if(needsUserManual) {   //this shows a user manual hint to the user for save progress button
+            new MaterialShowcaseView.Builder(this)
+                    .setTarget(saveProgressButton)
+                    .setShapePadding(96)
+                    .setTitleText(getResources().getString(R.string.UserManualTitle))
+                    .setDismissText(getResources().getString(R.string.UserManualDismissText))
+                    .setContentText(getResources().getString(R.string.UserManualSavePgContent))
+                    .singleUse("saveProgressButton")
+                    .setMaskColour(getResources().getColor(R.color.manualBackground))
+                    .setFadeDuration(300)
+                    .show();
+            needsUserManual = false;
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("manual", needsUserManual);
+
+            return;
+        }
+
 		Log.d(TAG,"Save progress clicked");
         StoriesSelectionActivity.needsToScore=true;
         LiteNewsFragment.needsToScore=true;
@@ -441,6 +479,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         sharedPreferences = this.getSharedPreferences("Settings", Context.MODE_PRIVATE);
         GEARClickableSpan.colorChoice = sharedPreferences.getBoolean("color", true);
         GEARClickableSpan.speakChoice = sharedPreferences.getBoolean("speak", true);
+        needsUserManual = sharedPreferences.getBoolean("manual", true);
     }
 
     /*

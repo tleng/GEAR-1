@@ -8,6 +8,7 @@ import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 /**
  * Created by Michael on 4/6/16.
@@ -61,7 +64,7 @@ public class GEARClickableSpan extends ClickableSpan {
             currentDefinitionRequest.cancel(true);
         }
         clearWidget = widget;
-        Log.d(TAG,"tapped on: "+ mWord);
+        Log.d(TAG, "tapped on: " + mWord);
         ArrayList<String> time_place_holder = new ArrayList<>();
         time_place_holder.add("0");
         translate();
@@ -70,6 +73,9 @@ public class GEARClickableSpan extends ClickableSpan {
             color(widget);
         }
         speakWord(); //speak the word when clicked
+
+		showUserManual();
+
     }
 
     @Override
@@ -131,8 +137,8 @@ public class GEARClickableSpan extends ClickableSpan {
             word.add(String.valueOf(index));
             GEARGlobal.ListLastClickedWords.add(word);
         }
-		Log.d("MaximumLastClicked",GEARGlobal.MaximumLastClickedWords.toString());
-		Log.d("ListLastClicked",GEARGlobal.ListLastClickedWords.toString());
+		Log.d("MaximumLastClicked", GEARGlobal.MaximumLastClickedWords.toString());
+		Log.d("ListLastClicked", GEARGlobal.ListLastClickedWords.toString());
     }
 
     /*
@@ -391,6 +397,26 @@ public class GEARClickableSpan extends ClickableSpan {
 			}
 		}
 
+	}
+
+
+	/*
+	 * This method shows for the user when clicking on a word for the first time.
+	 * it highlights the undo button with a proper guide message
+	 * This will show only once in the application.
+	 */
+
+	private void showUserManual(){
+		new MaterialShowcaseView.Builder(readArticleActivity)
+				.setTarget(ReadArticleActivity.UndoView)
+				.setShapePadding(96)
+                .setTitleText(readArticleActivity.getResources().getString(R.string.UserManualTitle))
+                .setDismissText(readArticleActivity.getResources().getString(R.string.UserManualDismissText))
+                .setContentText(readArticleActivity.getResources().getString(R.string.UserManualUndoContent))
+				.singleUse("undoButton")
+				.setMaskColour(readArticleActivity.getResources().getColor(R.color.manualBackground))
+				.setFadeDuration(300)
+				.show();
 	}
 
 }
