@@ -46,5 +46,5 @@ dependencies {
     compile 'de.codecrafters.tableview:tableview:2.1.0'
     compile files('libs/jsoup-1.9.2.jar')
     compile 'com.github.deano2390:MaterialShowcaseView:1.1.0'
-
+    compile files('libs/gesturetutorial.jar')
 }

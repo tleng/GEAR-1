@@ -16,8 +16,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewManager;
 import android.view.ViewTreeObserver;
 
+import com.gesturetutorial.awesomeness.TutorialView;
 import com.mattmellor.gear.R;
 import com.mit.gear.activities.LiteNewsFragment;
 import com.mit.gear.activities.MainActivity;
@@ -45,10 +47,12 @@ import java.util.Set;
 
 import android.os.Handler;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.PrefsManager;
 
 /**
  * Activity where user reads article
@@ -90,6 +94,10 @@ public class ReadArticleActivity extends AppCompatActivity {
 	public static ArrayList<ArrayList<String>> DefinitionBoxList = new ArrayList<>();
 	public static TextView readingDictionary;
     private boolean needsUserManual;
+	TextView pageIndicator;
+	private boolean mSingleUse = false; // should display only once
+	private PrefsManager mPrefsManager; // used to store state doe single use mode
+
     public ReadArticleActivity() {
         instance = this;
     }
@@ -123,6 +131,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 			UndoView = (TextView)findViewById(R.id.UndotextView);
         }
 		readingDictionary = (TextView)findViewById(R.id.definition_box);
+		pageIndicator = (TextView) getReadArticleActivityInstance().findViewById(R.id.pageIndicator);
    //     toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
      //   setSupportActionBar(toolbar);
         offlineDictionary = GEARGlobal.getOfflineDictionary(getApplicationContext());
@@ -148,7 +157,10 @@ public class ReadArticleActivity extends AppCompatActivity {
                     .singleUse("colorWords")
                     .show();
         }
-
+		boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE).getBoolean("isFirstRun", true);
+		if (isFirstRun){
+			ShowSwipeTutorial();
+		}
     }
 
     public void setPagesView() {
@@ -194,7 +206,6 @@ public class ReadArticleActivity extends AppCompatActivity {
                 pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages()));
                 pagesView.getAdapter().notifyDataSetChanged();
                 pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                TextView pageIndicator = (TextView) getReadArticleActivityInstance().findViewById(R.id.pageIndicator);
                 pageIndicator.setText("Page " + String.valueOf(1) + " of " + numberOfPages);
             }
         });
@@ -708,6 +719,26 @@ public class ReadArticleActivity extends AppCompatActivity {
 				UndoClicks = 1;
 			}
 		}
+	}
+
+	private void ShowSwipeTutorial(){
+		TextView GotIt = (TextView)findViewById(R.id.textViewSwipe);
+		final View root = findViewById(R.id.RelativeLayout);
+		root.setVisibility(View.VISIBLE);
+		TutorialView tutorialView = TutorialView.create
+				(this,TutorialView.RightToLeft,TutorialView.LowerCenter,findViewById(R.id.frameLayout));
+		tutorialView.show();
+		GotIt.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((ViewManager)root.getParent()).removeView(root);
+			}
+		});
+		getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+				.edit()
+				.putBoolean("isFirstRun", false)
+				.apply();
+
 	}
 
 }
