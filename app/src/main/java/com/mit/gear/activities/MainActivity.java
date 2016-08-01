@@ -172,7 +172,7 @@ public class MainActivity extends Activity {
 					DataStorage dataStorage = new DataStorage(context);
 					dataStorage.clearUserDictionary();
 					dataStorage.clearColorFile();
-					displayView(2);
+					displayView(3);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

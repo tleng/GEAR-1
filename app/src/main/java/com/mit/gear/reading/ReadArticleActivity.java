@@ -60,13 +60,10 @@ import uk.co.deanwild.materialshowcaseview.PrefsManager;
 public class ReadArticleActivity extends AppCompatActivity {
     private String TAG = "ReadArticleActivity";
     private static ReadArticleActivity instance;
-    //private android.support.v7.widget.Toolbar toolbar;
     public static HashMap<String, ArrayList<String>> offlineDictionary;
     public HashMap<String, Word> userDictionary;
-    private DefinitionRequest currentDefinitionRequest;
     public static String currentDefinition = "No definition";
     public static String currentLemma = "None";
-    private Integer currentPosition = 0;
     private Long startTime;
     public String currentArticle;
     public static ViewPager pagesView;
@@ -95,8 +92,9 @@ public class ReadArticleActivity extends AppCompatActivity {
 	public static TextView readingDictionary;
     private boolean needsUserManual;
 	TextView pageIndicator;
-	private boolean mSingleUse = false; // should display only once
-	private PrefsManager mPrefsManager; // used to store state doe single use mode
+	View SwipeTutorial = null; 						//View to show and hide page swipe tutorial
+	Button Savebtn;									//Save progress button
+
 
     public ReadArticleActivity() {
         instance = this;
@@ -132,15 +130,17 @@ public class ReadArticleActivity extends AppCompatActivity {
         }
 		readingDictionary = (TextView)findViewById(R.id.definition_box);
 		pageIndicator = (TextView) getReadArticleActivityInstance().findViewById(R.id.pageIndicator);
-   //     toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.app_article_bar);
-     //   setSupportActionBar(toolbar);
         offlineDictionary = GEARGlobal.getOfflineDictionary(getApplicationContext());
         userDictionary = new DataStorage(getApplicationContext()).loadUserDictionary();
-        currentDefinitionRequest = null;
-
-//        getSupportActionBar().setDisplayShowTitleEnabled(false);    // Getting rid of title for the action bar
         startTime = System.currentTimeMillis();                     // Log start time for when user opened article
-        setPagesView();
+		SwipeTutorial = findViewById(R.id.RelativeLayout);
+		Savebtn = (Button)findViewById(R.id.buttonSave);
+		boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE).getBoolean("isFirstRun", true); //Check if the activity is opened for the first time
+		if (isFirstRun){    //If activity opened for first time show page swipe tutorial
+			ShowSwipeTutorial();
+		}else{				//Else set page view
+			setPagesView();
+		}
         initTextToSpeech();
         getUserSettings();
 
@@ -157,10 +157,6 @@ public class ReadArticleActivity extends AppCompatActivity {
                     .singleUse("colorWords")
                     .show();
         }
-		boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE).getBoolean("isFirstRun", true);
-		if (isFirstRun){
-			ShowSwipeTutorial();
-		}
     }
 
     public void setPagesView() {
@@ -265,7 +261,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 
     public void saveProgress(View view) {
 
-        Button saveProgressButton = (Button)findViewById(R.id.button5);
+        Button saveProgressButton = (Button)findViewById(R.id.buttonSave);
         if(needsUserManual) {   //this shows a user manual hint to the user for save progress button
             new MaterialShowcaseView.Builder(this)
                     .setTarget(saveProgressButton)
@@ -505,59 +501,62 @@ public class ReadArticleActivity extends AppCompatActivity {
 		Log.d("DictionaryBeforeRemove", userDictionary.toString());
 		String def ="";
 		if(UndoView.getCurrentTextColor()==getResources().getColor(R.color.table_header_text)){
-			DefinitionBoxList.remove(DefinitionBoxList.size()-1);
-			for(ArrayList<String> list: DefinitionBoxList){
-				def = def +"\n"+list.get(0)+",\t"+list.get(1);
-			}
-			readingDictionary.setText(def);
-			try {
-				Log.d("UndoWord",ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
-				String WordToUndo = ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0);
-				Log.d("UndoWord",WordToUndo);
-				dataStorage.deleteFromWordFile(WordToUndo, "None", dataStorage.USERDICTIONARY, currentArticle, true);
-                HashMap<String, Word> userDictionaryNEW = dataStorage.loadUserDictionary();
-				Log.d("New dictionary", userDictionaryNEW.toString());
-                //check if the undo word is still exist in the new dictionary
-                if(userDictionaryNEW.containsKey(WordToUndo)){
-					Log.d("UndoWord",WordToUndo + " exist in the new dictionary");
-                    if(!userDictionaryNEW.get(WordToUndo).clicked){
-                        userDictionary.get(WordToUndo).setClicked(false);
-                    }
-                }
-				//else check if the small version of undo word is still exist in the new dictionary
-				else if(userDictionaryNEW.containsKey(WordToUndo.toLowerCase())){
-					Log.d("UndoWord",WordToUndo+" small exist in the new dictionary "+WordToUndo.toLowerCase());
-					WordToUndo = WordToUndo.toLowerCase();
-					if(!userDictionaryNEW.get(WordToUndo).clicked){
-						userDictionary.get(WordToUndo).setClicked(false);
-					}
-                }
-				//else it does not exist, delete it from the un updated dictionary
-				else{
-					Log.d("UndoWord",WordToUndo+" not in new dictionary");
-					userDictionary.remove(WordToUndo);
+			if(SwipeTutorial.isShown()){ //Do nothing if undo is clicked while tutorial is shown
+
+			}else{
+				DefinitionBoxList.remove(DefinitionBoxList.size()-1);
+				for(ArrayList<String> list: DefinitionBoxList){
+					def = def +"\n"+list.get(0)+",\t"+list.get(1);
 				}
-				Log.d("UndoWord1",WordToUndo);
-				Integer numOfClicks = currentSessionWords.get(WordToUndo);
-				if(numOfClicks == null){
-					if(Character.isUpperCase(WordToUndo.charAt(0))){
-					numOfClicks =currentSessionWords.get(WordToUndo.toLowerCase());
-					WordToUndo = WordToUndo.toLowerCase();
-					}else{
-						Character first = Character.toUpperCase(WordToUndo.charAt(0));
-						String WordToCheck = first+WordToUndo.substring(1);
-						numOfClicks = currentSessionWords.get(WordToCheck);
-						WordToUndo=WordToCheck;
+				readingDictionary.setText(def);
+				try {
+					Log.d("UndoWord",ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
+					String WordToUndo = ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0);
+					Log.d("UndoWord",WordToUndo);
+					dataStorage.deleteFromWordFile(WordToUndo, "None", dataStorage.USERDICTIONARY, currentArticle, true);
+					HashMap<String, Word> userDictionaryNEW = dataStorage.loadUserDictionary();
+					Log.d("New dictionary", userDictionaryNEW.toString());
+					//check if the undo word is still exist in the new dictionary
+					if(userDictionaryNEW.containsKey(WordToUndo)){
+						Log.d("UndoWord",WordToUndo + " exist in the new dictionary");
+						if(!userDictionaryNEW.get(WordToUndo).clicked){
+							userDictionary.get(WordToUndo).setClicked(false);
+						}
 					}
-				}
-                if(numOfClicks==1)
-                    currentSessionWords.remove(WordToUndo);
-                else if (numOfClicks>1){
-                    numOfClicks--;
-                    currentSessionWords.put(WordToUndo,numOfClicks);
-                }
-				Log.d("UndoWord2",WordToUndo);
-				Log.d("currentSessionNewLast", currentSessionWords.toString());
+					//else check if the small version of undo word is still exist in the new dictionary
+					else if(userDictionaryNEW.containsKey(WordToUndo.toLowerCase())){
+						Log.d("UndoWord",WordToUndo+" small exist in the new dictionary "+WordToUndo.toLowerCase());
+						WordToUndo = WordToUndo.toLowerCase();
+						if(!userDictionaryNEW.get(WordToUndo).clicked){
+							userDictionary.get(WordToUndo).setClicked(false);
+						}
+					}
+					//else it does not exist, delete it from the un updated dictionary
+					else{
+						Log.d("UndoWord",WordToUndo+" not in new dictionary");
+						userDictionary.remove(WordToUndo);
+					}
+					Log.d("UndoWord1",WordToUndo);
+					Integer numOfClicks = currentSessionWords.get(WordToUndo);
+					if(numOfClicks == null){
+						if(Character.isUpperCase(WordToUndo.charAt(0))){
+							numOfClicks =currentSessionWords.get(WordToUndo.toLowerCase());
+							WordToUndo = WordToUndo.toLowerCase();
+						}else{
+							Character first = Character.toUpperCase(WordToUndo.charAt(0));
+							String WordToCheck = first+WordToUndo.substring(1);
+							numOfClicks = currentSessionWords.get(WordToCheck);
+							WordToUndo=WordToCheck;
+						}
+					}
+					if(numOfClicks==1)
+						currentSessionWords.remove(WordToUndo);
+					else if (numOfClicks>1){
+						numOfClicks--;
+						currentSessionWords.put(WordToUndo,numOfClicks);
+					}
+					Log.d("UndoWord2",WordToUndo);
+					Log.d("currentSessionNewLast", currentSessionWords.toString());
 				/*if(currentSessionWords.isEmpty()){
 					if(Character.isUpperCase(WordToUndo.charAt(0))){
 						MainActivity.WordToColor.remove(WordToUndo.toLowerCase());
@@ -567,16 +566,17 @@ public class ReadArticleActivity extends AppCompatActivity {
 						MainActivity.WordToColor.remove(WordToCheck);
 					}
 				}*/
-				ListLastClickedWords = GEARGlobal.ListLastClickedWords;
-				pagesView.getAdapter().notifyDataSetChanged();
-				userDictionary = dataStorage.loadUserDictionary();
-				Log.d("DictionaryAfterRemove", userDictionary.toString());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
+					ListLastClickedWords = GEARGlobal.ListLastClickedWords;
+					pagesView.getAdapter().notifyDataSetChanged();
+					userDictionary = dataStorage.loadUserDictionary();
+					Log.d("DictionaryAfterRemove", userDictionary.toString());
+				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				UpdateUndoList();
 			}
-			UpdateUndoList();
 		}else {
 			Toast.makeText(this, "Cannot undo, only two undoes allowed", Toast.LENGTH_LONG).show();
 		}
@@ -721,24 +721,30 @@ public class ReadArticleActivity extends AppCompatActivity {
 		}
 	}
 
+	/*
+	 * Method to show the page swiping tutorial
+	 * Set the first run preference to false so when article opened again method will not run
+	 */
 	private void ShowSwipeTutorial(){
-		TextView GotIt = (TextView)findViewById(R.id.textViewSwipe);
-		final View root = findViewById(R.id.RelativeLayout);
-		root.setVisibility(View.VISIBLE);
-		TutorialView tutorialView = TutorialView.create
+		TextView Dissmis = (TextView)findViewById(R.id.textViewSwipe);
+		SwipeTutorial.setVisibility(View.VISIBLE);										//Show tutorial layout and text
+		final TutorialView tutorialView = TutorialView.create
 				(this,TutorialView.RightToLeft,TutorialView.LowerCenter,findViewById(R.id.frameLayout));
-		tutorialView.show();
-		GotIt.setOnClickListener(new View.OnClickListener() {
+		tutorialView.show(); 															//Show the hand tutorial view
+		Savebtn.setEnabled(false);														//Disable save progress button while tutorial is shown
+		Dissmis.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				((ViewManager)root.getParent()).removeView(root);
+				((ViewManager)SwipeTutorial.getParent()).removeView(SwipeTutorial);
+				tutorialView.hide();
+				Savebtn.setEnabled(true);
+				setPagesView();
 			}
 		});
-		getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+		getSharedPreferences("PREFERENCE", MODE_PRIVATE) 								//Set first run preferences to false
 				.edit()
 				.putBoolean("isFirstRun", false)
 				.apply();
-
 	}
 
 }
