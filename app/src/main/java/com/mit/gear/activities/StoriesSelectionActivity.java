@@ -83,7 +83,7 @@ public class StoriesSelectionActivity extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(needsToScore){  //check if we need to score again (if new words are clicked/saves)
+        if(needsToScore && ListRssArticle!= null){  //check if we need to score again (if new words are clicked/saves)
             scoreArticles(getNewsFromStorage());
         }else if(ListRssArticle!= null){
             prepareTheList(mappingCategory);

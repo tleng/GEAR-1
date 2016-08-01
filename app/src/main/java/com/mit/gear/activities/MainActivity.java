@@ -211,17 +211,17 @@ public class MainActivity extends Activity {
 			fragment = new StoriesSelectionActivity();
 			break;
 		case 1:
+			Log.d(TAG,"Lite News Tab Opened");
+			fragment = new LiteNewsFragment();
+				break;
+		case 2:
 			Log.d(TAG,"Stories Tab Opened");
 			fragment = new SuggestedStoriesActivity();
 			break;
-		case 2:
+		case 3:
 			Log.d(TAG,"Vocabulary Tab Opened");
 			fragment = new DisplayVocabularyActivity();
 			break;
-        case 3:
-            Log.d(TAG,"Lite News Tab Opened");
-            fragment = new LiteNewsFragment();
-            break;
 
 
 

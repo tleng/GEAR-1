@@ -110,13 +110,13 @@ public class SuggestedStoriesActivity extends Fragment {
                     @Override
                     public void run() {
                         // update the nav drawer to indicate the number of suggested stories are there
-                        MainActivity.navDrawerItems.get(1).setCounterVisibility(true);
-                        MainActivity.navDrawerItems.get(1).setCount(String.valueOf(num_recommended_articles));
+                        MainActivity.navDrawerItems.get(2).setCounterVisibility(true);
+                        MainActivity.navDrawerItems.get(2).setCount(String.valueOf(num_recommended_articles));
                         MainActivity.adapter = new NavDrawerListAdapter(MainActivity.context,
                                 MainActivity.navDrawerItems);
                         MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
-                        MainActivity.mDrawerList.setItemChecked(1, true);
-                        MainActivity.mDrawerList.setSelection(1);
+                        MainActivity.mDrawerList.setItemChecked(2, true);
+                        MainActivity.mDrawerList.setSelection(2);
                     }
                 });
 

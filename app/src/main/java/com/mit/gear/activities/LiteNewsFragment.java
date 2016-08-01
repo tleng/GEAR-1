@@ -84,7 +84,7 @@ public class LiteNewsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(needsToScore){  //check if we need to score again (if new words are clicked/saves)
+        if(needsToScore && ListRssArticle!= null){  //check if we need to score again (if new words are clicked/saves)
             scoreArticles(getNewsFromStorage());
         }else if(ListRssArticle!= null){
             prepareTheList(mappingCategory);
@@ -125,14 +125,12 @@ public class LiteNewsFragment extends Fragment {
             else{    //if today date is not after the last update date
                 if(ListRssArticle==null){ //open app for first time
                     scoreArticles(getNewsFromStorage());
-                    Log.i("stories", "if no update / list is null");
 
                 }
 
                 else {   //the news list are already loaded
                     if(mappingCategory!=null)
                         prepareTheList(mappingCategory);
-                    Log.i("stories", "if no update / mapping is not null");
 
                 }
             }
@@ -141,7 +139,6 @@ public class LiteNewsFragment extends Fragment {
 
             ListRssArticle= (List<RssArticle>) savedInstanceState.getSerializable("RssArticleLite");
             mappingCategory = (Map<String, List<RssArticle>>) savedInstanceState.getSerializable("mappingCategoryLite");
-            Log.i("stories","if saved instanse not null");
             prepareTheList(mappingCategory);
 
         }
@@ -423,13 +420,13 @@ public class LiteNewsFragment extends Fragment {
         if (firstVisibleItem != 0)
             expListView.setSelection(firstVisibleItem);
 
-        MainActivity.navDrawerItems.get(3).setCounterVisibility(true);
-        MainActivity.navDrawerItems.get(3).setCount(String.valueOf(ListRssArticle.size()));
+        MainActivity.navDrawerItems.get(1).setCounterVisibility(true);
+        MainActivity.navDrawerItems.get(1).setCount(String.valueOf(ListRssArticle.size()));
         MainActivity.adapter = new NavDrawerListAdapter(MainActivity.context,
                 MainActivity.navDrawerItems);
         MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
-        MainActivity.mDrawerList.setItemChecked(3, true);
-        MainActivity.mDrawerList.setSelection(3);
+        MainActivity.mDrawerList.setItemChecked(1, true);
+        MainActivity.mDrawerList.setSelection(1);
 
 
 
