@@ -499,7 +499,6 @@ public class ReadArticleActivity extends AppCompatActivity {
     public void Undo(View view) {
         load();
         DataStorage dataStorage = new DataStorage(this);
-        //userDictionary = dataStorage.loadUserDictionary();
 		Log.d("DictionaryBeforeRemove", userDictionary.toString());
 		String def ="";
 		if(UndoView.getCurrentTextColor()==getResources().getColor(R.color.table_header_text)){
@@ -522,7 +521,9 @@ public class ReadArticleActivity extends AppCompatActivity {
 					if(userDictionaryNEW.containsKey(WordToUndo)){
 						Log.d("UndoWord",WordToUndo + " exist in the new dictionary");
 						if(!userDictionaryNEW.get(WordToUndo).clicked){
-							userDictionary.get(WordToUndo).setClicked(false);
+							if(userDictionary.containsKey(WordToUndo)){
+								userDictionary.get(WordToUndo).setClicked(false);
+							}
 						}
 					}
 					//else check if the small version of undo word is still exist in the new dictionary
@@ -559,18 +560,9 @@ public class ReadArticleActivity extends AppCompatActivity {
 					}
 					Log.d("UndoWord2",WordToUndo);
 					Log.d("currentSessionNewLast", currentSessionWords.toString());
-				/*if(currentSessionWords.isEmpty()){
-					if(Character.isUpperCase(WordToUndo.charAt(0))){
-						MainActivity.WordToColor.remove(WordToUndo.toLowerCase());
-					}else{
-						Character first = Character.toUpperCase(WordToUndo.charAt(0));
-						String WordToCheck = first+WordToUndo.substring(1);
-						MainActivity.WordToColor.remove(WordToCheck);
-					}
-				}*/
 					ListLastClickedWords = GEARGlobal.ListLastClickedWords;
 					pagesView.getAdapter().notifyDataSetChanged();
-					userDictionary = dataStorage.loadUserDictionary();
+					//userDictionary = dataStorage.loadUserDictionary();
 					Log.d("DictionaryAfterRemove", userDictionary.toString());
 				} catch (JSONException e) {
 					e.printStackTrace();
