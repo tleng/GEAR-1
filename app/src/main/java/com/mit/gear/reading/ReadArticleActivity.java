@@ -90,7 +90,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     public static Set<String> articlesOpened;
 	public static ArrayList<ArrayList<String>> DefinitionBoxList = new ArrayList<>();
 	public static TextView readingDictionary;
-    private boolean needsUserManual;
+    public static boolean needsUserManual;
 	TextView pageIndicator;
 	View SwipeTutorial = null; 						//View to show and hide page swipe tutorial
 	Button Savebtn;									//Save progress button
@@ -274,8 +274,11 @@ public class ReadArticleActivity extends AppCompatActivity {
                     .setFadeDuration(300)
                     .show();
             needsUserManual = false;
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("manual", needsUserManual);
+            getSharedPreferences("Settings", MODE_PRIVATE) 								//Set first run preferences to false
+                    .edit()
+                    .putBoolean("manual", needsUserManual)
+                    .apply();
+
 
             return;
         }
@@ -432,7 +435,6 @@ public class ReadArticleActivity extends AppCompatActivity {
             intent.putExtra("isLastPage", false);
             startActivity(intent);
         }
-
         Long endTime = System.currentTimeMillis();         // updates user data with time spent
         Long timeSpent = endTime - startTime;
         UserDataCollection.setTimeSpentOnArticle(currentArticle, timeSpent);

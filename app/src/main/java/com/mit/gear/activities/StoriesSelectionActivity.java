@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.RSS.ExpandableListAdapter;
@@ -43,6 +44,7 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.text.BreakIterator;
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,6 +76,7 @@ public class StoriesSelectionActivity extends Fragment {
     ExpandableListView expListView;
     List<String> listDataHeader = new ArrayList<String>();
     Map<String, List<RssArticle>> listDataChild;
+    static Long  lastUpdateDate;
     public static Map<String,List<RssArticle>> mappingCategory= new HashMap<>();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -119,7 +122,7 @@ public class StoriesSelectionActivity extends Fragment {
 
                 //get rss items
                 GetRSSDataTask task = new GetRSSDataTask();
-                task.execute(getResources().getString(R.string.rssLink));
+                task.execute(getResources().getString(R.string.regular_rss_news_link));
 
                 //save today date as the last update date
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -139,9 +142,6 @@ public class StoriesSelectionActivity extends Fragment {
                     prepareTheList(mappingCategory);
                 }
 
-//                if(needsToScore){
-//                    ;
-//                }
             }
        }
         else{                                   //if news were previously generated, get them from the bundle
@@ -446,6 +446,10 @@ public class StoriesSelectionActivity extends Fragment {
         if( expListView!=null)
             firstVisibleItem =expListView.getFirstVisiblePosition();
 
+        TextView lastUpdateDateTxt = (TextView) getActivity().findViewById(R.id.lastUpdateDate);
+        Format format = new SimpleDateFormat("dd/MM/yyyy");
+        lastUpdateDateTxt.setText("Last update: "+format.format(new Date(lastUpdateDate))+"\t\tSource: "+getResources().getString(R.string.regular_rss_news_sourceName));
+
         // get the listview
         expListView = (ExpandableListView) getActivity().findViewById(R.id.lvExp);
 
@@ -518,16 +522,6 @@ public class StoriesSelectionActivity extends Fragment {
         MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
         MainActivity.mDrawerList.setItemChecked(0, true);
         MainActivity.mDrawerList.setSelection(0);
-
-//        if(debugChoice){           //show the article score (debug mode is on)
-//            ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item_debug_mode, ListRssArticle, articleAndScoreMap);
-//            rssItems.setAdapter(adapter);
-//        }
-//        else{                     //do not show the article score (debug mode is off)
-//            ArrayAdapter<RssArticle> adapter = new RssListAdapter(getActivity(), R.layout.rss_list_item, ListRssArticle);
-//            rssItems.setAdapter(adapter);
-//        }
-//        rssItems.setOnItemClickListener(new RssListListener(result, getActivity()));
 
     }
 
@@ -623,10 +617,11 @@ public class StoriesSelectionActivity extends Fragment {
 
     private boolean needsUpdate(){
         sharedPreferences = context.getSharedPreferences("LastUpdateDate", Context.MODE_PRIVATE);
-        Long lastUpdateDate = sharedPreferences.getLong("date", 0);
+        lastUpdateDate = sharedPreferences.getLong("date", 0);
         Long todayDate = getTodayDate();
         if(lastUpdateDate <todayDate)
         {
+            lastUpdateDate=todayDate;
             return true;
         }
         return false;

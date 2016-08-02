@@ -45,7 +45,27 @@
     <string name="desc_list_item_icon">Item Icon</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="rssLink">http://www.spiegel.de/schlagzeilen/index.rss</string>
+
+    <!-- Rss news link and source name-->
+    <string name="regular_rss_news_link">http://www.spiegel.de/schlagzeilen/index.rss</string>
+    <string name="regular_rss_news_sourceName">spiegel </string>
+
+    <!-- Rss Simple news link, category and source name-->
+    <string name="simple_rss_news_sourceName">nachrichtenleicht </string>
+    <array name="simple_rss_news_link"> 
+        <item>http://www.nachrichtenleicht.de/sport.2004.de.rss</item> 
+        <item>http://www.nachrichtenleicht.de/nachrichten.2005.de.rss</item> 
+        <item>http://www.nachrichtenleicht.de/kultur.2006.de.rss</item> 
+        <item>http://www.nachrichtenleicht.de/vermischtes.2007.de.rss</item> 
+    </array>
+
+    <array name="simple_rss_news_category"> 
+        <item>sport</item> 
+        <item>nachrichten</item> 
+        <item>kultur</item> 
+        <item>vermischtes</item>
+    </array>
+
     <!-- indicator if copyRight text is reached in rss content -->
     <string name="endOfArticleIndicator">GearAppEndOfArticleIndicator</string>
     <string name="UserManualTitle">Hint</string>

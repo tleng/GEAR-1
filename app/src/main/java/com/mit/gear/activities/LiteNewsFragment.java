@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.NavDrawer.NavDrawerListAdapter;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,6 +77,7 @@ public class LiteNewsFragment extends Fragment {
     List<String> listDataHeader = new ArrayList<String>();
     Map<String, List<RssArticle>> listDataChild;
     public static Map<String,List<RssArticle>> mappingCategory= new HashMap<>();
+    static Long  lastUpdateDate;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -114,7 +117,7 @@ public class LiteNewsFragment extends Fragment {
 
                 //get rss items
                 GetRSSDataTask task = new GetRSSDataTask();
-                task.execute("http://www.nachrichtenleicht.de/sport.2004.de.rss");
+                task.execute(getResources().getStringArray(R.array.simple_rss_news_link)[0]);
 
                 //save today date as the last update date
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -196,10 +199,10 @@ public class LiteNewsFragment extends Fragment {
             else{
                 ListRssArticle = new ArrayList<RssArticle>();
             }
-            ListRssArticle.addAll(getRssArticles(urls[0],"sport"));
-            ListRssArticle.addAll(getRssArticles("http://www.nachrichtenleicht.de/nachrichten.2005.de.rss","nachrichten"));
-            ListRssArticle.addAll(getRssArticles("http://www.nachrichtenleicht.de/kultur.2006.de.rss","kultur"));
-            ListRssArticle.addAll(getRssArticles("http://www.nachrichtenleicht.de/vermischtes.2007.de.rss","vermischtes"));
+            ListRssArticle.addAll(getRssArticles(urls[0],getResources().getStringArray(R.array.simple_rss_news_category)[0]));
+            ListRssArticle.addAll(getRssArticles(getResources().getStringArray(R.array.simple_rss_news_link)[1],getResources().getStringArray(R.array.simple_rss_news_category)[1]));
+            ListRssArticle.addAll(getRssArticles(getResources().getStringArray(R.array.simple_rss_news_link)[2],getResources().getStringArray(R.array.simple_rss_news_category)[2]));
+            ListRssArticle.addAll(getRssArticles(getResources().getStringArray(R.array.simple_rss_news_link)[3],getResources().getStringArray(R.array.simple_rss_news_category)[3]));
 
             if(ListRssArticle==null)
                 return null;
@@ -362,6 +365,11 @@ public class LiteNewsFragment extends Fragment {
         int firstVisibleItem = 0;
         if( expListView!=null)
             firstVisibleItem =expListView.getFirstVisiblePosition();
+
+        TextView lastUpdateDateTxt = (TextView) getActivity().findViewById(R.id.lastUpdateDate);
+        Format format = new SimpleDateFormat("dd/MM/yyyy");
+        lastUpdateDateTxt.setText("Last update: "+format.format(new Date(lastUpdateDate))+"\t\tSource: "+getResources().getString(R.string.simple_rss_news_sourceName));
+
         expListView = (ExpandableListView) getActivity().findViewById(R.id.lvExp);        // get the listview
         listDataHeader.clear();
 
@@ -464,10 +472,11 @@ public class LiteNewsFragment extends Fragment {
 
     private boolean needsUpdate(){
         sharedPreferences = context.getSharedPreferences("LastUpdateDate", Context.MODE_PRIVATE);
-        Long lastUpdateDate = sharedPreferences.getLong("dateLite", 0);
+        lastUpdateDate = sharedPreferences.getLong("dateLite", 0);
         Long todayDate = getTodayDate();
         if(lastUpdateDate <todayDate)
         {
+            lastUpdateDate=todayDate;
             return true;
         }
         return false;
