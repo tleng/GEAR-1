@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="com.mit.gear.activities.MainActivity"
-            android:theme="@style/android:Theme.Holo.Light.DarkActionBar">
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +24,7 @@
             android:name="com.mit.gear.reading.ReadArticleActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.AppBarOverlay" />
         <activity
             android:name="com.mit.gear.activities.StartActivity"
             android:label="@string/app_name" />

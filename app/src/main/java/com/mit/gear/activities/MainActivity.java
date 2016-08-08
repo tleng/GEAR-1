@@ -9,8 +9,10 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,32 +22,37 @@ import android.widget.ListView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.NavDrawer.NavDrawerItem;
 import com.mit.gear.NavDrawer.NavDrawerListAdapter;
+import com.mit.gear.ShareActionProvider.SmartShareActionProvider;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
+import com.mit.gear.words.Word;
 
 /**
  * Activity that represents the starting screen of the app
  */
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 	private String TAG = "MainActivity";
 	private DrawerLayout mDrawerLayout;
 	public static ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
     public static Context context;
 	private MenuItem clearItem;
+	private MenuItem shareItem;
 
 
 	// nav drawer title
 	private CharSequence mDrawerTitle;
 
 	// used to store app title
-	private CharSequence mTitle;
+	public static CharSequence mTitle;
 
 	// slide menu items
 	private String[] navMenuTitles;
@@ -100,8 +107,8 @@ public class MainActivity extends Activity {
 		mDrawerList.setAdapter(adapter);
 
 		// enabling action bar app icon and behaving it as toggle button
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.mipmap.ic_drawer, //nav menu toggle icon
@@ -109,13 +116,13 @@ public class MainActivity extends Activity {
 				R.string.app_name // nav drawer close - description for accessibility
 		) {
 			public void onDrawerClosed(View view) {
-				getActionBar().setTitle(mTitle);
+				getSupportActionBar().setTitle(mTitle);
 				// calling onPrepareOptionsMenu() to show action bar icons
 				invalidateOptionsMenu();
 			}
 
 			public void onDrawerOpened(View drawerView) {
-				getActionBar().setTitle(mDrawerTitle);
+				getSupportActionBar().setTitle(mDrawerTitle);
 				// calling onPrepareOptionsMenu() to hide action bar icons
 				invalidateOptionsMenu();
 			}
@@ -143,6 +150,21 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu_start, menu);
+		final SmartShareActionProvider provider =
+				new SmartShareActionProvider(this, SmartShareActionProvider.ShareIcon.White);		//Create new share action object and set the icon
+		provider.setShareIntent(createShareIntent());
+		final MenuItem item = menu.findItem(R.id.action_share);
+		MenuItemCompat.setActionProvider(item, provider);
+		provider.setOnShareTargetSelectedListener
+				(new SmartShareActionProvider.OnShareTargetSelectedListener() {
+					@Override
+					public boolean onShareTargetSelected(SmartShareActionProvider source, Intent intent){
+						final String app = intent.getComponent().getPackageName();
+						Log.d("Chosen app",app);
+						customizeIntent(app,intent);
+						return false;
+					}
+				});
 		return true;
 	}
 
@@ -189,8 +211,10 @@ public class MainActivity extends Activity {
 		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
 		menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
 		clearItem = menu.findItem(R.id.action_clear);
+		shareItem = menu.findItem(R.id.action_share);
 		if (mTitle.equals("Vocabulary")){
 			clearItem.setVisible(true);
+			shareItem.setVisible(true);
 		}else{
 			clearItem.setVisible(false);
 		}
@@ -250,7 +274,7 @@ public class MainActivity extends Activity {
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
-		getActionBar().setTitle(mTitle);
+		getSupportActionBar().setTitle(mTitle);
 	}
 
 	/**
@@ -270,6 +294,68 @@ public class MainActivity extends Activity {
 		super.onConfigurationChanged(newConfig);
 		// Pass any configuration change to the drawer toggls
 		mDrawerToggle.onConfigurationChanged(newConfig);
+	}
+
+	/*
+	 * Method to create intent to share with other app
+	 * by setting the intent action to send
+	 */
+	private Intent createShareIntent(){
+		Intent shareIntent = new Intent();
+		shareIntent.setAction(Intent.ACTION_SEND);
+		shareIntent.putExtra(Intent.EXTRA_TITLE,"Vocabulary List");
+		shareIntent.setType("text/plain");
+		return shareIntent;
+	}
+
+	/*
+	 * Method to customize intent text depending on the selected app
+	 */
+	private void customizeIntent(String app, Intent intent){
+		switch (app){
+			case"com.google.android.gm":
+				intent.setType("message/rfc822");
+				intent.putExtra(Intent.EXTRA_SUBJECT, "GEAR vocabulary list");
+				intent.putExtra(Intent.EXTRA_TEXT,
+						"Check out my vocabulary list from the GEAR app\n"+getVocabularyString());
+				break;
+			case "com.google.android.keep":
+				intent.putExtra(Intent.EXTRA_SUBJECT, "GEAR vocabulary list");
+				intent.putExtra(Intent.EXTRA_TEXT,
+						"Check out my vocabulary list from the GEAR app\n"+getVocabularyString());
+				break;
+			case "com.google.android.apps.docs":
+				intent.putExtra(Intent.EXTRA_TEXT,
+						"My vocabulary list copied from the GEAR app\n"+getVocabularyString());
+				break;
+			default:
+				intent.putExtra(Intent.EXTRA_TEXT,
+						"Check out my vocabulary list from the GEAR app\n"+getVocabularyString());
+		}
+	}
+
+	/*
+	 * Method to generate vocabulary string by reading user dictionary
+	 */
+	public static String getVocabularyString() {
+		DataStorage dataStorage = new DataStorage(context);
+		HashMap<String, Word> vocabulary = dataStorage.loadUserDictionary();
+		String vocabString ="";
+		if (vocabulary.isEmpty()) {
+			vocabString = " ";
+		}else{
+			vocabString = "Word\tDefinition\n";
+			//Loop through user dictionary and list vocabulary words
+			for (Map.Entry<String, Word> entry : vocabulary.entrySet()) {
+				String key = entry.getKey();
+				Word word = entry.getValue();
+				if(word.getLemma().equals("None"))
+					vocabString += key +",\t"+ "\n";
+				else
+					vocabString += key + ",\t"+word.getLemma()+ "\n";
+			}
+		}
+		return vocabString;
 	}
 
 }
