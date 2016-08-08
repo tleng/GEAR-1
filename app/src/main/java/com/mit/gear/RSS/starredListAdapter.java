@@ -186,7 +186,7 @@ public class starredListAdapter extends ArrayAdapter<RssArticle> {
 
     private void updateStarredCount(){
         File starredDir = context.getDir("StarredArticles", Context.MODE_PRIVATE);
-        StarredNewsFragment.setTheCountBox(StarredNewsFragment.starredArticles.size());
+        StarredNewsFragment.setTheCountBox(starredDir.listFiles().length);
     }
 }
 

@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.text.BreakIterator;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
@@ -46,6 +47,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -493,6 +495,8 @@ public class LiteNewsFragment extends Fragment {
         articleAndScoreMap.clear();
         for(RssArticle article: listOfArticleAssets){
             Double fraction = getScore(article);
+            String count = getCount(article);
+            article.setCount(count);
             articleAndScoreMap.put(article,fraction);
         }
         articleAndScoreMap = MapUtil.sortByValue(articleAndScoreMap);
@@ -608,5 +612,57 @@ public class LiteNewsFragment extends Fragment {
         ReadArticleActivity.articlesOpened=  new HashSet<String>(sharedPreferences.getStringSet("openedArticles", new HashSet<String>()));
 
     }
+
+
+
+    /*
+     * Method to read the article and count
+     * total number of words
+     * number of unique words
+     * number of total words in user dictionary
+     * number of total unique words in user dictionary
+     */
+
+
+    private  String getCount(RssArticle rssArticle){
+        int VocUniqueCount=0;
+        int WordsInUD = 0;
+        int count =0;
+        HashMap<String, Integer> UniqueWordCount = new HashMap<>();                         //Keep track of unique word along with their occurrence
+        userDictionary = dataStorage.loadUserDictionary();
+        BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);             //Set language of break iterator
+        iterator.setText(rssArticle.getContent());
+        int start = iterator.first();
+        //Loop through each word in the article
+        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator
+                .next()) {
+            String possibleWord = rssArticle.getContent().substring(start, end);
+            if (Character.isLetter(possibleWord.charAt(0))) {                              //if the word start with letter increment total word count
+                count++;
+                if (UniqueWordCount.containsKey(possibleWord.toLowerCase())){
+                    UniqueWordCount.put(possibleWord.toLowerCase(),
+                            UniqueWordCount.get(possibleWord.toLowerCase()) + 1);   //Word is already contained in map increment it's occurrence by 1
+                }else{
+                    UniqueWordCount.put(possibleWord.toLowerCase(), 1);                                  //Word is not contained in map add it and set it's occurrence to 1
+                }
+            }
+            if (userDictionary.containsKey(possibleWord)){                                 //Word is in user dictionary increment counter
+                WordsInUD++;
+            }
+        }
+        //Loop through user dictionary to check if word exist in both the dictionary and unique word map
+        for(Map.Entry<String, Word> entry : userDictionary.entrySet()){
+            String key = entry.getKey();
+            if(UniqueWordCount.containsKey(key)){
+                VocUniqueCount++;
+            }
+        }
+        //Set the resulting string to contain all counters
+        String result = String.valueOf(WordsInUD)+"/"+String.valueOf(count)+"\t\t\t"
+                +String.valueOf(VocUniqueCount)+"/"+String.valueOf(UniqueWordCount.size());
+        UniqueWordCount.clear();
+        return result;
+    }
+
 
 }
