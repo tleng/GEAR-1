@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.mattmellor.gear.R;
+import com.mit.gear.activities.StarredNewsFragment;
 import com.mit.gear.reading.ReadArticleActivity;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
@@ -113,7 +114,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                             String string = rssArticle.getCategory()+"\n"+rssArticle.isStarred()+"\n"+rssArticle.getContent();
 
                             writeFile(myDir, filename, string);      //updating the existing file (either in news dir or lite news dir)
-                            writeFile(starredDir,filename,string);   //Adding a file to starred dir
+                            writeFile(starredDir, filename, string);   //Adding a file to starred dir
 
 
                         }else{                                            //if the click was to un favorite
@@ -134,6 +135,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                                             break;
                                         }
                                     }
+                                    updateStarredCount();
 
                                 }
                             });
@@ -149,6 +151,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                             alertDialog.setCancelable(false);
                             alertDialog.show();
                         }
+                        updateStarredCount();
                     }
                 });
         favorite.setOnFavoriteAnimationEndListener(
@@ -268,5 +271,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             e.printStackTrace();
         }
 
+    }
+
+    private void updateStarredCount(){
+        File starredDir = _context.getDir("StarredArticles", Context.MODE_PRIVATE);
+        StarredNewsFragment.setTheCountBox(starredDir.listFiles().length);
     }
 }

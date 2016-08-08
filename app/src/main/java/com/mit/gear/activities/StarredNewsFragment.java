@@ -3,6 +3,7 @@ package com.mit.gear.activities;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -100,6 +102,8 @@ public class StarredNewsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ReadArticleActivity.class);
+                if(ReadArticleActivity.articlesOpened== null)
+                    loadTheOpenedArticles();
                 ReadArticleActivity.articlesOpened.add(starredArticles.get(position).getTitle());
                 intent.putExtra("title", starredArticles.get(position).getTitle());
                 intent.putExtra("content", starredArticles.get(position).getContent());
@@ -117,5 +121,15 @@ public class StarredNewsFragment extends Fragment {
         MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
         MainActivity.mDrawerList.setItemChecked(4, true);
         MainActivity.mDrawerList.setSelection(4);
+    }
+
+     /*
+     * This method loads the opened articles set from shared preference
+     */
+
+    public void loadTheOpenedArticles(){
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        ReadArticleActivity.articlesOpened=  new HashSet<String>(sharedPreferences.getStringSet("openedArticles", new HashSet<String>()));
+
     }
 }

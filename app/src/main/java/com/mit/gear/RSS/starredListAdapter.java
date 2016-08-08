@@ -159,9 +159,11 @@ public class starredListAdapter extends ArrayAdapter<RssArticle> {
                 for(RssArticle starredArticle : StarredNewsFragment.starredArticles){
                     if(starredArticle.getTitle().trim().equals(fileName)) {
                         StarredNewsFragment.starredArticles.remove(starredArticle);
+                        updateStarredCount();
                         StarredNewsFragment.adapter.notifyDataSetChanged();
                     }
                 }
+                break;
             }
         }
     }
@@ -180,6 +182,11 @@ public class starredListAdapter extends ArrayAdapter<RssArticle> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateStarredCount(){
+        File starredDir = context.getDir("StarredArticles", Context.MODE_PRIVATE);
+        StarredNewsFragment.setTheCountBox(StarredNewsFragment.starredArticles.size());
     }
 }
 
