@@ -48,7 +48,7 @@ public class StoryListAdapter extends ArrayAdapter<StoryItem> {
         View view ;
 
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.rss_list_item_debug_mode, null);
+            view = inflater.inflate(R.layout.stories_list_item_debug_mode, null);
 
 
          StoryItem storyItem = listStoryItem.get(position);

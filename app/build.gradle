@@ -47,4 +47,6 @@ dependencies {
     compile files('libs/jsoup-1.9.2.jar')
     compile 'com.github.deano2390:MaterialShowcaseView:1.1.0'
     compile files('libs/gesturetutorial.jar')
+    compile 'com.github.ivbaranov:materialfavoritebutton:0.1.2'
+
 }

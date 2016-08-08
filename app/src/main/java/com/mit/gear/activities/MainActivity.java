@@ -20,7 +20,6 @@ import android.widget.ListView;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import com.mattmellor.gear.R;
@@ -28,7 +27,6 @@ import com.mit.gear.NavDrawer.NavDrawerItem;
 import com.mit.gear.NavDrawer.NavDrawerListAdapter;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
-import com.mit.gear.reading.GEARClickableSpan;
 
 /**
  * Activity that represents the starting screen of the app
@@ -81,12 +79,14 @@ public class MainActivity extends Activity {
 		// adding nav drawer items to array
 		// news
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
-		// stories
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
-		// vocab
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
 		//Lite Stories
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
+		// stories
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
+		// vocab
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
+		//starred
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
 
 
 		// Recycle the typed array
@@ -99,7 +99,7 @@ public class MainActivity extends Activity {
 				navDrawerItems);
 		mDrawerList.setAdapter(adapter);
 
-//		// enabling action bar app icon and behaving it as toggle button
+		// enabling action bar app icon and behaving it as toggle button
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
 
@@ -123,8 +123,6 @@ public class MainActivity extends Activity {
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
 		if (savedInstanceState == null) {
-			// on first time display view for first nav item
-//			displayView(0);
             mDrawerLayout.openDrawer(mDrawerList);
 		}
 	}
@@ -223,6 +221,10 @@ public class MainActivity extends Activity {
 			fragment = new DisplayVocabularyActivity();
 			break;
 
+		case 4:
+			Log.d(TAG,"Starred Tab Opened");
+			fragment = new StarredNewsFragment();
+			break;
 
 
 		default:

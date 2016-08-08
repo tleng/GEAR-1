@@ -1,28 +1,24 @@
 package com.mit.gear.activities;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.app.Fragment;
-import android.content.Context;
-import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.mattmellor.gear.R;
-import com.mit.gear.RSS.ExpandableListAdapter;
-import com.mit.gear.RSS.RssListListener;
-import com.mit.gear.RSS.RssArticle;
-import com.mit.gear.RSS.RssReader;
 import com.mit.gear.NavDrawer.NavDrawerListAdapter;
+import com.mit.gear.RSS.ExpandableListAdapter;
+import com.mit.gear.RSS.RssArticle;
+import com.mit.gear.RSS.RssListListener;
+import com.mit.gear.RSS.RssReader;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.miscellaneous.MapUtil;
 import com.mit.gear.reading.ReadArticleActivity;
@@ -39,7 +35,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.text.BreakIterator;
@@ -72,7 +67,7 @@ public class StoriesSelectionActivity extends Fragment {
     DataStorage dataStorage;
     HashMap<String,Word> userDictionary;
     public static boolean needsToScore = false; //boolean indicate if we need to score the news
-    ExpandableListAdapter listAdapter;
+    public static ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
     List<String> listDataHeader = new ArrayList<String>();
     Map<String, List<RssArticle>> listDataChild;
@@ -362,7 +357,7 @@ public class StoriesSelectionActivity extends Fragment {
                 }
                 // saving the news as a file in the internal storage under rssArticles directory
                 String filename = rssArticle.getTitle();
-                String string = rssArticle.getCategory()+"\n"+rssArticle.getContent();
+                String string = rssArticle.getCategory()+"\n"+rssArticle.isStarred()+"\n"+rssArticle.getContent();
 
                 try {
                     File fileWithinMyDir = new File(myDir, filename); //Getting a file within the dir.
@@ -419,6 +414,8 @@ public class StoriesSelectionActivity extends Fragment {
                     String readString = bufferedReader.readLine () ; //the first line is the article's category
                     rssArticle.setCategory(readString);
                     readString = bufferedReader.readLine () ;
+                    rssArticle.setStarred(Boolean.parseBoolean(readString));
+                    readString = bufferedReader.readLine () ;
                     while ( readString != null ) {
                         content.append(readString);
                         content.append('\n');
@@ -462,11 +459,11 @@ public class StoriesSelectionActivity extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
         Boolean debugChoice = sharedPreferences.getBoolean("debug", false);
         if(debugChoice) {
-            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,articleAndScoreMap);
+            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,articleAndScoreMap,"rssArticles");
         }
 
         else {
-            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild);
+            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,"rssArticles");
         }
 
         // setting list adapter

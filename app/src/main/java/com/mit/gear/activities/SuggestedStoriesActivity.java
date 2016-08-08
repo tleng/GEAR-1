@@ -1,30 +1,29 @@
 package com.mit.gear.activities;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.mattmellor.gear.R;
+import com.mit.gear.NavDrawer.NavDrawerListAdapter;
+import com.mit.gear.data.DataStorage;
+import com.mit.gear.miscellaneous.MapUtil;
 import com.mit.gear.reading.ReadArticleActivity;
 import com.mit.gear.reading.StoryItem;
 import com.mit.gear.reading.StoryListAdapter;
 import com.mit.gear.reading.StoryListListener;
-import com.mit.gear.data.DataStorage;
-import com.mit.gear.miscellaneous.MapUtil;
-import com.mit.gear.NavDrawer.NavDrawerListAdapter;
 import com.mit.gear.words.GEARGlobal;
 import com.mit.gear.words.Word;
 
@@ -206,8 +205,8 @@ public class SuggestedStoriesActivity extends Fragment {
         }
         final ListView lv = (ListView) getActivity().findViewById(R.id.listView2);
 
-             adapter = new StoryListAdapter(getActivity(), R.layout.rss_list_item_debug_mode, listStoryItem);
-            getActivity().runOnUiThread(new Runnable() {
+        adapter = new StoryListAdapter(getActivity(), R.layout.stories_list_item_debug_mode, listStoryItem);
+        getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     lv.setAdapter(adapter);

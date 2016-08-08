@@ -15,6 +15,16 @@ public class RssArticle implements Serializable{
     private String content;
     private String count;
     private String category;
+    private boolean starred;
+
+
+    public boolean isStarred() {
+        return starred;
+    }
+
+    public void setStarred(boolean starred) {
+        this.starred = starred;
+    }
 
     public String getCategory() {
         return category;

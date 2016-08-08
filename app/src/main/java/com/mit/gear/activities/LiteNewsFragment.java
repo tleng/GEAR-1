@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -281,7 +280,7 @@ public class LiteNewsFragment extends Fragment {
                 }
                 // saving the news as a file in the internal storage under rssArticles directory
                 String filename = rssArticle.getTitle();
-                String string = rssArticle.getCategory()+"\n"+rssArticle.getContent();
+                String string = rssArticle.getCategory()+"\n"+rssArticle.isStarred()+"\n"+rssArticle.getContent();
 
                 try {
                     File fileWithinMyDir = new File(myDir, filename); //Getting a file within the dir.
@@ -337,7 +336,8 @@ public class LiteNewsFragment extends Fragment {
                 String readString = bufferedReader.readLine () ; //the first line is the article's category
                 rssArticle.setCategory(readString);
                 readString = bufferedReader.readLine () ;
-
+                rssArticle.setStarred(Boolean.parseBoolean(readString));
+                readString = bufferedReader.readLine () ;
                 while ( readString != null ) {
                     content.append(readString);
                     content.append('\n');
@@ -380,11 +380,11 @@ public class LiteNewsFragment extends Fragment {
         Boolean debugChoice = sharedPreferences.getBoolean("debug", false);
 
         if(debugChoice) {
-            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,articleAndScoreMap);
+            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,articleAndScoreMap,"LiteRssArticles");
         }
 
         else {
-            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild);
+            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,"LiteRssArticles");
         }
 
         expListView.setAdapter(listAdapter); // setting list adapter
