@@ -35,19 +35,21 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private String Dir;
     private Map<String, List<RssArticle>> _listDataChild;// child data, mapping between <header,child List>
     private Integer maxOfStarredArticles = 50;
+    private Integer navIndex;
 
     /**
      * if the mode was not debug mode
      */
 
     public ExpandableListAdapter(Context context, List<String> listDataHeader,
-                                 Map<String, List<RssArticle>> listChildData, String Dir) {
+                                 Map<String, List<RssArticle>> listChildData, String Dir,Integer index) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
         articleAndScoreMap=null;
         debugMode =false;
         this.Dir=Dir;
+        this.navIndex=index;
     }
 
     /**
@@ -55,13 +57,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      */
 
     public ExpandableListAdapter(Context context, List<String> listDataHeader,
-                                 Map<String, List<RssArticle>> listChildData, Map<RssArticle,Double> ArticleAndScoreMap, String Dir) {
+                                 Map<String, List<RssArticle>> listChildData, Map<RssArticle,Double> ArticleAndScoreMap, String Dir,Integer index) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
         articleAndScoreMap=ArticleAndScoreMap;
         debugMode =true;
         this.Dir=Dir;
+        this.navIndex=index;
     }
 
     @Override
@@ -273,8 +276,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     }
 
+    /*
+    *This method updates the count of the starred news in nav menu
+    */
+
     private void updateStarredCount(){
         File starredDir = _context.getDir("StarredArticles", Context.MODE_PRIVATE);
-        StarredNewsFragment.setTheCountBox(starredDir.listFiles().length);
+        StarredNewsFragment.setTheCountBoxWithoutSelection(starredDir.listFiles().length,navIndex);
     }
 }

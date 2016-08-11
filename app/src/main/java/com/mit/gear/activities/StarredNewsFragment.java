@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,7 +96,7 @@ public class StarredNewsFragment extends Fragment {
 
     private void prepareTheList(){
         ListView rssItems = (ListView) getActivity().findViewById(R.id.listView);
-        setTheCountBox(starredArticles.size());
+        setTheCountBoxWithSelection(starredArticles.size());
         adapter = new starredListAdapter(getActivity(), R.layout.rss_list_item, starredArticles);
         rssItems.setAdapter(adapter);
         rssItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -113,7 +114,13 @@ public class StarredNewsFragment extends Fragment {
 
     }
 
-    public static void setTheCountBox(Integer size){
+
+    /*
+     *This method updates the count of the starred news in nav menu
+     * sets the selection of the menu to be the starred tab
+     */
+
+    public static void setTheCountBoxWithSelection(Integer size){
         MainActivity.navDrawerItems.get(4).setCounterVisibility(true);
         MainActivity.navDrawerItems.get(4).setCount(String.valueOf(size));
         MainActivity.adapter = new NavDrawerListAdapter(MainActivity.context,
@@ -121,6 +128,24 @@ public class StarredNewsFragment extends Fragment {
         MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
         MainActivity.mDrawerList.setItemChecked(4, true);
         MainActivity.mDrawerList.setSelection(4);
+    }
+
+
+    /*
+     *This method updates the count of the starred news in nav menu
+     * sets the selection of the menu to be as the same selection as it was.
+     */
+
+    public static void setTheCountBoxWithoutSelection(Integer size,Integer navIndex){
+
+        MainActivity.navDrawerItems.get(4).setCounterVisibility(true);
+        MainActivity.navDrawerItems.get(4).setCount(String.valueOf(size));
+        MainActivity.adapter = new NavDrawerListAdapter(MainActivity.context,
+                MainActivity.navDrawerItems);
+        MainActivity.mDrawerList.setAdapter(MainActivity.adapter);
+        MainActivity.mDrawerList.setItemChecked(navIndex, true);
+        MainActivity.mDrawerList.setSelection(navIndex);
+
     }
 
      /*

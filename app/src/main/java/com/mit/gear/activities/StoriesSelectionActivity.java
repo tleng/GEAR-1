@@ -459,11 +459,11 @@ public class StoriesSelectionActivity extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
         Boolean debugChoice = sharedPreferences.getBoolean("debug", false);
         if(debugChoice) {
-            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,articleAndScoreMap,"rssArticles");
+            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,articleAndScoreMap,"rssArticles",0);
         }
 
         else {
-            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,"rssArticles");
+            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,"rssArticles",0);
         }
 
         // setting list adapter

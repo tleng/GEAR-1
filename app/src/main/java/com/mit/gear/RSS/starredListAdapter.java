@@ -184,9 +184,15 @@ public class starredListAdapter extends ArrayAdapter<RssArticle> {
         }
     }
 
+
+    /*
+     *This method updates the count of the starred news in nav menu
+     */
+
+
     private void updateStarredCount(){
         File starredDir = context.getDir("StarredArticles", Context.MODE_PRIVATE);
-        StarredNewsFragment.setTheCountBox(starredDir.listFiles().length);
+        StarredNewsFragment.setTheCountBoxWithoutSelection(starredDir.listFiles().length,4);
     }
 }
 

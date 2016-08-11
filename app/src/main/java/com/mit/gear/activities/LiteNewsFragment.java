@@ -382,11 +382,11 @@ public class LiteNewsFragment extends Fragment {
         Boolean debugChoice = sharedPreferences.getBoolean("debug", false);
 
         if(debugChoice) {
-            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,articleAndScoreMap,"LiteRssArticles");
+            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,articleAndScoreMap,"LiteRssArticles",1);
         }
 
         else {
-            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,"LiteRssArticles");
+            listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild,"LiteRssArticles",1);
         }
 
         expListView.setAdapter(listAdapter); // setting list adapter
