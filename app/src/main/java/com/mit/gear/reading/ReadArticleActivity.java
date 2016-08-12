@@ -1,7 +1,9 @@
 package com.mit.gear.reading;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
@@ -94,6 +96,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 	TextView pageIndicator;
 	View SwipeTutorial = null; 						//View to show and hide page swipe tutorial
 	Button Savebtn;									//Save progress button
+	AlertDialog.Builder SaveProgressDialog;
 
 
     public ReadArticleActivity() {
@@ -398,9 +401,10 @@ public class ReadArticleActivity extends AppCompatActivity {
 					dataStorage.addGroupToUserDictionary(wordsToSave);
 					//dismiss the progress and finish the SavePopupActivity if exist
 					progress.dismiss();
-					if (SavePopupActivity.savePopupActivity != null) {
-						SavePopupActivity.savePopupActivity.finish();
+					if(SaveProgressDialog != null){
+						finish();
 					}
+
 				} catch (JSONException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -408,49 +412,70 @@ public class ReadArticleActivity extends AppCompatActivity {
 				}
 			}
         }).start();
-        //Toast endToast = Toast.makeText(getApplicationContext(), "Updated " + newWords.toString() + " unclicked words.", Toast.LENGTH_SHORT);
-        //endToast.show();
     }
 
 
-    @Override
-    protected void onPause() {
+	/*
+	 * Method called when back button pressed
+	 * show dialog to ask user wither to save progress or not
+	 */
+	@Override
+	public void onBackPressed() {
+		final View view = findViewById(R.id.buttonSave);
+		//If last page has been reached show last page dialog
+		if(fragmentIndex == numberOfPages - 1){
+			SaveProgressDialog = new AlertDialog.Builder(this)
+					.setTitle("Save Progress")
+					.setMessage("You have reached the end of the article\nWould you like to save your progress?")
+					.setNegativeButton("Don't Save", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					})
+					.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface arg0, int arg1) {
+							progressSaved = false;
+							GEARGlobal.setLastWordClicked("None");
+							Integer LastWordIndex= PageFragment.wordIndexing.get(numberOfPages);
+							GEARGlobal.setLastWordClickedIndex(LastWordIndex);
+							saveProgress(view);
+						}
+					});
+			SaveProgressDialog.create().show();
+		}
+		//If user did not save progress show save progress dialog
+		else if (!isProgressSaved()){
+			SaveProgressDialog = new AlertDialog.Builder(this)
+					.setTitle("Save Progress")
+					.setMessage("Would you like to save your progress?")
+					.setNegativeButton("Don't Save", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					})
+					.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface arg0, int arg1) {
+							saveProgress(view);
+						}
+					});
+			SaveProgressDialog.create().show();
+		}else {
+			finish();
+		}
+	}
 
+	@Override
+    protected void onPause() {
         SaveOpenedArticles();
 		DefinitionBoxList.clear();
         Log.i("On pause", String.valueOf(fragmentIndex) + " / " + String.valueOf(numberOfPages));
-        //fragment index starts from zero
-        if (fragmentIndex == numberOfPages - 1) {
-            Intent intent = new Intent(ReadArticleActivity.this, SavePopupActivity.class);
-            progressSaved = false;
-            intent.putExtra("saveProgressQuery", "You reached the end of the article do you want to save?");
-            intent.putExtra("isLastPage", true);
-            intent.putExtra("numberOfPages", numberOfPages);
-            startActivity(intent);
-        }
-        //show SavePopupActivity if the user did not save when exiting
-        else if (!isProgressSaved()) {
-            Intent intent = new Intent(ReadArticleActivity.this, SavePopupActivity.class);
-            intent.putExtra("saveProgressQuery", "Save Progress?");
-            intent.putExtra("isLastPage", false);
-            startActivity(intent);
-        }
         Long endTime = System.currentTimeMillis();         // updates user data with time spent
         Long timeSpent = endTime - startTime;
         UserDataCollection.setTimeSpentOnArticle(currentArticle, timeSpent);
 		SendUserDictionary();
-		DataStorage dataStorage = new DataStorage(this);
-		HashMap<String, Boolean> WordToColor = dataStorage.loadColorFile();
-		for (Map.Entry<String, Boolean> entry : WordToColor.entrySet()) {
-			try {
-				dataStorage.addToColorFile(entry.getKey(),false);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-        super.onPause();
+		super.onPause();
     }
 
     protected void OnResume() {
