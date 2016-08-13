@@ -7,9 +7,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 
 import com.mattmellor.gear.R;
+
+import java.util.Objects;
 
 /**
  * Activity where user can manage the settings.
@@ -30,6 +34,7 @@ public class UserSettingsActivity extends AppCompatActivity {
     private boolean debugChoice;
     private boolean showClicked;
     private boolean showSeen;
+    private RadioGroup swipeRadioGroup;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +44,7 @@ public class UserSettingsActivity extends AppCompatActivity {
         debugSwitch =(Switch)findViewById(R.id.debug);
 		clickedCheckBox = (CheckBox)findViewById(R.id.ClickcheckBox);
 		seenCheckBox = (CheckBox)findViewById(R.id.SeencheckBox);
+        swipeRadioGroup=(RadioGroup)findViewById(R.id.swipeRadioGroup);
         //Access the shared preference
         sharedPreferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
         //getting user preference or true/false for default
@@ -47,6 +53,13 @@ public class UserSettingsActivity extends AppCompatActivity {
         debugChoice=sharedPreferences.getBoolean("debug", false);
 		showClicked=sharedPreferences.getBoolean("showClicked",true);
 		showSeen=sharedPreferences.getBoolean("showSeen",true);
+        if(sharedPreferences.getString("swipeRadio", "Hswipe").equals("Hswipe")) {
+            swipeRadioGroup.check(R.id.Hswipe);
+        }
+        else{
+            swipeRadioGroup.check(R.id.Vswipe);
+        }
+
         //set the switch to user preference
         colorSwitch.setChecked(colorChoice);
         speakSwitch.setChecked(speakChoice);
@@ -102,5 +115,22 @@ public class UserSettingsActivity extends AppCompatActivity {
 				editor.commit();
 			}
 		});
+        swipeRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(checkedId==R.id.Hswipe){
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("swipeRadio", "Hswipe");
+                    Log.d(TAG,"swipeRadio turned to Horizontal");
+                    editor.commit();
+                }else if(checkedId==R.id.Vswipe){
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("swipeRadio", "Vswipe");
+                    Log.d(TAG, "swipeRadio turned to vertical");
+                    editor.commit();
+
+                }
+            }
+        });
     }
 }

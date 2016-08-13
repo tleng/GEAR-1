@@ -63,7 +63,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     public static String currentLemma = "None";
     private Long startTime;
     public String currentArticle;
-    public static ViewPager pagesView;
+    public static CustomViewPager pagesView;
     private String storyText = "None";
     public boolean definition_scroll = true;                // Set definition_scroll to true when using a scrolling definition textbox
     public HashMap<String, Integer> currentSessionWords = new HashMap<>();
@@ -92,8 +92,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     private Button Savebtn;                                    //Save progress button
     private int click = 0;                                    //Used to count number of click on dismiss text in tutorial
 	private boolean isFirstRun;
-
-
+    public static boolean verticalSwipeDirection = false;     //indicate if the swipe us a vertical swipe
 
     public ReadArticleActivity() {
         instance = this;
@@ -113,6 +112,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 		UpdateAndSetData();
+        getUserSettings();
         if (definition_scroll) {
             setContentView(R.layout.pages_scrolling_definition);
             UndoView = (TextView) findViewById(R.id.UndotextViewScrolling);
@@ -137,7 +137,6 @@ public class ReadArticleActivity extends AppCompatActivity {
             setPagesView();
         }
         initTextToSpeech();
-        getUserSettings();
 
         // if there are clicked/passed words, show user manual for different color meaning
         if (!userDictionary.isEmpty()) {
@@ -156,7 +155,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 
     public void setPagesView() {
         PageFragment.wordIndexing.clear();         //clearing the hash map that contains the fragments starting-indexes
-        pagesView = (ViewPager) findViewById(R.id.pages);
+        pagesView = (CustomViewPager) findViewById(R.id.pages);
         pagesView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -197,6 +196,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 pagesView.getAdapter().notifyDataSetChanged();
                 pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 pageIndicator.setText("Page " + String.valueOf(1) + " of " + numberOfPages);
+
             }
         });
         pagesView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -456,6 +456,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         GEARClickableSpan.colorChoice = sharedPreferences.getBoolean("color", true);
         GEARClickableSpan.speakChoice = sharedPreferences.getBoolean("speak", true);
         needsUserManual = sharedPreferences.getBoolean("manual", true);
+        verticalSwipeDirection = (sharedPreferences.getString("swipeRadio", "Hswipe").equals("Vswipe")) ? true : false;
     }
 
     /*
@@ -544,7 +545,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 		String def = "";
 		DefinitionBoxList.remove(DefinitionBoxList.size() - 1);
 		for (ArrayList<String> list : DefinitionBoxList) {
-			def = def + "\n" + list.get(0) + ",\t" + list.get(1);
+            def = def + "\n" + list.get(0) + ",\t" + list.get(1);
 		}
 		readingDictionary.setText(def);
 	}

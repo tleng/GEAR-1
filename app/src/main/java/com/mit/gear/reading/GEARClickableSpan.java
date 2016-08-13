@@ -60,13 +60,14 @@ public class GEARClickableSpan extends ClickableSpan {
         Log.d(TAG, "tapped on: " + mWord);
         ArrayList<String> time_place_holder = new ArrayList<>();
         time_place_holder.add("0");
-        final Integer caseNo =  SetWordToSave();
+       final Integer caseNo =  SetWordToSave();
 
         if (textPaint != null) {
             color(widget);
         }
         lemma = translate();
         new UpdateClickedWordData().execute(caseNo.toString(),lemma);
+
 
     }
 
@@ -347,8 +348,8 @@ public class GEARClickableSpan extends ClickableSpan {
             readArticleActivity.UndoView.setEnabled(true);
 
             SaveWordToDictionarySwitch(Integer.parseInt(caseNoAndLemma.substring(0, 1)), caseNoAndLemma.substring(1));
-                    readArticleActivity.pagesView.getAdapter().notifyDataSetChanged();         //Update the view for all the preloaded fragments (max 3)
-                    showUserManual();
+            readArticleActivity.pagesView.getAdapter().notifyDataSetChanged();         //Update the view for all the preloaded fragments (max 3)
+            showUserManual();
         }
     }
 }
