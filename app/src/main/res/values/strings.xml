@@ -78,6 +78,7 @@
     <string name="UserManualWordColoring">Every blue word means you have clicked it before\nEvery gray word means you have read it before</string>
     <string name="UserManualDismissText">GOT IT</string>
     <string name="UserManualPageSwiping">Swipe left and right to move between pages</string>
+    <string name="UserManualWordClicking">Tap on a word to hear the pronunciation and get the definition</string>
 
 
 </resources>

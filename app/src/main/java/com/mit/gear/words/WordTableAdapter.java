@@ -8,6 +8,8 @@ import android.widget.TextView;
 import com.mattmellor.gear.R;
 import com.mit.gear.activities.DisplayVocabularyActivity;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,11 +23,13 @@ import de.codecrafters.tableview.TableDataAdapter;
 public class WordTableAdapter extends TableDataAdapter<Word> {
     private boolean ShowClicked;
     private boolean ShowSeen;
+	private String TodaysDate;
 
     public WordTableAdapter(Context context, ArrayList<Word> data) {
 		super(context, data);
 		ShowClicked = DisplayVocabularyActivity.ShowClicked;
 		ShowSeen = DisplayVocabularyActivity.ShowSeen;
+		TodaysDate = getTodayDate();
     }
 
     /*
@@ -37,60 +41,90 @@ public class WordTableAdapter extends TableDataAdapter<Word> {
 		if(ShowClicked&&ShowSeen){
 			switch (columnIndex) {
 				case 0:
-					renderedView = renderString(word.getWord());
+					renderedView = renderString(word.getWord(),false);
 					break;
 				case 1:
 					if(word.getLemma().equals("None")){
 						break;
 					}else{
-						renderedView = renderString(word.getLemma());
+						renderedView = renderString(word.getLemma(),false);
 						break;
 					}
 				case 2:
-					renderedView = renderString(String.valueOf(word.totalWordClicks()));
+					renderedView = renderString(String.valueOf(word.totalWordClicks()),false);
 					break;
 				case 3:
-					renderedView = renderString(String.valueOf(word.totalWordPasses()));
+					renderedView = renderString(String.valueOf(word.totalWordPasses()),false);
 					break;
 				case 4:
-					SimpleDateFormat sdf = new SimpleDateFormat("h:mm:ss:SS a");
-					Date resultdate = new Date(word.getClickTime());
-					renderedView = renderString(sdf.format(resultdate));
-					break;
+					DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+					Date date = new Date(word.getClickTime());
+					String WordDate = formatter.format(date);
+					if(TodaysDate.equals(WordDate)){
+						SimpleDateFormat sdf = new SimpleDateFormat("h:mm:ss a");
+						Date resultdate = new Date(word.getClickTime());
+						renderedView = renderString(sdf.format(resultdate),true);
+						break;
+					}else{
+						SimpleDateFormat sdf = new SimpleDateFormat("d MMM h:mm a");
+						Date resultdate = new Date(word.getClickTime());
+						renderedView = renderString(sdf.format(resultdate),true);
+						break;
+					}
 			}
 		}else if(ShowClicked&&!ShowSeen){
 			switch (columnIndex) {
 				case 0:
-					renderedView = renderString(word.getWord());
+					renderedView = renderString(word.getWord(),false);
 					break;
 				case 1:
-					renderedView = renderString(word.getLemma());
+					renderedView = renderString(word.getLemma(),false);
 					break;
 				case 2:
-					renderedView = renderString(String.valueOf(word.totalWordClicks()));
+					renderedView = renderString(String.valueOf(word.totalWordClicks()),false);
 					break;
 				case 3:
-					SimpleDateFormat sdf = new SimpleDateFormat("h:mm:ss:SS a");
-					Date resultdate = new Date(word.getClickTime());
-					renderedView = renderString(sdf.format(resultdate));
-					break;
+					DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+					Date date = new Date(word.getClickTime());
+					String WordDate = formatter.format(date);
+					if(TodaysDate.equals(WordDate)){
+						SimpleDateFormat sdf = new SimpleDateFormat("h:mm:ss a");
+						Date resultdate = new Date(word.getClickTime());
+						renderedView = renderString(sdf.format(resultdate),true);
+						break;
+					}else{
+						SimpleDateFormat sdf = new SimpleDateFormat("d MMM h:mm a");
+						Date resultdate = new Date(word.getClickTime());
+						renderedView = renderString(sdf.format(resultdate),true);
+						break;
+					}
 			}
 		}else if(ShowSeen&&!ShowClicked){
 			switch (columnIndex) {
 				case 0:
-					renderedView = renderString(word.getWord());
+					renderedView = renderString(word.getWord(),false);
 					break;
 				case 1:
-					renderedView = renderString(String.valueOf(word.totalWordPasses()));
+					renderedView = renderString(String.valueOf(word.totalWordPasses()),false);
 					break;
 				case 2:
-					SimpleDateFormat sdf = new SimpleDateFormat("h:mm:ss:SS a");
-					Date resultdate = new Date(word.getClickTime());
-					renderedView = renderString(sdf.format(resultdate));
-					break;
+					DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+					Date date = new Date(word.getClickTime());
+					String WordDate = formatter.format(date);
+					if(TodaysDate.equals(WordDate)){
+						SimpleDateFormat sdf = new SimpleDateFormat("h:mm:ss a");
+						Date resultdate = new Date(word.getClickTime());
+						renderedView = renderString(sdf.format(resultdate),true);
+						break;
+					}else{
+						SimpleDateFormat sdf = new SimpleDateFormat("d MMM h:mm a");
+						Date resultdate = new Date(word.getClickTime());
+						renderedView = renderString(sdf.format(resultdate),true);
+						break;
+					}
 			}
 		}else{
-			renderedView = renderString("");
+			renderedView = renderString("",false);
 		}
 		return renderedView;
 	}
@@ -99,13 +133,26 @@ public class WordTableAdapter extends TableDataAdapter<Word> {
     /*
      * Set the text view style and data for table cell
      */
-    private View renderString(final String value) {
+    private View renderString(final String value, boolean Smaller) {
         final TextView textView = new TextView(getContext());
         textView.setText(value);
         textView.setGravity(Gravity.LEFT);
         textView.setTextColor(getResources().getColor(R.color.default_word));
         textView.setPadding(20, 10, 20, 10);
-        textView.setTextSize(15);
+		if(Smaller){
+			textView.setTextSize(13);
+		}else{
+			textView.setTextSize(15);
+		}
         return textView;
     }
+
+	/*
+     * Method to get today's date without time
+     */
+	private String getTodayDate(){
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		Date TodayDate = new Date(System.currentTimeMillis());
+		return formatter.format(TodayDate);
+	}
 }

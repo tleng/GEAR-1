@@ -48,7 +48,10 @@ import java.util.Map;
 import java.util.Set;
 
 import android.os.Handler;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -97,6 +100,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 	View SwipeTutorial = null; 						//View to show and hide page swipe tutorial
 	Button Savebtn;									//Save progress button
 	AlertDialog.Builder SaveProgressDialog;
+	int click = 0;									//Used to count number of click on got it in tutorial
 
 
     public ReadArticleActivity() {
@@ -324,9 +328,12 @@ public class ReadArticleActivity extends AppCompatActivity {
 						if (count >= GEARGlobal.getLastWordClickedIndex()) {
 							break;
 						}
-						if (currentSessionWords.containsKey(possibleWord) || WordToColor.containsKey(possibleWord)) {
+						if (currentSessionWords.containsKey(possibleWord)
+								|| currentSessionWords.containsKey(possibleWord.toLowerCase())
+								|| currentSessionWords.containsKey(WordToCheck) ) {
 							continue;
 						}
+
 						ArrayList<Object> wordArrayList = new ArrayList<>();
 						wordArrayList.add("None");
 						wordArrayList.add(currentArticle);
@@ -745,19 +752,35 @@ public class ReadArticleActivity extends AppCompatActivity {
 	 * Set the first run preference to false so when article opened again method will not run
 	 */
 	private void ShowSwipeTutorial(){
-		TextView Dissmis = (TextView)findViewById(R.id.textViewSwipe);
-		SwipeTutorial.setVisibility(View.VISIBLE);										//Show tutorial layout and text
+		final Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade);
+		final TextView TutorialMessage = (TextView)findViewById(R.id.HintTextView);
 		final TutorialView tutorialView = TutorialView.create
 				(this,TutorialView.RightToLeft,TutorialView.LowerCenter,findViewById(R.id.frameLayout));
+		TextView Dismiss = (TextView)findViewById(R.id.textViewSwipe);
+		SwipeTutorial.setVisibility(View.VISIBLE);										//Show tutorial layout and text
 		tutorialView.show(); 															//Show the hand tutorial view
 		Savebtn.setEnabled(false);														//Disable save progress button while tutorial is shown
-		Dissmis.setOnClickListener(new View.OnClickListener() {
+		Dismiss.setOnClickListener(new View.OnClickListener() {
+			TutorialView tutorialView2;
 			@Override
 			public void onClick(View v) {
-				((ViewManager)SwipeTutorial.getParent()).removeView(SwipeTutorial);
-				tutorialView.hide();
-				Savebtn.setEnabled(true);
-				setPagesView();
+				click++;
+				if(click == 1){
+					tutorialView.hide();
+					SwipeTutorial.startAnimation(animation);
+					TutorialMessage.setText(R.string.UserManualWordClicking);
+					tutorialView2 = TutorialView.create
+							(getReadArticleActivityInstance(),
+									TutorialView.SingleFingerTap,
+									TutorialView.LowerCenter,
+									findViewById(R.id.frameLayout));
+					tutorialView2.show();
+				}else{
+					((ViewManager)SwipeTutorial.getParent()).removeView(SwipeTutorial);
+					tutorialView2.hide();
+					Savebtn.setEnabled(true);
+					setPagesView();
+				}
 			}
 		});
 		getSharedPreferences("PREFERENCE", MODE_PRIVATE) 								//Set first run preferences to false
