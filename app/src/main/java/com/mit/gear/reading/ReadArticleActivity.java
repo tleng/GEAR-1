@@ -82,17 +82,17 @@ public class ReadArticleActivity extends AppCompatActivity {
     ArrayList<ArrayList<String>> MaximumLastClickedWords = GEARGlobal.MaximumLastClickedWords;
     public static Boolean copyRightReachedFirstTime;   //checks if the copy right text is reached for first time
     public static Integer CopyRightFragmentIndex;       //the fragment index which has the copy right text
-    public static boolean stillInSameSession;           //checks if is still in same session, used to not update passed words if user in same session
     public static TextView UndoView;
     public static Set<String> articlesOpened;
     public static ArrayList<ArrayList<String>> DefinitionBoxList = new ArrayList<>();
     public static TextView readingDictionary;
     public static boolean needsUserManual;
-    TextView pageIndicator;
-    View SwipeTutorial = null;                        //View to show and hide page swipe tutorial
-    Button Savebtn;                                    //Save progress button
-    AlertDialog.Builder SaveProgressDialog;
-    int click = 0;                                    //Used to count number of click on got it in tutorial
+    private TextView pageIndicator;
+    private View SwipeTutorial = null;                        //View to show and hide page swipe tutorial
+    private Button Savebtn;                                    //Save progress button
+    private int click = 0;                                    //Used to count number of click on dismiss text in tutorial
+	private boolean isFirstRun;
+
 
 
     public ReadArticleActivity() {
@@ -112,14 +112,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        stillInSameSession = false;
-        copyRightReachedFirstTime = false;
-        CopyRightFragmentIndex = -1;
-        GEARGlobal.ListLastClickedWords.clear();
-        GEARGlobal.MaximumLastClickedWords.clear();
-        GEARGlobal.resetWordIndex();
-        GEARGlobal.setLastWordClickedIndex(-1);                   //clearing the last word index every time the story loads
-        GEARGlobal.setLastWordClicked("None");
+		UpdateAndSetData();
         if (definition_scroll) {
             setContentView(R.layout.pages_scrolling_definition);
             UndoView = (TextView) findViewById(R.id.UndotextViewScrolling);
@@ -127,15 +120,18 @@ public class ReadArticleActivity extends AppCompatActivity {
             setContentView(R.layout.pages);
             UndoView = (TextView) findViewById(R.id.UndotextView);
         }
+
         readingDictionary = (TextView) findViewById(R.id.definition_box);
         pageIndicator = (TextView) getReadArticleActivityInstance().findViewById(R.id.pageIndicator);
+		SwipeTutorial = findViewById(R.id.RelativeLayout);
+		Savebtn = (Button) findViewById(R.id.buttonSave);
+
         offlineDictionary = GEARGlobal.getOfflineDictionary(getApplicationContext());
         userDictionary = new DataStorage(getApplicationContext()).loadUserDictionary();
         startTime = System.currentTimeMillis();                     // Log start time for when user opened article
-        SwipeTutorial = findViewById(R.id.RelativeLayout);
-        Savebtn = (Button) findViewById(R.id.buttonSave);
-        boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE).getBoolean("isFirstRun", true); //Check if the activity is opened for the first time
-        if (isFirstRun) {    //If activity opened for first time show page swipe tutorial
+
+        isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE).getBoolean("isFirstRun", true); //Check if the activity is opened for the first time
+        if (isFirstRun) {    	//If activity opened for first time show page swipe tutorial
             ShowSwipeTutorial();
         } else {                //Else set page view
             setPagesView();
@@ -278,7 +274,6 @@ public class ReadArticleActivity extends AppCompatActivity {
         Log.d(TAG, "Save progress clicked");
         StoriesSelectionActivity.needsToScore = true;
         LiteNewsFragment.needsToScore = true;
-        stillInSameSession = true; //used to not color passed word if user in same session
         ResetUndo();
         PrepareProgressBar(view);
         if (progressSaved) {
@@ -453,8 +448,8 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     /*
-    *this method access the color/speak sharedPreferences to get user
-    *text color choice or true for default
+     * This method access the color/speak sharedPreferences to get user
+     * text color choice or true for default
      */
     private void getUserSettings() {
         sharedPreferences = this.getSharedPreferences("Settings", Context.MODE_PRIVATE);
@@ -464,9 +459,9 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     /*
-    *this method remove the last clicked word and update the view
-    * keeps track of undoClicks
-    * remove the last clicked word from  ListLastClickedWords and MaximumUndoClicks
+     * This method remove the last clicked word and update the view
+     * keeps track of undoClicks
+     * remove the last clicked word from  ListLastClickedWords and MaximumUndoClicks
      */
     public void Undo(View view) {
         if (!UndoView.isEnabled())
@@ -474,27 +469,19 @@ public class ReadArticleActivity extends AppCompatActivity {
         UndoView.setEnabled(false);
         load();
         DataStorage dataStorage = new DataStorage(this);
-        Log.d("DictionaryBeforeRemove", userDictionary.toString());
-        String def = "";
+
         if (UndoView.getCurrentTextColor() == getResources().getColor(R.color.table_header_text)) {
             if (SwipeTutorial.isShown()) { //Do nothing if undo is clicked while tutorial is shown
 
             } else {
-                DefinitionBoxList.remove(DefinitionBoxList.size() - 1);
-                for (ArrayList<String> list : DefinitionBoxList) {
-                    def = def + "\n" + list.get(0) + ",\t" + list.get(1);
-                }
-                readingDictionary.setText(def);
+
+				UpdatedDefinitionBoxString();
                 try {
-                    Log.d("UndoWord", ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0));
                     String WordToUndo = ListLastClickedWords.get(ListLastClickedWords.size() - 1).get(0);
-                    Log.d("UndoWord", WordToUndo);
                     dataStorage.deleteFromWordFile(WordToUndo, "None", dataStorage.USERDICTIONARY, currentArticle, true);
                     HashMap<String, Word> userDictionaryNEW = dataStorage.loadUserDictionary();
-                    Log.d("New dictionary", userDictionaryNEW.toString());
                     //check if the undo word is still exist in the new dictionary
                     if (userDictionaryNEW.containsKey(WordToUndo)) {
-                        Log.d("UndoWord", WordToUndo + " exist in the new dictionary");
                         if (!userDictionaryNEW.get(WordToUndo).clicked) {
                             if (userDictionary.containsKey(WordToUndo)) {
                                 userDictionary.get(WordToUndo).setClicked(false);
@@ -503,7 +490,6 @@ public class ReadArticleActivity extends AppCompatActivity {
                     }
                     //else check if the small version of undo word is still exist in the new dictionary
                     else if (userDictionaryNEW.containsKey(WordToUndo.toLowerCase())) {
-                        Log.d("UndoWord", WordToUndo + " small exist in the new dictionary " + WordToUndo.toLowerCase());
                         WordToUndo = WordToUndo.toLowerCase();
                         if (!userDictionaryNEW.get(WordToUndo).clicked) {
                             userDictionary.get(WordToUndo).setClicked(false);
@@ -511,10 +497,8 @@ public class ReadArticleActivity extends AppCompatActivity {
                     }
                     //else it does not exist, delete it from the un updated dictionary
                     else {
-                        Log.d("UndoWord", WordToUndo + " not in new dictionary");
                         userDictionary.remove(WordToUndo);
                     }
-                    Log.d("UndoWord1", WordToUndo);
                     Integer numOfClicks = currentSessionWords.get(WordToUndo);
                     if (numOfClicks == null) {
                         if (Character.isUpperCase(WordToUndo.charAt(0))) {
@@ -533,12 +517,8 @@ public class ReadArticleActivity extends AppCompatActivity {
                         numOfClicks--;
                         currentSessionWords.put(WordToUndo, numOfClicks);
                     }
-                    Log.d("UndoWord2", WordToUndo);
-                    Log.d("currentSessionNewLast", currentSessionWords.toString());
                     ListLastClickedWords = GEARGlobal.ListLastClickedWords;
                     pagesView.getAdapter().notifyDataSetChanged();
-                    //userDictionary = dataStorage.loadUserDictionary();
-                    Log.d("DictionaryAfterRemove", userDictionary.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -556,6 +536,18 @@ public class ReadArticleActivity extends AppCompatActivity {
         ListLastClickedWords = GEARGlobal.ListLastClickedWords;
         MaximumLastClickedWords = GEARGlobal.MaximumLastClickedWords;
     }
+
+	/*
+	 * Method to remove the last added Word, Definition and update defintion box string
+	 */
+	private void UpdatedDefinitionBoxString(){
+		String def = "";
+		DefinitionBoxList.remove(DefinitionBoxList.size() - 1);
+		for (ArrayList<String> list : DefinitionBoxList) {
+			def = def + "\n" + list.get(0) + ",\t" + list.get(1);
+		}
+		readingDictionary.setText(def);
+	}
 
     /*
      * Method to generate vocabulary string by reading user dictionary
@@ -622,17 +614,24 @@ public class ReadArticleActivity extends AppCompatActivity {
         UndoClicks = 0;
     }
 
+	/*
+	 * Method to prepare ProgressBar and setting the progressDialog max value
+	 * to the last clicked word index
+	 */
     private void PrepareProgressBar(View view) {
         progress = new ProgressDialog(view.getContext());
         progress.setMessage("Saving Progress");
         progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progress.setProgress(0);
         progress.setCancelable(false);
-        //setting the progressDialog to the last clicked word index
         progress.setMax(GEARGlobal.getLastWordClickedIndex());
 
     }
 
+	/*
+	 * Method to update the ListLastClickedWords list and the MaximumLastClickedWords list
+	 * Set the UndoClicks and MaximumUndoClicks accordingly
+	 */
     private void UpdateUndoList() {
         if (UndoClicks >= 3) {
             if (MaximumUndoClicks > 0) {
@@ -689,6 +688,19 @@ public class ReadArticleActivity extends AppCompatActivity {
         }
     }
 
+	/*
+	 * Method to update naccessary data and flags
+	 */
+	private void UpdateAndSetData(){
+		copyRightReachedFirstTime = false;
+		CopyRightFragmentIndex = -1;
+		GEARGlobal.ListLastClickedWords.clear();
+		GEARGlobal.MaximumLastClickedWords.clear();
+		GEARGlobal.resetWordIndex();
+		GEARGlobal.setLastWordClickedIndex(-1);                   //clearing the last word index every time the story loads
+		GEARGlobal.setLastWordClicked("None");
+	}
+
     /*
      * Method to show the page swiping tutorial and word click tutorial
      * Set the first run preference to false so when article opened again method will not run
@@ -701,8 +713,8 @@ public class ReadArticleActivity extends AppCompatActivity {
         TextView Dismiss = (TextView) findViewById(R.id.textViewSwipe);
         SwipeTutorial.setVisibility(View.VISIBLE);                                        //Show tutorial layout and text
         tutorialView.show();                                                              //Show the hand tutorial view
-        Savebtn.setEnabled(false);                                                        //Disable save progress button while tutorial is shown
-        Dismiss.setOnClickListener(new View.OnClickListener() {
+		Savebtn.setEnabled(false);                                                        //Disable save progress button while tutorial is shown
+		Dismiss.setOnClickListener(new View.OnClickListener() {
             TutorialView tutorialView2;
             @Override
             public void onClick(View v) {

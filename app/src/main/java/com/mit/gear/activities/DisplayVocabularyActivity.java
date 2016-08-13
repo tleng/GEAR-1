@@ -46,6 +46,7 @@ public class DisplayVocabularyActivity extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+		//Access sharedPreferences to get th user setting on what type of word to display
         sharedPreferences = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
         ShowClicked = sharedPreferences.getBoolean("showClicked",true);
         ShowSeen = sharedPreferences.getBoolean("showSeen",true);
@@ -63,10 +64,10 @@ public class DisplayVocabularyActivity extends Fragment {
     }
 
     /*
-		 * This method is used to set vocabulary table view
-		 * set header and table text and cell color, set column comparator
-		 * column changes depending on the settings
-		 */
+	 * This method is used to set vocabulary table view
+	 * set header and table text and cell color, set column comparator
+	 * column changes depending on the settings
+	 */
     private void SetTableView(SortableTableView tableView){
         VocabularyList = SetData();
         final int rowEvenColor = getResources().getColor(R.color.table_data_row_even);
@@ -75,7 +76,7 @@ public class DisplayVocabularyActivity extends Fragment {
         tableView.setDataRowBackgroundProvider
                 (TableDataRowBackgroundProviders.alternatingRowColors(rowEvenColor, rowOddColor));   //Set row color alternating even odd color
         tableView.setHeaderSortStateViewProvider(SortStateViewProviders.brightArrows());             //Set header sorting arrows style
-        if(ShowClicked&&ShowSeen){
+		if(ShowClicked&&ShowSeen){
             final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter
                     (getActivity().getApplicationContext(), "Word","Definition","Clicks","Seen","Time");             //Set table header column
             simpleTableHeaderAdapter.setTextColor(getResources().getColor(R.color.table_header_text));           //Set table header column text color
