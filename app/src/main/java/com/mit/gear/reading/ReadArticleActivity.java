@@ -1,5 +1,6 @@
 package com.mit.gear.reading;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -29,6 +30,7 @@ import android.widget.Toast;
 import com.gesturetutorial.awesomeness.TutorialView;
 import com.mattmellor.gear.R;
 import com.mit.gear.activities.LiteNewsFragment;
+import com.mit.gear.activities.SavePopupActivity;
 import com.mit.gear.activities.StoriesSelectionActivity;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
@@ -254,11 +256,9 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     public void saveProgress(View view) {
-
-        Button saveProgressButton = (Button) findViewById(R.id.buttonSave);
         if (needsUserManual) {   //this shows a user manual hint to the user for save progress button
             new MaterialShowcaseView.Builder(this)
-                    .setTarget(saveProgressButton)
+                    .setTarget(Savebtn)
                     .setShapePadding(96)
                     .setTitleText(getResources().getString(R.string.UserManualTitle))
                     .setDismissText(getResources().getString(R.string.UserManualDismissText))
@@ -272,8 +272,6 @@ public class ReadArticleActivity extends AppCompatActivity {
                     .edit()
                     .putBoolean("manual", needsUserManual)
                     .apply();
-
-
             return;
         }
 
@@ -293,7 +291,8 @@ public class ReadArticleActivity extends AppCompatActivity {
         Log.d(TAG, "Progress saved on word index " + GEARGlobal.getLastWordClickedIndex().toString());
         final DataStorage dataStorage = new DataStorage(getApplicationContext());
         new Thread(new Runnable() {
-            @Override
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+			@Override
             public void run() {
                 HashMap<String, ArrayList<Object>> wordsToSave = new HashMap<String, ArrayList<Object>>();
                 BreakIterator iterator = BreakIterator.getWordInstance(Locale.GERMANY);
@@ -373,10 +372,10 @@ public class ReadArticleActivity extends AppCompatActivity {
                     dataStorage.addGroupToUserDictionary(wordsToSave);
                     //dismiss the progress and finish the SavePopupActivity if exist
                     progress.dismiss();
-                    if (SaveProgressDialog != null) {
+                    if (SavePopupActivity.savePopupActivity != null) {
+                        SavePopupActivity.savePopupActivity.finish();
                         finish();
                     }
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -393,46 +392,22 @@ public class ReadArticleActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        final View view = findViewById(R.id.buttonSave);
-        //If last page has been reached show last page dialog
+        //If last page has been reached show last page popup
         if (fragmentIndex == numberOfPages - 1) {
-            SaveProgressDialog = new AlertDialog.Builder(this)
-                    .setTitle("Save Progress")
-                    .setMessage("You have reached the end of the article\nWould you like to save your progress?")
-                    .setNegativeButton("Don't Save", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    })
-                    .setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            progressSaved = false;
-                            GEARGlobal.setLastWordClicked("None");
-                            Integer LastWordIndex = PageFragment.wordIndexing.get(numberOfPages);
-                            GEARGlobal.setLastWordClickedIndex(LastWordIndex);
-                            saveProgress(view);
-                        }
-                    });
-            SaveProgressDialog.create().show();
+			Intent intent = new Intent(ReadArticleActivity.this, SavePopupActivity.class);
+			progressSaved = false;
+			intent.putExtra("saveProgressQuery", "You have reached the end of the article\n" +
+					"Would you like to save your progress?");
+			intent.putExtra("isLastPage", true);
+			intent.putExtra("numberOfPages", numberOfPages);
+			startActivity(intent);
         }
-        //If user did not save progress show save progress dialog
+        //If user did not save progress show save progress popup
         else if (!isProgressSaved()) {
-            SaveProgressDialog = new AlertDialog.Builder(this)
-                    .setTitle("Save Progress")
-                    .setMessage("Would you like to save your progress?")
-                    .setNegativeButton("Don't Save", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    })
-                    .setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            saveProgress(view);
-                        }
-                    });
-            SaveProgressDialog.create().show();
+			Intent intent = new Intent(ReadArticleActivity.this, SavePopupActivity.class);
+			intent.putExtra("saveProgressQuery", "Would you like to save your progress?");
+			intent.putExtra("isLastPage", false);
+			startActivity(intent);
         } else {
             finish();
         }
@@ -715,7 +690,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     }
 
     /*
-     * Method to show the page swiping tutorial
+     * Method to show the page swiping tutorial and word click tutorial
      * Set the first run preference to false so when article opened again method will not run
      */
     private void ShowSwipeTutorial() {
@@ -725,14 +700,14 @@ public class ReadArticleActivity extends AppCompatActivity {
                 (this, TutorialView.RightToLeft, TutorialView.LowerCenter, findViewById(R.id.frameLayout));
         TextView Dismiss = (TextView) findViewById(R.id.textViewSwipe);
         SwipeTutorial.setVisibility(View.VISIBLE);                                        //Show tutorial layout and text
-        tutorialView.show();                                                            //Show the hand tutorial view
+        tutorialView.show();                                                              //Show the hand tutorial view
         Savebtn.setEnabled(false);                                                        //Disable save progress button while tutorial is shown
         Dismiss.setOnClickListener(new View.OnClickListener() {
             TutorialView tutorialView2;
-
             @Override
             public void onClick(View v) {
                 click++;
+				//If dismiss text is clicked for first time hide swipe tutorial and show click tutorial
                 if (click == 1) {
                     tutorialView.hide();
                     SwipeTutorial.startAnimation(animation);
@@ -743,7 +718,9 @@ public class ReadArticleActivity extends AppCompatActivity {
                                     TutorialView.LowerCenter,
                                     findViewById(R.id.frameLayout));
                     tutorialView2.show();
-                } else {
+                }
+				//If dismiss text is clicked for second time hide the tutorial view
+				else {
                     ((ViewManager) SwipeTutorial.getParent()).removeView(SwipeTutorial);
                     tutorialView2.hide();
                     Savebtn.setEnabled(true);

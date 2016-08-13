@@ -1,26 +1,74 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center">
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center"
+              android:background="#FFFFFF">
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/saveProgressQuery" />
+        android:text="Save Progress"
+        android:id="@+id/PopupTitle"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:textSize="20dp"
+        android:paddingLeft="20dp"
+        android:paddingBottom="15dp"
+        android:layout_gravity="left"
+        />
 
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Save"
-        android:onClick="saveProgress"
-        android:id="@+id/savePopup"
-        android:layout_gravity="center" />
+        android:id="@+id/saveProgressQuery"
+        android:textColor="#000000"
+        android:textSize="17dp"
+        android:paddingLeft="20dp"
+        android:gravity="left"
+        android:layout_gravity="left"/>
 
-    <Button
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Don&apos;t Save"
-        android:id="@+id/dontSaveButton"
-        android:onClick="dontSave" />
+        android:layout_gravity="right"
+        android:paddingTop="10dp"
+        >
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/dontSaveButton"
+            android:onClick="dontSave"
+            android:text="Don&apos;t Save"
+            android:background="#00000000"
+            android:textSize="17dp"
+            android:textStyle="bold"
+            android:textColor="#128677"
+            android:stateListAnimator="@null"
+            android:layout_marginLeft="82dp"
+            android:layout_marginStart="82dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/savePopup"
+            android:onClick="saveProgress"
+            android:text="Save"
+            android:background="#00000000"
+            android:textSize="17dp"
+            android:textStyle="bold"
+            android:textColor="#128677"
+            android:stateListAnimator="@null"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/dontSaveButton"
+            android:layout_toEndOf="@+id/dontSaveButton"
+            android:layout_marginLeft="41dp"
+            android:layout_marginStart="41dp"/>
+    </RelativeLayout>
+
 </LinearLayout>

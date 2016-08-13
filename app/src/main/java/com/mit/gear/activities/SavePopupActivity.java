@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -30,25 +32,23 @@ public class SavePopupActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState){
         savePopupActivity = this;
         super.onCreate(savedInstanceState);
-
+		savePopupActivity.setFinishOnTouchOutside(false);    //Make the activity not cancelable
         setContentView(R.layout.popup_save);
         TextView saveProgressQuery = (TextView)findViewById(R.id.saveProgressQuery);
         Intent i = getIntent();
         saveProgressQuery.setText( i.getStringExtra("saveProgressQuery"));
         isLastPage = i.getBooleanExtra("isLastPage",false);
         numberOfPages = i.getIntExtra("numberOfPages", 0);
+		//Sets this activity to be a pop up
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
-
         final int width = dm.widthPixels;
         final int height = dm.heightPixels;
 
-        //sets this activity to be a pop up
-
         if(ReadArticleActivity.needsUserManual) {   //this shows a user manual hint to the user for save progress button
             new MaterialShowcaseView.Builder(this)
-                    .setTarget(findViewById(R.id.savePopup))
-                    .setShapePadding(150)
+                    .setTarget(findViewById(R.id.dontSaveButton))
+                    .setShapePadding(370)
                     .setTitleText(getResources().getString(R.string.UserManualTitle))
                     .setDismissText(getResources().getString(R.string.UserManualDismissText))
                     .setContentText(getResources().getString(R.string.UserManualSavePgContent))
@@ -63,7 +63,7 @@ public class SavePopupActivity extends Activity {
 
                         @Override
                         public void onShowcaseDismissed(MaterialShowcaseView materialShowcaseView) {
-                            getWindow().setLayout((int) (width*0.5) , (int) (height* 0.2));
+                            getWindow().setLayout((int) (width*0.6) , (int) (height* 0.2));
                         }
                     })
                     .show();
@@ -73,26 +73,37 @@ public class SavePopupActivity extends Activity {
                     .putBoolean("manual", false)
                     .apply();
         }else{
-            getWindow().setLayout((int) (width*0.5) , (int) (height* 0.2));
+            getWindow().setLayout((int) (width*0.6) , (int) (height* 0.2));				//Set the size of the activity
         }
-
-        //Following lines set the size of the activity
     }
 
+	/*
+	 * This method will be excused when don't save button clicked
+	 * Method will dismiss the savePopupActivity and ReadArticleActivity
+	 */
     public void dontSave(View view){
-        //dismissing the savePopupActivity
         savePopupActivity.finish();
+		ReadArticleActivity.getReadArticleActivityInstance().finish();
     }
 
+	/*
+	 * This method will be excused when save button clicked
+	 * Method will call save progress in ReadArticleActivity and will dismiss both activty
+	 * If the last page has been reached valus are set accordingly
+	 */
     public void saveProgress(View view) {
-    //checks if the user in the last page sets the last clicked word index to the end of the article
-        if (isLastPage)
-    {
-        GEARGlobal.setLastWordClicked("None");
-        Integer LastWordIndex= PageFragment.wordIndexing.get(numberOfPages);
-        GEARGlobal.setLastWordClickedIndex(LastWordIndex);
-    }
+        if (isLastPage){														//Checks last page has been reached
+        	GEARGlobal.setLastWordClicked("None");
+        	Integer LastWordIndex= PageFragment.wordIndexing.get(numberOfPages); 	//Sets the last clicked word index to the end of the article
+        	GEARGlobal.setLastWordClickedIndex(LastWordIndex);
+		}
         ReadArticleActivity.getReadArticleActivityInstance().saveProgress(view);
     }
+
+	@Override
+	protected void onPause() {
+		savePopupActivity = null;
+		super.onPause();
+	}
 
 }
