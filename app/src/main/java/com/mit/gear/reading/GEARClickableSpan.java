@@ -1,23 +1,17 @@
 package com.mit.gear.reading;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.os.AsyncTask;
 import android.speech.tts.TextToSpeech;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.activities.LiteNewsFragment;
-import com.mit.gear.activities.MainActivity;
 import com.mit.gear.activities.StoriesSelectionActivity;
 import com.mit.gear.data.DataStorage;
-import com.mit.gear.words.DefinitionRequest;
 import com.mit.gear.words.GEARGlobal;
 import com.mit.gear.words.Translator;
 import com.mit.gear.words.Word;
@@ -27,7 +21,6 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
@@ -49,17 +42,17 @@ public class GEARClickableSpan extends ClickableSpan {
     public static boolean speakChoice;
     private ReadArticleActivity readArticleActivity =
 			ReadArticleActivity.getReadArticleActivityInstance();		//Creating ReadArticleActivity instance to access variable and objects
-    private static String lemma;
+    private static String lemma = "None";
 	DataStorage dataStorage = new DataStorage(context);
 
     public GEARClickableSpan(String word) {
         mWord = word;
     }
 
+
     @Override
     public void onClick(View widget) {
-		UpdateFlags();
-        updateLastClickedWord();
+        readArticleActivity.UndoView.setEnabled(false);     //disable the undo button unless all work of onclick finishes
         if (currentDefinitionRequest != null) {
             currentDefinitionRequest.cancel(true);
         }
@@ -67,14 +60,14 @@ public class GEARClickableSpan extends ClickableSpan {
         Log.d(TAG, "tapped on: " + mWord);
         ArrayList<String> time_place_holder = new ArrayList<>();
         time_place_holder.add("0");
-        translate();
-		SetWordToSave();
+       final Integer caseNo =  SetWordToSave();
+
         if (textPaint != null) {
             color(widget);
         }
-        speakWord(); //speak the word when clicked
+        lemma = translate();
+        new UpdateClickedWordData().execute(caseNo.toString(),lemma);
 
-		showUserManual();
 
     }
 
@@ -84,7 +77,6 @@ public class GEARClickableSpan extends ClickableSpan {
         ds.setUnderlineText(false);
 		if (colorChoice) {         //if the color choice is true(color switch is on)
 			ColorWordInDictionary(ds);
-			ColorWordInColorFile(ds);
         }else{                     //if the user turned off the text coloring color with the default color
             ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
 					.getColor(R.color.default_word));
@@ -137,12 +129,12 @@ public class GEARClickableSpan extends ClickableSpan {
             word.add(String.valueOf(index));
             GEARGlobal.ListLastClickedWords.add(word);
         }
-		Log.d("MaximumLastClicked", GEARGlobal.MaximumLastClickedWords.toString());
-		Log.d("ListLastClicked", GEARGlobal.ListLastClickedWords.toString());
+
     }
 
+
     /*
-     * this method speak the clicked word if the speack option is on
+     * this method speak the clicked word if the speak option is on
      */
     public void speakWord(){
         if(speakChoice) {
@@ -150,126 +142,121 @@ public class GEARClickableSpan extends ClickableSpan {
         }
     }
 
+
     /*
      * this method call translator class to translate the clicked word  and sets its lemma
      * if the translator return empty lemma, set it to None
      */
-    public void translate(){
+
+    public String translate(){
         try {
             currentDefinitionRequest=  new Translator(mWord);
             lemma= currentDefinitionRequest.execute().get();
             if(lemma.isEmpty()){
                 lemma="None";
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return lemma;
+
     }
+
 
 	/*
 	 * Method to check if word is clicked in current session or not and update count
 	 * Check word first letter case and update accordingly
 	 */
-	public void SetWordToSave(){
-		DataStorage dataStorage = new DataStorage(context);
+
+	public Integer SetWordToSave(){
+
 		//If word clicked contained in current session update count (Number of clicks)
 		if (readArticleActivity.currentSessionWords.containsKey(mWord)) {
 			Integer count = readArticleActivity.currentSessionWords.get(mWord);
 			count += 1;
 			readArticleActivity.currentSessionWords.put(mWord, count);
-			Log.d("SetWordToSave","Word in currentSessionWords update count");
-			Log.d("SetWordToSave1",readArticleActivity.currentSessionWords.toString());
-			SaveWord(mWord,"None");
-			return;
+			return 0;
 		}
 		//If word not in current session check word first letter case
 		else{
+
 			//If word first letter is upper case
 			if(Character.isUpperCase(mWord.charAt(0))){
-				Log.d("SetWordToSave","Word is in upper case");
+
 				//Check if word in lower case form is in current session update count (Number of clicks)
 				if (readArticleActivity.currentSessionWords.containsKey(mWord.toLowerCase())) {
 					Integer count = readArticleActivity.currentSessionWords.get(mWord.toLowerCase());
 					count += 1;
 					readArticleActivity.currentSessionWords.put(mWord.toLowerCase(), count);
-					Log.d("SetWordToSave","Word small version is in currentSessionWords update count");
-					Log.d("SetWordToSave2",readArticleActivity.currentSessionWords.toString());
-					try {
-						dataStorage.addToColorFile(mWord,true);
-					} catch (JSONException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					SaveWord(mWord.toLowerCase(),"None");
-					return;
+					return 1;
 				}
+
 				//Both lower and upper case not in current session word is new
 				else{
-					Log.d("SetWordToSave","Word is not in currentSessionWords");
 					readArticleActivity.currentSessionWords.put(mWord, 1);
-					Log.d("SetWordToSave3",readArticleActivity.currentSessionWords.toString());
-					try {
-						dataStorage.addToColorFile(mWord.toLowerCase(),true);
-					} catch (JSONException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					SaveWord(mWord,"None");
-					return;
+					return 2;
 				}
 			}
+
 			//If word first letter is lower case
-			else if(Character.isLowerCase(mWord.charAt(0))){
-				Log.d("SetWordToSave","Word is in lower case");
+			else {
 				Character first = Character.toUpperCase(mWord.charAt(0));
 				String WordToCheck = first+mWord.substring(1);
+
 				//Check if word in upper case form is in current session update count (Number of clicks)
 				if (readArticleActivity.currentSessionWords.containsKey(WordToCheck)){
-					Log.d("SetWordToSave","Word capital version is in currentSessionWords update count");
 					Integer count = readArticleActivity.currentSessionWords.get(WordToCheck);
 					count += 1;
 					readArticleActivity.currentSessionWords.put(WordToCheck, count);
-					Log.d("SetWordToSave4",readArticleActivity.currentSessionWords.toString());
-					try {
-						dataStorage.addToColorFile(mWord,true);
-					} catch (JSONException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					SaveWord(WordToCheck,mWord);
-					return;
+					return 3;
 				}
+
 				//Both lower and upper case not in current session word is new
 				else{
-					Log.d("SetWordToSave","Word is not in currentSessionWords");
 					readArticleActivity.currentSessionWords.put(mWord, 1);
-					Log.d("SetWordToSave5",readArticleActivity.currentSessionWords.toString());
-					try {
-						dataStorage.addToColorFile(WordToCheck,true);
-					} catch (JSONException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					SaveWord(mWord,"None");
-					return;
+					return 4;
 				}
 			}
 		}
 
 	}
 
+    /*
+     *This method saves the clicked word in dictionary based of the case number from SetWordToSave method
+     * there are 3 cases either save the same word, save the other version or replace the word with lowercase version
+     *This method will call SaveWordToDictionary with the appropriate parameters
+     */
+
+    private void SaveWordToDictionarySwitch(Integer caseNo,String lemma){
+        switch (caseNo){
+            case 0:
+            case 2:
+            case 4:
+                SaveWordToDictionary(mWord, "None", lemma);
+                break;
+            case 1:
+                SaveWordToDictionary(mWord.toLowerCase(), "None", lemma);
+                break;
+
+            case 3:
+                Character first = Character.toUpperCase(mWord.charAt(0));
+                String WordToCheck = first+mWord.substring(1);
+                SaveWordToDictionary(WordToCheck, mWord, lemma);
+                break;
+
+        }
+    }
+
+
+
 
 	/*
 	 * Method to create new word object and add word to dictionary
 	 * WordSmall will be set if small is clicked and capital exist in dictionary
 	 */
-	public void SaveWord(String WordToSave, String WordSmall){
-		Log.d("SaveWord","WordToSave = "+WordToSave+" WordSmall = "+WordSmall);
-		Log.d("currentSession",readArticleActivity.currentSessionWords.toString());
+	public void SaveWordToDictionary(String WordToSave, String WordSmall, String lemma){
+
 		Word wordData = new Word(WordToSave,lemma);
 		wordData.setClicked(true);
 		//If WordSmall is set get the count of the capital, remove the capital and add the small with same count
@@ -277,18 +264,9 @@ public class GEARClickableSpan extends ClickableSpan {
 			Integer count = readArticleActivity.currentSessionWords.get(WordToSave);
 			readArticleActivity.currentSessionWords.remove(WordToSave);
 			readArticleActivity.currentSessionWords.put(WordSmall, count);
-			try {
-				dataStorage.deleteFromColorFile(WordSmall);
-				dataStorage.addToColorFile(WordToSave,true);			//Add the capital to the coloring file
-			} catch (JSONException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
 		}
-		Log.d("currentSession2",readArticleActivity.currentSessionWords.toString());
 		userDictionary = readArticleActivity.userDictionary;
-		Log.d("userDictionary1",userDictionary.toString());
 		try {
 			dataStorage.addToUserDictionary(WordToSave, lemma, WordSmall,readArticleActivity.currentArticle, true);
 		} catch (JSONException e) {
@@ -304,100 +282,68 @@ public class GEARClickableSpan extends ClickableSpan {
 	private void UpdateFlags(){
 		StoriesSelectionActivity.needsToScore=true;
 		LiteNewsFragment.needsToScore=true;
-		readArticleActivity.pagesView.getAdapter().notifyDataSetChanged();         //Update the view for all the preloaded fragments (max 3)
 		readArticleActivity.setProgressSaved(false);                               //Set progressSaved to false to popup the savePopupActivity in case user did not save
-		readArticleActivity.UndoView.setTextColor
-				(readArticleActivity.getResources().getColor(R.color.table_header_text));
 		readArticleActivity.UndoClicks++;
 	}
 
-	/*
-	 * Method to color words in current session and in user dictionary
-	 */
-	private void ColorWordInDictionary(TextPaint ds){
-		HashMap<String, Word> userDictionary =
-				ReadArticleActivity.getReadArticleActivityInstance().userDictionary; 						//Access the latest userDictionary
-		if(readArticleActivity.currentSessionWords.containsKey(mWord)){    //if the word in the currentSessionWords word ( clicked in the current session )
-			ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-					.getColor(R.color.clicked_word));
-			ds.bgColor=(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-					.getColor(R.color.clicked_word_background));
-		}
-		else if(userDictionary.containsKey(mWord)){             										//if the word in the userDictionary check if it is clicked or passed
-			if(userDictionary.get(mWord).clicked)
-				ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-						.getColor(R.color.clicked_word));
-			else{
-				ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-						.getColor(R.color.passed_word));
-			}
-		}else{                                                  										//else color the rest of the word with the default color
-			ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-					.getColor(R.color.default_word));
-		}
-	}
 
-	/*
-	 * Method to color words in color file
-	 */
-	private void ColorWordInColorFile(TextPaint ds){
-		HashMap<String, Word> userDictionary =
-				ReadArticleActivity.getReadArticleActivityInstance().userDictionary; 						//Access the latest userDictionary
-		HashMap<String, Boolean> WordToColor = dataStorage.loadColorFile();									//Access the latest file that contains the word to color
-		if((WordToColor.containsKey(mWord)&&WordToColor.get(mWord))){
-			if(Character.isUpperCase(mWord.charAt(0))){
-				if (readArticleActivity.currentSessionWords.containsKey(mWord.toLowerCase())){
-					ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-							.getColor(R.color.clicked_word));
-					ds.bgColor=(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-							.getColor(R.color.clicked_word_background));
-				}else if (userDictionary.containsKey(mWord.toLowerCase())){
-					ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-							.getColor(R.color.clicked_word));
-				}
-			}
-			if (Character.isLowerCase(mWord.charAt(0))){
-				Character first = Character.toUpperCase(mWord.charAt(0));
-				String cWord = first+mWord.substring(1);
-				if (readArticleActivity.currentSessionWords.containsKey(cWord)){
-					ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-							.getColor(R.color.clicked_word));
-					ds.bgColor=(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-							.getColor(R.color.clicked_word_background));
-				}else if (userDictionary.containsKey(cWord)){
-					ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-							.getColor(R.color.clicked_word));
-				}
-			}
-		}
-		if((WordToColor.containsKey(mWord)&&!WordToColor.get(mWord))){
-			if(Character.isUpperCase(mWord.charAt(0))){
-				if (userDictionary.containsKey(mWord.toLowerCase())){
-					if(userDictionary.get(mWord.toLowerCase()).clicked){
-						ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-								.getColor(R.color.clicked_word));
-					}else {
-						ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-								.getColor(R.color.passed_word));
-					}
-				}
-			}
-			if (Character.isLowerCase(mWord.charAt(0))){
-				Character first = Character.toUpperCase(mWord.charAt(0));
-				String cWord = first+mWord.substring(1);
-				if (userDictionary.containsKey(cWord)){
-					if(userDictionary.get(cWord).clicked){
-						ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-								.getColor(R.color.clicked_word));
-					}else {
-						ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
-								.getColor(R.color.passed_word));
-					}
-				}
-			}
-		}
 
-	}
+
+
+    /*
+     * Method to color words in current session and in user dictionary
+     */
+
+    private void ColorWordInDictionary(TextPaint ds){
+        HashMap<String, Word> userDictionary =
+                ReadArticleActivity.getReadArticleActivityInstance().userDictionary; 						//Access the latest userDictionary
+        String uppercaseWord = mWord.toUpperCase().charAt(0)+mWord.substring(1);
+        String lowerCaseWord = mWord.toLowerCase();
+
+        //if the word in the currentSessionWords word ( clicked in the current session )
+        if(readArticleActivity.currentSessionWords.containsKey(lowerCaseWord)||readArticleActivity.currentSessionWords.containsKey(uppercaseWord)) {
+            ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
+                    .getColor(R.color.clicked_word));
+            ds.bgColor=(ReadArticleActivity.getReadArticleActivityInstance().getResources()
+                    .getColor(R.color.clicked_word_background));
+        }
+
+        //if the lowercase word in the userDictionary check if it is clicked or passed
+        else if(userDictionary.containsKey(lowerCaseWord)){
+
+            if(userDictionary.get(lowerCaseWord).clicked)
+                ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
+                        .getColor(R.color.clicked_word));
+            else{
+                ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
+                        .getColor(R.color.passed_word));
+            }
+
+        }
+
+        //if the uppercase word in the userDictionary check if it is clicked or passed
+        else if(userDictionary.containsKey(uppercaseWord)){
+
+            if(userDictionary.get(uppercaseWord).clicked)
+                ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
+                        .getColor(R.color.clicked_word));
+            else{
+                ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
+                        .getColor(R.color.passed_word));
+            }
+
+        }
+
+        //else color the rest of the word with the default color
+        else{
+            ds.setColor(ReadArticleActivity.getReadArticleActivityInstance().getResources()
+                    .getColor(R.color.default_word));
+        }
+    }
+
+
+
+
 
 
 	/*
@@ -419,4 +365,28 @@ public class GEARClickableSpan extends ClickableSpan {
 				.show();
 	}
 
+    /*
+     * This asyncTask will run the necessary method after a word is clicked
+     * When done, the undo button will be enabled again (will be disabled when a word is clicked until the task finishes)
+     * This asyncTask were separated from onclick method for the huge load on main thread when onclick method run
+     */
+    private class UpdateClickedWordData extends AsyncTask<String, Void, String> {
+        protected String doInBackground(String... caseNoAndLemma) {
+
+            UpdateFlags();
+            updateLastClickedWord();
+            speakWord();
+            return caseNoAndLemma[0]+caseNoAndLemma[1] ;
+        }
+
+        protected void onPostExecute(String caseNoAndLemma) {
+            readArticleActivity.UndoView.setTextColor
+                    (readArticleActivity.getResources().getColor(R.color.table_header_text));
+            readArticleActivity.UndoView.setEnabled(true);
+
+            SaveWordToDictionarySwitch(Integer.parseInt(caseNoAndLemma.substring(0, 1)), caseNoAndLemma.substring(1));
+                    readArticleActivity.pagesView.getAdapter().notifyDataSetChanged();         //Update the view for all the preloaded fragments (max 3)
+                    showUserManual();
+        }
+    }
 }

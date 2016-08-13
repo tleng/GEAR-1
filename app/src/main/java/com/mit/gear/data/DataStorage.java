@@ -7,7 +7,6 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mattmellor.gear.R;
-import com.mit.gear.activities.MainActivity;
 import com.mit.gear.words.Word;
 
 import org.json.JSONException;
@@ -19,7 +18,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Michael on 12/12/15.
@@ -56,82 +54,7 @@ public class DataStorage {
         return userDictionary;
     }
 
-	public HashMap<String, Boolean> loadColorFile() {
-		WordToColor = loadWordsColor(COLORFILE);
-		return WordToColor;
-	}
 
-	/*
-	 * Method to load file that contains the words that are not in dictionary
-	 * and needs to be colored, different case of the word is in dictionary
-	 */
-	private HashMap<String, Boolean> loadWordsColor(String file) {
-		HashMap<String, Boolean> loadingFile = new HashMap<>();
-		try {
-			InputStream in = context.openFileInput(file);
-			if (in != null) {
-				InputStreamReader tmp=new InputStreamReader(in);
-				BufferedReader reader=new BufferedReader(tmp);
-				String str;
-				StringBuilder buf=new StringBuilder();
-				while ((str = reader.readLine()) != null) {
-					buf.append(str);
-				}
-				in.close();
-				loadingFile = new Gson().fromJson(buf.toString(), new TypeToken<HashMap<String, Boolean>>() {
-				}.getType());
-			}
-		}catch (java.io.FileNotFoundException e) {
-			Log.d("Dictionary","No dictionary file found.");
-		}catch (Throwable t) {
-
-		}finally {
-			return loadingFile;
-		}
-	}
-
-
-	/*
-	 * Method to add word to coloring file
-	 * different case of the word is clicked
-	 */
-	public void addToColorFile(String word, boolean click) throws JSONException, IOException {
-		HashMap<String, Boolean> dictionary = loadColorFile();
-		Log.d("WordToColor", dictionary.toString());
-		dictionary.put(word,click);
-		Gson gson = new Gson();
-		String json = gson.toJson(dictionary);
-		OutputStreamWriter out = new OutputStreamWriter(context.openFileOutput(COLORFILE, 0));
-		out.write(json);
-		Log.d("Saved WordToColor",word +","+click);
-		out.close();
-	}
-
-	/*
-	 * Method to delete word to coloring file
-	 * different case of the word is clicked
-	 */
-	public void deleteFromColorFile(String word) throws JSONException, IOException {
-		HashMap<String, Boolean> dictionary = loadColorFile();
-		dictionary.remove(word);
-		Gson gson = new Gson();
-		String json = gson.toJson(dictionary);
-		OutputStreamWriter out= new OutputStreamWriter(context.openFileOutput(COLORFILE, 0));
-		out.write(json);
-		out.close();
-	}
-
-	/*
-	 * Method to clear all words in coloring file
-	 */
-	public void clearColorFile() throws IOException {
-		HashMap<String,Boolean> userDictionary = new HashMap<>();
-		Gson gson = new Gson();
-		String json = gson.toJson(userDictionary);
-		OutputStreamWriter out= new OutputStreamWriter(context.openFileOutput(COLORFILE, 0));
-		out.write(json);
-		out.close();
-	}
 
     public HashMap<String, Word> loadUnclickedWords() {
         unclickedWords = loadWordsFile(UNCLICKEDWORDS);
@@ -154,9 +77,7 @@ public class DataStorage {
                 in.close();
                 loadingFile = new Gson().fromJson(buf.toString(), new TypeToken<HashMap<String, Word>>() {
                 }.getType());
-                //Log.d(file,loadingFile.toString());
             }
-            //Log.d(file,"null");
 
         } catch (java.io.FileNotFoundException e) {
             Log.d("Dictionary","No dictionary file found.");
@@ -225,20 +146,56 @@ public class DataStorage {
             String lemma = (String) lemmaArticleClick.get(0); // Lemma
             String article = (String) lemmaArticleClick.get(1); // Article filename
             boolean click = (boolean) lemmaArticleClick.get(2); // click should be false
+            String wordToCheck ;                    //other version of the word (uppercase/lowercase)
+            boolean otherVersionExist = false;      //this flag indicates if there is either a lowercase or uppercase version of the word in the dictionary
+            boolean needsToSwap;                    //this flag indicate if there is the need to swap a uppercase word from dictionary with lowercase word
+
+            if(Character.isUpperCase(word.charAt(0))){
+
+                wordToCheck=Character.toLowerCase(word.charAt(0))+word.substring(1);
+                needsToSwap=false;                      //regardless of whether there is another version on dictionary, there is no need to swap the lowercase in dic with uppercase
+
+            }else{
+
+                wordToCheck=Character.toUpperCase(word.charAt(0))+word.substring(1);
+                needsToSwap=true;
+
+            }
+
             userData = null;
             for (int i = 0; i < (Integer) lemmaArticleClick.get(3); i++) {
                 if (dictionary.containsKey(word)) {
                     userData = dictionary.get(word);
                     userData.update(article, click);
                     userData.scoreWord(click, true);
+                }else if(dictionary.containsKey(wordToCheck)){
+                    userData = dictionary.get(wordToCheck);
+                    userData.update(article, click);
+                    userData.scoreWord(click, true);
+                    otherVersionExist = true;
                 } else {
                     userData = new Word(word, lemma);
                     userData.update(article, click);
                     userData.scoreWord(click, false);
+                    dictionary.put(word, userData);
                 }
             }
-            dictionary.put(word, userData);
+            if(otherVersionExist){              //if other version of the word exist in dic (lowercase or uppercase)
+
+                if(needsToSwap){                //if uppercase exist in dic and the word we are processing is lower, then update the dic with lowercase word
+                    userData.setWord(word);
+                    dictionary.remove(wordToCheck);
+                    dictionary.put(word,userData);
+                }
+                else{                           //if lowercase word exist in dic just update its parameter
+                    dictionary.put(wordToCheck, userData);
+                }
+            }
+            else{
+                dictionary.put(word, userData);
+            }
         }
+
         Gson gson = new Gson();
         String json = gson.toJson(dictionary);
         OutputStreamWriter out=
@@ -252,7 +209,6 @@ public class DataStorage {
 
     public void addToWordsFile(String word, String lemma, String wordSmall,String file, String article, boolean click) throws JSONException, IOException {
         HashMap<String, Word> dictionary = loadWordsFile(file);
-        Log.d("1 dictionaryAdd", dictionary.toString());
         Word userData = null;
         if (dictionary.containsKey(word))
 		{
@@ -261,16 +217,12 @@ public class DataStorage {
 				userData.setLemma(lemma);
 			}
             if(!wordSmall.equals("None")){
-				Log.d("addToWordsFile","before Change to small = "+userData.getWord());
 				userData.setWord(wordSmall);
-				Log.d("addToWordsFile","Change to small = "+userData.getWord());
 				dictionary.remove(word);
-				Log.d("dictionaryAdd", dictionary.toString());
 				word = wordSmall;
 			}
             userData.update(article, click);
             userData.scoreWord(click, true);
-			Log.d("userDataAdd", "1 Word="+userData.getWord());
         }
 		else if(Character.isUpperCase(word.charAt(0)))
 		{
@@ -281,13 +233,11 @@ public class DataStorage {
 				}
 				userData.update(article, click);
 				userData.scoreWord(click, true);
-				Log.d("userDataAdd", "1 Word=" + userData.getWord());
 				word = word.toLowerCase();
 			}else {
 				userData = new Word(word, lemma);
 				userData.update(article, click);
 				userData.scoreWord(click, false);
-				Log.d("userDataAdd", "2 Word="+userData.getWord());
 			}
 		}
 		else if(Character.isLowerCase(word.charAt(0)))
@@ -303,18 +253,13 @@ public class DataStorage {
 				userData.update(article, click);
 				userData.scoreWord(click, true);
 				dictionary.remove(WordCheck);
-				Log.d("userDataAdd", "1 Word=" + userData.getWord());
 			}else {
 				userData = new Word(word, lemma);
 				userData.update(article, click);
 				userData.scoreWord(click, false);
-				Log.d("userDataAdd", "2 Word="+userData.getWord());
 			}
 		}
-		Log.d("userDataAdd", "Word Last=" + userData.getWord());
-		Log.d("Word", "Last=" + word);
         dictionary.put(word, userData);
-		Log.d("2 dictionaryAdd", dictionary.toString());
         Gson gson = new Gson();
         String json = gson.toJson(dictionary);
         OutputStreamWriter out=
@@ -334,38 +279,22 @@ public class DataStorage {
     public void deleteFromWordFile(String word, String lemma, String file, String article, boolean click) throws JSONException, IOException {
         HashMap<String, Word> dictionary = loadWordsFile(file);
 		Word userData;
-		Log.d("1 dictionaryDelete", dictionary.toString());
-        Log.d("userDataWord 1 ", word);
         userData = dictionary.get(word);
         if(userData == null){
-			Log.d("userData", "Null");
             if(Character.isUpperCase(word.charAt(0))){
-				Log.d("Word", "UpperCase");
                 word = word.toLowerCase();
                 userData = dictionary.get(word);
-				Log.d("userData", "get small Word = "+userData.getWord());
             }
         }
-		Log.d("userData", "NotNull Word = "+userData.getWord());
-        Log.d("userDataWord 2 ", word);
-        boolean KeepInDictionary = userData.RemoveUpdate(article, click); //update the word clicks (decrement)
+
+        boolean KeepInDictionary = userData != null && userData.RemoveUpdate(article, click); //update the word clicks (decrement)
 		Log.d("KeepInDictionary", String.valueOf(KeepInDictionary));
         if(KeepInDictionary){
             dictionary.put(word, userData); //update the word if clicked or passed
         }
         else {
-            dictionary.remove(word); // remove from dictionary if not clikced or passed
-			if(Character.isUpperCase(word.charAt(0))){
-				//MainActivity.WordToColor.remove(word.toLowerCase());
-				deleteFromColorFile(word.toLowerCase());
-			}else {
-				Character first = Character.toUpperCase(word.charAt(0));
-				word = first + word.substring(1);
-				//MainActivity.WordToColor.remove(word);
-				deleteFromColorFile(word);
-			}
+            dictionary.remove(word); // remove from dictionary if not clicked or passed
 		}
-		Log.d("2 dictionaryDelete", dictionary.toString());
         Gson gson = new Gson();
         String json = gson.toJson(dictionary);
         OutputStreamWriter out= new OutputStreamWriter(context.openFileOutput(file, 0));

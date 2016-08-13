@@ -49,7 +49,7 @@ public class Translator extends AsyncTask<Void, Void, String> {
         final TextView readingDictionary = activityInstance.readingDictionary;
 		ArrayList<String> WordDefinition = new ArrayList<>();
 		WordDefinition.add(mWord);
-        if (result != null) {
+        if (result != null ) {
 			WordDefinition.add(result);
 			activityInstance.DefinitionBoxList.add(WordDefinition);
 			Log.d("DefinitionBoxList",activityInstance.DefinitionBoxList.toString());
@@ -75,9 +75,9 @@ public class Translator extends AsyncTask<Void, Void, String> {
                     scrollview.fullScroll(View.FOCUS_DOWN);             //scroll the definition box to the bottom whenever word translation added
                 }
             });
-            super.onPostExecute(result);
         }else{
             readingDictionary.setText("");             //If no translation found
         }
+        super.onPostExecute(result);
     }
 }

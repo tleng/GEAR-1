@@ -1,5 +1,4 @@
 package com.mit.gear.activities;
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
-
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -20,12 +18,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
 import com.mattmellor.gear.R;
 import com.mit.gear.NavDrawer.NavDrawerItem;
 import com.mit.gear.NavDrawer.NavDrawerListAdapter;
@@ -33,6 +25,12 @@ import com.mit.gear.ShareActionProvider.SmartShareActionProvider;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.data.UserDataCollection;
 import com.mit.gear.words.Word;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Activity that represents the starting screen of the app
@@ -191,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
 					LiteNewsFragment.needsToScore=true;
 					DataStorage dataStorage = new DataStorage(context);
 					dataStorage.clearUserDictionary();
-					dataStorage.clearColorFile();
 					displayView(3);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -222,8 +219,9 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	/**
-	 * Diplaying fragment view for selected nav drawer list item
+	 * Displaying fragment view for selected nav drawer list item
 	 * */
+
 	private void displayView(int position) {
 		// update the main content by replacing fragments
 		Fragment fragment = null;
