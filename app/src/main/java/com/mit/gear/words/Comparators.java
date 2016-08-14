@@ -32,6 +32,26 @@ public final class Comparators {
 		return new TimeComparator();
 	}
 
+	public static Comparator<Word> SetWordComparatorReverse() {
+		return new WordComparatorReverse();
+	}
+
+	public static Comparator<Word> SetPassesComparatorReverse() {
+		return new PassesComparatorReverse();
+	}
+
+	public static Comparator<Word> SetLemmaComparatorReverse() {
+		return new LemmaComparatorReverse();
+	}
+
+	public static Comparator<Word> SetClicksComparatorReverse() {
+		return new ClicksComparatorReverse();
+	}
+
+	public static Comparator<Word> SetTimesComparatorReverse() {
+		return new TimeComparatorReverse();
+	}
+
     /*
     * Inner classes to override compare method
     */
@@ -77,4 +97,46 @@ public final class Comparators {
             return 0;
         }
     }
+
+	private static class WordComparatorReverse implements Comparator<Word> {
+		@Override
+		public int compare(final Word word1, final Word word2) {
+			return word2.getWord().compareToIgnoreCase(word1.getWord());
+
+		}
+	}
+
+	private static class PassesComparatorReverse implements Comparator<Word> {
+		@Override
+		public int compare(final Word word1, final Word word2) {
+			if (word2.totalWordPasses() > word1.totalWordPasses()) return -1;
+			if (word2.totalWordPasses() < word1.totalWordPasses()) return 1;
+			return 0;
+		}
+	}
+
+	private static class LemmaComparatorReverse implements Comparator<Word> {
+		@Override
+		public int compare(final Word word1, final Word word2) {
+			return word2.getLemma().compareToIgnoreCase(word1.getLemma());
+		}
+	}
+
+	private static class ClicksComparatorReverse implements Comparator<Word> {
+		@Override
+		public int compare(final Word word1, final Word word2) {
+			if (word2.totalWordClicks() > word1.totalWordClicks()) return -1;
+			if (word2.totalWordClicks() < word1.totalWordClicks()) return 1;
+			return 0;
+		}
+	}
+
+	private static class TimeComparatorReverse implements Comparator<Word> {
+		@Override
+		public int compare(final Word word1, final Word word2) {
+			if (word2.getClickTime() > word1.getClickTime()) return -1;
+			if (word2.getClickTime() < word1.getClickTime()) return 1;
+			return 0;
+		}
+	}
 }

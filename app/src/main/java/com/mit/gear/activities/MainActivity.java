@@ -341,15 +341,15 @@ public class MainActivity extends AppCompatActivity {
 		if (vocabulary.isEmpty()) {
 			vocabString = " ";
 		}else{
-			vocabString = "Word\tDefinition\n";
+			vocabString = "Word\t\tDefinition\n";
 			//Loop through user dictionary and list vocabulary words
 			for (Map.Entry<String, Word> entry : vocabulary.entrySet()) {
 				String key = entry.getKey();
 				Word word = entry.getValue();
 				if(word.getLemma().equals("None"))
-					vocabString += key +",\t"+ "\n";
+					vocabString += key +",\t\t"+ "\n";
 				else
-					vocabString += key + ",\t"+word.getLemma()+ "\n";
+					vocabString += key + ",\t\t"+word.getLemma()+ "\n";
 			}
 		}
 		return vocabString;

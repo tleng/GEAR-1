@@ -21,10 +21,12 @@ import com.mit.gear.words.Word;
 import com.mit.gear.words.WordTableAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.codecrafters.tableview.SortableTableView;
+import de.codecrafters.tableview.listeners.TableHeaderClickListener;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.SortStateViewProviders;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
@@ -38,6 +40,12 @@ public class DisplayVocabularyActivity extends Fragment {
     public static boolean ShowSeen;
     private SharedPreferences sharedPreferences;
     private SortableTableView TableView;
+	//Counter to count the number of header clicks for each column
+	private int WordColClicksNum = 0;
+	private int LemmaColClicksNum = 0;
+	private int ClicksColClicksNum = 0;
+	private int PassedColClicksNum = 0;
+	private int TimeColClicksNum = 0;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_display_user_vocabulary, container, false);
@@ -53,15 +61,40 @@ public class DisplayVocabularyActivity extends Fragment {
         View v = getView();
         TableView = (SortableTableView)v.findViewById(R.id.tableView);
         SetTableView(TableView);        //Set table view to display current user vocabulary
+		/*
+		 * Set header click listener to get the sort state and save it
+		 * so when vocabulary list opened again list will be sorted accordingly
+		 */
+		TableView.addHeaderClickListener(new TableHeaderClickListener() {
+			@Override
+			public void onHeaderClicked(int columnIndex) {
+				SharedPreferences.Editor editor = sharedPreferences.edit();
+				editor.putString("SortState", SortState(columnIndex));
+				editor.commit();
+			}
+		});
     }
 
     @Override
     public void onResume() {
+		TableView = (SortableTableView)getView().findViewById(R.id.tableView);
         ShowClicked = sharedPreferences.getBoolean("showClicked",true);
         ShowSeen = sharedPreferences.getBoolean("showSeen",true);
         SetTableView(TableView);        //Set table view to display current user vocabulary
         super.onResume();
     }
+
+	@Override
+	public void onPause() {
+		//Reset all column click counter
+		WordColClicksNum = 0;
+		LemmaColClicksNum = 0;
+		ClicksColClicksNum = 0;
+		PassedColClicksNum = 0;
+		TimeColClicksNum = 0;
+		TableView = null;
+		super.onPause();
+	}
 
     /*
 	 * This method is used to set vocabulary table view
@@ -150,6 +183,7 @@ public class DisplayVocabularyActivity extends Fragment {
     /*
      * This method is used to add the words is the user dictionary to the array list
      * The type of word added depends on the settings
+     * `calls method SortDate to sort data according to the saved sort state
      */
     private ArrayList<Word> SetData(){
         DataStorage dataStorage = new DataStorage(getActivity().getApplicationContext());
@@ -183,6 +217,128 @@ public class DisplayVocabularyActivity extends Fragment {
                 }
             }
         }
+		if(SortDate(VocList) != null){
+			VocList = SortDate(VocList);
+		}
         return VocList;
     }
+
+	/*
+	 * Method to keep track of columns clicks
+	 * return the sort state to be saved
+	 */
+	private String SortState(int columnIndex){
+		switch (columnIndex){
+			case 0:
+				WordColClicksNum++;
+				if(WordColClicksNum%2 == 0){
+					return "WordDesc";
+				}else{
+					return "WordAsc";
+				}
+			case 1:
+				if(ShowClicked&&ShowSeen || ShowClicked&&!ShowSeen){
+					LemmaColClicksNum++;
+					if(LemmaColClicksNum%2 == 0){
+						return "LemmaDesc";
+					}else{
+						return "LemmaAsc";
+					}
+				}else if(ShowSeen&&!ShowClicked){
+					PassedColClicksNum++;
+					if(PassedColClicksNum%2 == 0){
+						return "PassedDesc";
+					}else{
+						return "PassedAsc";
+					}
+				}
+				break;
+			case 2:
+				if(ShowClicked&&ShowSeen || ShowClicked&&!ShowSeen){
+					ClicksColClicksNum++;
+					if(ClicksColClicksNum%2 == 0){
+						return "ClicksDesc";
+					}else{
+						return "ClicksAsc";
+					}
+				}else if(ShowSeen&&!ShowClicked){
+					TimeColClicksNum++;
+					if(TimeColClicksNum%2 == 0){
+						return "TimeDesc";
+					}else{
+						return "TimeAsc";
+					}
+				}
+				break;
+			case 3:
+				if(ShowClicked&&ShowSeen){
+					PassedColClicksNum++;
+					if(PassedColClicksNum%2 == 0){
+						return "PassedDesc";
+					}else{
+						return "PassedAsc";
+					}
+				}else if(ShowClicked&&!ShowSeen){
+					TimeColClicksNum++;
+					if(TimeColClicksNum%2 == 0){
+						return  "TimeDesc";
+					}else{
+						return "TimeAsc";
+					}
+				}
+				break;
+			case 4:
+				TimeColClicksNum++;
+				if(TimeColClicksNum%2 == 0){
+					return "TimeDesc";
+				}else{
+					return "TimeAsc";
+				}
+		}
+		return "";
+	}
+
+	/*
+	 * Method to sort data acording to the saved sort state
+	 */
+	private ArrayList<Word> SortDate(ArrayList<Word> vocList){
+		String SavedState = sharedPreferences.getString("SortState", "None");
+		if(!SavedState.equals("None")){
+			switch (SavedState){
+				case "WordDesc":
+					Collections.sort(vocList, Comparators.SetWordComparatorReverse());
+					break;
+				case "WordAsc":
+					Collections.sort(vocList, Comparators.SetWordComparator());
+					break;
+				case "LemmaDesc":
+					Collections.sort(vocList, Comparators.SetLemmaComparatorReverse());
+					break;
+				case "LemmaAsc":
+					Collections.sort(vocList, Comparators.SetLemmaComparator());
+					break;
+				case "ClicksDesc":
+					Collections.sort(vocList, Comparators.SetClicksComparatorReverse());
+					break;
+				case "ClicksAsc":
+					Collections.sort(vocList, Comparators.SetClicksComparator());
+					break;
+				case "PassedDesc":
+					Collections.sort(vocList, Comparators.SetPassesComparatorReverse());
+					break;
+				case "PassedAsc":
+					Collections.sort(vocList, Comparators.SetPassesComparator());
+					break;
+				case "TimeDesc":
+					Collections.sort(vocList, Comparators.SetTimesComparatorReverse());
+					break;
+				case "TimeAsc":
+					Collections.sort(vocList, Comparators.SetTimesComparator());
+					break;
+			}
+		}else {
+			vocList = null;
+		}
+		return vocList;
+	}
 }
