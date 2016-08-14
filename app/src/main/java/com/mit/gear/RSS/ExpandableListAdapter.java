@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,6 +27,8 @@ import com.mattmellor.gear.R;
 import com.mit.gear.activities.StarredNewsFragment;
 import com.mit.gear.reading.ReadArticleActivity;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context _context;
@@ -36,13 +39,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Map<String, List<RssArticle>> _listDataChild;// child data, mapping between <header,child List>
     private Integer maxOfStarredArticles = 50;
     private Integer navIndex;
+    private Activity activity;
+    private boolean starredForFirstTime=false;
 
     /**
      * if the mode was not debug mode
      */
 
     public ExpandableListAdapter(Context context, List<String> listDataHeader,
-                                 Map<String, List<RssArticle>> listChildData, String Dir,Integer index) {
+                                 Map<String, List<RssArticle>> listChildData, String Dir,Integer index, Activity activity) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
@@ -50,6 +55,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         debugMode =false;
         this.Dir=Dir;
         this.navIndex=index;
+        this.activity=activity;
     }
 
     /**
@@ -57,7 +63,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      */
 
     public ExpandableListAdapter(Context context, List<String> listDataHeader,
-                                 Map<String, List<RssArticle>> listChildData, Map<RssArticle,Double> ArticleAndScoreMap, String Dir,Integer index) {
+                                 Map<String, List<RssArticle>> listChildData, Map<RssArticle,Double> ArticleAndScoreMap, String Dir,Integer index,Activity activity) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
@@ -65,6 +71,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         debugMode =true;
         this.Dir=Dir;
         this.navIndex=index;
+        this.activity=activity;
     }
 
     @Override
@@ -106,7 +113,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                         final String filename = rssArticle.getTitle();
                         final File myDir = _context.getDir(Dir, Context.MODE_PRIVATE); //the dir either the news or lite news
                         final File starredDir = _context.getDir("StarredArticles", Context.MODE_PRIVATE); //Creating an internal dir;
-
+                        starredForFirstTime = favorite;
                         if(favorite){                                   //if the click was to favorite
 
                             if(isMaximumReached()){                     // checks if the allowed maximum num of starred articles is reached
@@ -161,6 +168,18 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {
                     @Override
                     public void onAnimationEnd(MaterialFavoriteButton buttonView, boolean favorite) {
+                        if(starredForFirstTime){
+                            new MaterialShowcaseView.Builder(activity)
+                                    .setTarget(buttonView)
+                                    .setTitleText(_context.getResources().getString(R.string.UserManualTitle))
+                                    .setDismissText(_context.getResources().getString(R.string.UserManualDismissText))
+                                    .setContentText(_context.getResources().getString(R.string.UserManualStarredNews))
+                                    .setMaskColour(_context.getResources().getColor(R.color.manualBackground))
+                                    .setFadeDuration(300)
+                                    .singleUse("starredButton")
+                                    .show();
+                            starredForFirstTime=false;
+                        }
                     }
                 });
 
@@ -282,6 +301,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private void updateStarredCount(){
         File starredDir = _context.getDir("StarredArticles", Context.MODE_PRIVATE);
-        StarredNewsFragment.setTheCountBoxWithoutSelection(starredDir.listFiles().length,navIndex);
+        StarredNewsFragment.setTheCountBoxWithoutSelection(starredDir.listFiles().length, navIndex);
     }
 }

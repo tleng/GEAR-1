@@ -79,6 +79,8 @@
     <string name="UserManualDismissText">GOT IT</string>
     <string name="UserManualPageSwiping">Swipe left and right to move between pages</string>
     <string name="UserManualWordClicking">Tap on a word to hear the pronunciation and get the definition</string>
+    <string name="UserManualStarredNews">You have starred the news for future access\n you can get back to it from starred tab</string>
+
 
 
 </resources>
