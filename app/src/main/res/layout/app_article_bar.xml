@@ -7,9 +7,10 @@
     android:background="#303030">
 
 <Button
-    android:layout_width="130dp"
+    android:layout_width="wrap_content"
     android:layout_height="37dp"
     android:text="Save Progress"
+    android:padding="5dp"
     android:clickable="true"
     android:onClick="saveProgress"
     android:background="#737373"

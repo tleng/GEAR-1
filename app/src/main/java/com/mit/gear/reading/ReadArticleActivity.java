@@ -1,10 +1,8 @@
 package com.mit.gear.reading;
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
@@ -93,6 +91,7 @@ public class ReadArticleActivity extends AppCompatActivity {
     private int click = 0;                                    //Used to count number of click on dismiss text in tutorial
 	private boolean isFirstRun;
     public static boolean verticalSwipeDirection = false;     //indicate if the swipe us a vertical swipe
+    public static Integer  recentClickedWordIndex =-1;        //save the index of last clicked word (not necessary the maximum index)
 
     public ReadArticleActivity() {
         instance = this;
@@ -693,6 +692,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 	 * Method to update naccessary data and flags
 	 */
 	private void UpdateAndSetData(){
+        recentClickedWordIndex=-1;
 		copyRightReachedFirstTime = false;
 		CopyRightFragmentIndex = -1;
 		GEARGlobal.ListLastClickedWords.clear();

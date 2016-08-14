@@ -52,6 +52,10 @@ public class GEARClickableSpan extends ClickableSpan {
 
     @Override
     public void onClick(View widget) {
+        //check if it is the same last clicked word then return (consecutive clicks)
+        if((ReadArticleActivity.recentClickedWordIndex.intValue() ==index.intValue()) && (index.intValue()!=-1)){
+            return;
+        }
         readArticleActivity.UndoView.setEnabled(false);     //disable the undo button unless all work of onclick finishes
         if (currentDefinitionRequest != null) {
             currentDefinitionRequest.cancel(true);
@@ -129,7 +133,7 @@ public class GEARClickableSpan extends ClickableSpan {
             word.add(String.valueOf(index));
             GEARGlobal.ListLastClickedWords.add(word);
         }
-
+        ReadArticleActivity.recentClickedWordIndex=index;
     }
 
     /*
