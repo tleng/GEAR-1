@@ -184,6 +184,8 @@ public class MainActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor =  sharedPreferences.edit();
                     editor.putStringSet("openedArticles", new HashSet<String>());
                     editor.commit();
+					editor.putString("SortState","None");
+					editor.commit();
                     StoriesSelectionActivity.needsToScore=true;
 					LiteNewsFragment.needsToScore=true;
 					DataStorage dataStorage = new DataStorage(context);
