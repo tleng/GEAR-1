@@ -47,8 +47,8 @@ public class SavePopupActivity extends Activity {
 
         if(ReadArticleActivity.needsUserManual) {   //this shows a user manual hint to the user for save progress button
             new MaterialShowcaseView.Builder(this)
-                    .setTarget(findViewById(R.id.dontSaveButton))
-                    .setShapePadding(370)
+                    .setTarget(findViewById(R.id.saveProgressQuery))
+                    .setShapePadding(80)
                     .setTitleText(getResources().getString(R.string.UserManualTitle))
                     .setDismissText(getResources().getString(R.string.UserManualDismissText))
                     .setContentText(getResources().getString(R.string.UserManualSavePgContent))
