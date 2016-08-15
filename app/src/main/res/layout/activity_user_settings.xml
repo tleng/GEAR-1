@@ -1,124 +1,124 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context="com.mattmellor.gear.userSettings"
-    >
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.mattmellor.gear.userSettings">
 
 
     <RelativeLayout
         android:id="@+id/BarLayout"
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:background="#303030">
+        android:layout_alignParentTop="true"
+        android:background="#303030"
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="  User Setting"
-            android:id="@+id/textView"
-            android:textSize="20dp"
-            android:textColor="#FFFFFF"
-            android:layout_gravity="right"
             android:layout_centerVertical="true"
+            android:layout_gravity="right"
+            android:layout_toEndOf="@+id/imageView2"
             android:layout_toRightOf="@+id/imageView2"
-            android:layout_toEndOf="@+id/imageView2"/>
+            android:text="  User Setting"
+            android:textColor="#FFFFFF"
+            android:textSize="20dp" />
 
         <ImageView
+            android:id="@+id/imageView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView2"
-            android:src="@mipmap/settings"
-            android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="18dp"
-            android:layout_marginStart="18dp"/>
+            android:layout_marginStart="18dp"
+            android:src="@mipmap/settings" />
 
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/settingSwitches"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
         android:layout_below="@id/BarLayout"
-        android:id="@+id/settingSwitches"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <Switch
+            android:id="@+id/color"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/color"
             android:layout_below="@+id/textView5"
             android:layout_centerHorizontal="true"
             android:checked="true"
             android:text="Display Color    "
-            android:textSize="15dp"/>
+            android:textSize="15dp" />
 
         <Switch
+            android:id="@+id/speak"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Speak words     "
             android:layout_alignTop="@+id/color"
             android:layout_centerHorizontal="true"
-            android:checked="true"
-            android:id="@+id/speak"
             android:layout_gravity="center_horizontal"
-            android:textSize="15dp"
-            />
+            android:checked="true"
+            android:text="Speak words     "
+            android:textSize="15dp" />
 
         <Switch
+            android:id="@+id/debug"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Debug mode      "
-            android:id="@+id/debug"
             android:layout_below="@+id/linearLayout2"
             android:layout_centerHorizontal="true"
-            android:textSize="15dp"
-            android:checked="false" />
+            android:checked="false"
+            android:text="Debug mode      "
+            android:textSize="15dp" />
     </LinearLayout>
+
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/vocabCheck"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/settingSwitches"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/vocabCheck"
-        android:layout_margin="10dp">
+        android:layout_below="@+id/settingSwitches"
+        android:layout_margin="10dp"
+        android:orientation="vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Show in vocabulary:"
             android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:textSize="15dp"
-            android:textColor="#000000"/>
+            android:text="Show in vocabulary:"
+            android:textColor="#000000"
+            android:textSize="15dp" />
 
         <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Clicked words"
             android:id="@+id/ClickcheckBox"
-            android:checked="true"
-            android:textSize="15dp"
-            android:layout_gravity="center_horizontal"/>
-
-        <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Seen words     "
-            android:id="@+id/SeencheckBox"
+            android:layout_gravity="center_horizontal"
             android:checked="true"
-            android:textSize="15dp"
-            android:layout_gravity="center_horizontal"/>
+            android:text="Clicked words"
+            android:textSize="15dp" />
+
+        <CheckBox
+            android:id="@+id/SeencheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:checked="true"
+            android:text="Seen words     "
+            android:textSize="15dp" />
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/linearLayoutSwipe"
         android:layout_width="match_parent"
@@ -141,11 +141,11 @@
             android:textSize="15dp" />
 
         <RadioGroup
+            android:id="@+id/swipeRadioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:id="@+id/swipeRadioGroup"
-            >
+            android:orientation="horizontal">
+
             <RadioButton
                 android:id="@+id/Hswipe"
                 android:layout_width="wrap_content"
@@ -168,6 +168,34 @@
                 android:text="Vertical"
                 android:textSize="15dp" />
         </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayoutSwipe"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp"
+
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="10dp"
+            android:text="font Size:"
+            android:textColor="#000000"
+            android:textSize="20dp" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            style="@style/Widget.AppCompat.Spinner"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown" />
 
     </LinearLayout>
 

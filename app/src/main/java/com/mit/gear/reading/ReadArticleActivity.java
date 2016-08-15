@@ -93,7 +93,7 @@ public class ReadArticleActivity extends AppCompatActivity {
 	private boolean isFirstRun;
     public static boolean verticalSwipeDirection = false;     //indicate if the swipe us a vertical swipe
     public static Integer  recentClickedWordIndex =-1;        //save the index of last clicked word (not necessary the maximum index)
-
+    private Integer fontSizeCase;
     public ReadArticleActivity() {
         instance = this;
     }
@@ -172,7 +172,25 @@ public class ReadArticleActivity extends AppCompatActivity {
                 PageSplitter pageSplitter = new PageSplitter(pagesView.getWidth(), pagesView.getHeight(), 1, 0);
 
                 TextPaint textPaint = new TextPaint();
-                textPaint.setTextSize(getResources().getDimension(R.dimen.text_size));
+
+                switch (fontSizeCase){
+                    case 0:
+                        textPaint.setTextSize(getResources().getDimension(R.dimen.text_size_small));
+                        break;
+
+                    case 1:
+                        textPaint.setTextSize(getResources().getDimension(R.dimen.text_size_normal));
+                        break;
+
+                    case 2:
+                        textPaint.setTextSize(getResources().getDimension(R.dimen.text_size_large));
+                        break;
+
+                    case 3:
+                        textPaint.setTextSize(getResources().getDimension(R.dimen.text_size_huge));
+                        break;
+
+                }
                 textPaint.setColor(255);
                 AssetManager assetManager = getAssets();
                 String story = getIntent().getExtras().getString("title");
@@ -202,7 +220,7 @@ public class ReadArticleActivity extends AppCompatActivity {
                 }
                 pageSplitter.append(storyText, textPaint);
                 numberOfPages = pageSplitter.getPages().size(); //getting total number of pages in current atricle
-                pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages()));
+                pagesView.setAdapter(new TextPagerAdapter(getSupportFragmentManager(), pageSplitter.getPages(), fontSizeCase));
                 pagesView.getAdapter().notifyDataSetChanged();
                 pagesView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 pageIndicator.setText("Page " + String.valueOf(1) + " of " + numberOfPages);
@@ -473,6 +491,7 @@ public class ReadArticleActivity extends AppCompatActivity {
         GEARClickableSpan.speakChoice = sharedPreferences.getBoolean("speak", true);
         needsUserManual = sharedPreferences.getBoolean("manual", true);
         verticalSwipeDirection = (sharedPreferences.getString("swipeRadio", "Hswipe").equals("Vswipe")) ? true : false;
+        fontSizeCase = sharedPreferences.getInt("fontSize", 1);
     }
 
     /*
@@ -484,6 +503,8 @@ public class ReadArticleActivity extends AppCompatActivity {
         if (!UndoView.isEnabled())
             return;
         UndoView.setEnabled(false);
+        recentClickedWordIndex=Integer.MAX_VALUE;
+
         load();
         DataStorage dataStorage = new DataStorage(this);
 

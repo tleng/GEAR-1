@@ -9,6 +9,7 @@ import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,14 +37,16 @@ public class PageFragment extends Fragment {
     private TextView pageView;
     private static CharSequence articleText;
     public static Integer fragmentIndex =0 ;
+    public static Integer fontSizeCase;
 
     private DefinitionRequest currentDefinitionRequest = null;
 
-    public static PageFragment newInstance(CharSequence pageText, int fragmentIndex) {
+    public static PageFragment newInstance(CharSequence pageText, int fragmentIndex, Integer FontSizeCase) {
         articleText = pageText;
         PageFragment frag = new PageFragment();
         Bundle args = new Bundle();
         args.putCharSequence(PAGE_TEXT, pageText);
+        fontSizeCase= FontSizeCase;
         //saving the fragment index into its args
         args.putInt("index",fragmentIndex);
         frag.setArguments(args);
@@ -84,6 +87,26 @@ public class PageFragment extends Fragment {
         CharSequence text = getArguments().getCharSequence(PAGE_TEXT);
         fragmentIndex = getArguments().getInt("index");
         pageView = (TextView) inflater.inflate(R.layout.page, container, false);
+
+        switch (fontSizeCase){
+
+            case 0:
+                pageView.setTextSize (TypedValue.COMPLEX_UNIT_PX, ReadArticleActivity.getReadArticleActivityInstance().getResources().getDimensionPixelSize(R.dimen.text_size_small) );
+                break;
+
+            case 1:
+                pageView.setTextSize (TypedValue.COMPLEX_UNIT_PX, ReadArticleActivity.getReadArticleActivityInstance().getResources().getDimensionPixelSize(R.dimen.text_size_normal) );
+                break;
+
+            case 2:
+                pageView.setTextSize (TypedValue.COMPLEX_UNIT_PX, ReadArticleActivity.getReadArticleActivityInstance().getResources().getDimensionPixelSize(R.dimen.text_size_large) );
+                break;
+
+            case 3:
+                pageView.setTextSize (TypedValue.COMPLEX_UNIT_PX, ReadArticleActivity.getReadArticleActivityInstance().getResources().getDimensionPixelSize(R.dimen.text_size_huge) );
+                break;
+        }
+
         //removing the highlight color for the textView if clicked
         pageView.setHighlightColor(Color.TRANSPARENT);
         Log.d("Viewthis",pageView.toString());

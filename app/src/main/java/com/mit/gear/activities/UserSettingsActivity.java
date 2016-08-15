@@ -5,14 +5,20 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Switch;
 
 import com.mattmellor.gear.R;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -35,9 +41,13 @@ public class UserSettingsActivity extends AppCompatActivity {
     private boolean showClicked;
     private boolean showSeen;
     private RadioGroup swipeRadioGroup;
+    private Spinner spinner;
+    private Integer textSize;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_user_settings);
         colorSwitch =(Switch)findViewById(R.id.color);
         speakSwitch =(Switch)findViewById(R.id.speak);
@@ -45,14 +55,15 @@ public class UserSettingsActivity extends AppCompatActivity {
 		clickedCheckBox = (CheckBox)findViewById(R.id.ClickcheckBox);
 		seenCheckBox = (CheckBox)findViewById(R.id.SeencheckBox);
         swipeRadioGroup=(RadioGroup)findViewById(R.id.swipeRadioGroup);
+        spinner = (Spinner) findViewById(R.id.spinner);
         //Access the shared preference
         sharedPreferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
         //getting user preference or true/false for default
         colorChoice=sharedPreferences.getBoolean("color", true);
         speakChoice=sharedPreferences.getBoolean("speak", true);
         debugChoice=sharedPreferences.getBoolean("debug", false);
-		showClicked=sharedPreferences.getBoolean("showClicked",true);
-		showSeen=sharedPreferences.getBoolean("showSeen",true);
+		showClicked=sharedPreferences.getBoolean("showClicked", true);
+		showSeen=sharedPreferences.getBoolean("showSeen", true);
         if(sharedPreferences.getString("swipeRadio", "Hswipe").equals("Hswipe")) {
             swipeRadioGroup.check(R.id.Hswipe);
         }
@@ -60,12 +71,16 @@ public class UserSettingsActivity extends AppCompatActivity {
             swipeRadioGroup.check(R.id.Vswipe);
         }
 
+        textSize=sharedPreferences.getInt("fontSize", 1);
+
+
         //set the switch to user preference
         colorSwitch.setChecked(colorChoice);
         speakSwitch.setChecked(speakChoice);
         debugSwitch.setChecked(debugChoice);
 		clickedCheckBox.setChecked(showClicked);
 		seenCheckBox.setChecked(showSeen);
+
         //updating shredPreference to switch state
         colorSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -132,5 +147,35 @@ public class UserSettingsActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+        //get font sizes array from resources
+        String[] fontSizesArray = getResources().getStringArray(R.array.font_size_category);
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> fontSpinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, fontSizesArray);
+
+        // Drop down layout style - list view with radio button
+        fontSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        spinner.setAdapter(fontSpinnerAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("fontSize", position);
+                editor.commit();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinner.setSelection(textSize.intValue());
+
     }
 }
