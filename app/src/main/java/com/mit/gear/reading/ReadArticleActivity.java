@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.gesturetutorial.awesomeness.TutorialView;
 import com.mattmellor.gear.R;
 import com.mit.gear.activities.LiteNewsFragment;
+import com.mit.gear.activities.MainActivity;
 import com.mit.gear.activities.SavePopupActivity;
 import com.mit.gear.activities.StoriesSelectionActivity;
 import com.mit.gear.data.DataStorage;
@@ -139,13 +140,23 @@ public class ReadArticleActivity extends AppCompatActivity {
 
         // if there are clicked/passed words, show user manual for different color meaning
         if (!userDictionary.isEmpty()) {
+			//Set the tutorial content text and padding according to the screen size
+			int padding;
+			String ContentText;
+			if(MainActivity.ScreenSize.equals("Normal")){
+				padding = -350;
+				ContentText = getResources().getString(R.string.UserManualWordColoringSmall);
+			}else{
+				padding = -150;
+				ContentText = getResources().getString(R.string.UserManualWordColoring);
+			}
             new MaterialShowcaseView.Builder(this)
                     .setTarget(pagesView)
                     .setTitleText(getResources().getString(R.string.UserManualTitle))
                     .setDismissText(getResources().getString(R.string.UserManualDismissText))
-                    .setContentText(getResources().getString(R.string.UserManualWordColoring))
+                    .setContentText(ContentText)
                     .setMaskColour(getResources().getColor(R.color.manualBackground))
-                    .setShapePadding(-150)
+                    .setShapePadding(padding)
                     .setFadeDuration(300)
                     .singleUse("colorWords")
                     .show();
@@ -252,9 +263,15 @@ public class ReadArticleActivity extends AppCompatActivity {
 
     public void saveProgress(View view) {
         if (needsUserManual) {   //this shows a user manual hint to the user for save progress button
+			int padding;
+			if(MainActivity.ScreenSize.equals("Normal")){
+				padding = 20;
+			}else{
+				padding = 96;
+			}
             new MaterialShowcaseView.Builder(this)
                     .setTarget(Savebtn)
-                    .setShapePadding(96)
+                    .setShapePadding(padding)
                     .setTitleText(getResources().getString(R.string.UserManualTitle))
                     .setDismissText(getResources().getString(R.string.UserManualDismissText))
                     .setContentText(getResources().getString(R.string.UserManualSavePgContent))

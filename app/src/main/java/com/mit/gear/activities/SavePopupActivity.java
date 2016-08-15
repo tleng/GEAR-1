@@ -19,6 +19,7 @@ import com.mit.gear.words.GEARGlobal;
 
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.shape.CircleShape;
 
 /**
  *
@@ -46,12 +47,19 @@ public class SavePopupActivity extends Activity {
         final int height = dm.heightPixels;
 
         if(ReadArticleActivity.needsUserManual) {   //this shows a user manual hint to the user for save progress button
-            new MaterialShowcaseView.Builder(this)
+			//Set tutorial content text according to the screen size
+			String ContentText;
+			if(MainActivity.ScreenSize.equals("Normal")){
+				ContentText = getResources().getString(R.string.UserManualSavePgContentSmall);
+			}else{
+				ContentText = getResources().getString(R.string.UserManualSavePgContent);
+			}
+			new MaterialShowcaseView.Builder(this)
                     .setTarget(findViewById(R.id.saveProgressQuery))
-                    .setShapePadding(80)
+					.setShape(new CircleShape((int) (height* 0.1)))
                     .setTitleText(getResources().getString(R.string.UserManualTitle))
                     .setDismissText(getResources().getString(R.string.UserManualDismissText))
-                    .setContentText(getResources().getString(R.string.UserManualSavePgContent))
+                    .setContentText(ContentText)
                     .singleUse("saveProgressButton")
                     .setMaskColour(getResources().getColor(R.color.manualBackground))
                     .setFadeDuration(300)
@@ -63,7 +71,12 @@ public class SavePopupActivity extends Activity {
 
                         @Override
                         public void onShowcaseDismissed(MaterialShowcaseView materialShowcaseView) {
-                            getWindow().setLayout((int) (width*0.6) , (int) (height* 0.2));
+							//Change the size of the popup according to the screen size
+							if(MainActivity.ScreenSize.equals("Normal")){
+								getWindow().setLayout((int) (width*0.7) , (int) (height* 0.2));			//Set the size of the activity
+							}else{
+								getWindow().setLayout((int) (width*0.6) , (int) (height* 0.2));			//Set the size of the activity
+							}
                         }
                     })
                     .show();
@@ -73,8 +86,13 @@ public class SavePopupActivity extends Activity {
                     .putBoolean("manual", false)
                     .apply();
         }else{
-            getWindow().setLayout((int) (width*0.6) , (int) (height* 0.2));				//Set the size of the activity
-        }
+			//Change the size of the popup according to the screen size
+			if(MainActivity.ScreenSize.equals("Normal")){
+				getWindow().setLayout((int) (width*0.7) , (int) (height* 0.2));			//Set the size of the activity
+			}else{
+				getWindow().setLayout((int) (width*0.6) , (int) (height* 0.2));			//Set the size of the activity
+			}
+		}
     }
 
 	/*

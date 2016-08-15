@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import com.mattmellor.gear.R;
+import com.mit.gear.activities.MainActivity;
 
 
 public class NavDrawerListAdapter extends BaseAdapter {
@@ -49,6 +50,11 @@ public class NavDrawerListAdapter extends BaseAdapter {
         ImageView imgIcon = (ImageView) convertView.findViewById(R.id.icon);
         TextView txtTitle = (TextView) convertView.findViewById(R.id.title);
         TextView txtCount = (TextView) convertView.findViewById(R.id.counter);
+
+		//Set text size of nav drawer title to be smaller
+		if(MainActivity.ScreenSize.equals("Normal")){
+			txtTitle.setTextSize(15);
+		}
          
         imgIcon.setImageResource(navDrawerItems.get(position).getIcon());        
         txtTitle.setText(navDrawerItems.get(position).getTitle());

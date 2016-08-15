@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.mattmellor.gear.R;
 import com.mit.gear.activities.DisplayVocabularyActivity;
+import com.mit.gear.activities.MainActivity;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -139,10 +140,13 @@ public class WordTableAdapter extends TableDataAdapter<Word> {
         textView.setGravity(Gravity.LEFT);
         textView.setTextColor(getResources().getColor(R.color.default_word));
         textView.setPadding(20, 10, 20, 10);
-		if(Smaller){
-			textView.setTextSize(13);
+		if(MainActivity.ScreenSize.equals("Normal")){
+			textView.setTextSize(11);
 		}else{
 			textView.setTextSize(15);
+		}
+		if(Smaller && !MainActivity.ScreenSize.equals("Normal")){
+			textView.setTextSize(13);
 		}
         return textView;
     }

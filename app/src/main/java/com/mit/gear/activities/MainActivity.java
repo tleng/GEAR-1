@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     public static Context context;
 	private MenuItem clearItem;
 	private MenuItem shareItem;
+	public static String ScreenSize;
 
 
 	// nav drawer title
@@ -63,6 +64,17 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		//Get screen size to change font and size accordingly
+		int screenSize = getResources().getConfiguration().screenLayout &
+				Configuration.SCREENLAYOUT_SIZE_MASK;
+		switch(screenSize) {
+			case Configuration.SCREENLAYOUT_SIZE_LARGE:
+				ScreenSize = "Large";
+				break;
+			case Configuration.SCREENLAYOUT_SIZE_NORMAL:
+				ScreenSize = "Normal";
+				break;
+		}
         context = this;
         // login with dummy user
         String defaultUserName = "defaultUser";

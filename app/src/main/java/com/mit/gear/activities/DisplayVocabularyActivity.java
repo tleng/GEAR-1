@@ -113,8 +113,13 @@ public class DisplayVocabularyActivity extends Fragment {
             final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter
                     (getActivity().getApplicationContext(), "Word","Definition","Clicks","Seen","Time");             //Set table header column
             simpleTableHeaderAdapter.setTextColor(getResources().getColor(R.color.table_header_text));           //Set table header column text color
-            simpleTableHeaderAdapter.setPaddings(10, 15, 0, 15);
-            simpleTableHeaderAdapter.setTextSize(15);
+			if(MainActivity.ScreenSize.equals("Normal")){
+				simpleTableHeaderAdapter.setTextSize(10);
+				simpleTableHeaderAdapter.setPaddings(10, 10, 0, 10);
+			}else{
+				simpleTableHeaderAdapter.setTextSize(15);
+				simpleTableHeaderAdapter.setPaddings(10, 15, 0, 15);
+			}
             tableView.setHeaderAdapter(simpleTableHeaderAdapter);
 
             tableView.setColumnCount(5);                                                                          //Set the number of column
@@ -133,8 +138,13 @@ public class DisplayVocabularyActivity extends Fragment {
             final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter
                     (getActivity().getApplicationContext(), "Word","Definition","Clicks","Time");             //Set table header column
             simpleTableHeaderAdapter.setTextColor(getResources().getColor(R.color.table_header_text));           //Set table header column text color
-			simpleTableHeaderAdapter.setPaddings(10, 15, 0, 15);
-			simpleTableHeaderAdapter.setTextSize(15);
+			if(MainActivity.ScreenSize.equals("Normal")){
+				simpleTableHeaderAdapter.setTextSize(10);
+				simpleTableHeaderAdapter.setPaddings(10, 10, 0, 10);
+			}else{
+				simpleTableHeaderAdapter.setTextSize(15);
+				simpleTableHeaderAdapter.setPaddings(10, 15, 0, 15);
+			}
             tableView.setHeaderAdapter(simpleTableHeaderAdapter);
 
             tableView.setColumnCount(4);                                                                          //Set the number of column
@@ -152,8 +162,13 @@ public class DisplayVocabularyActivity extends Fragment {
             final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter
                     (getActivity().getApplicationContext(), "Word","Seen","Time");             //Set table header column
             simpleTableHeaderAdapter.setTextColor(getResources().getColor(R.color.table_header_text));           //Set table header column text color
-			simpleTableHeaderAdapter.setPaddings(10, 15, 0, 15);
-			simpleTableHeaderAdapter.setTextSize(15);
+			if(MainActivity.ScreenSize.equals("Normal")){
+				simpleTableHeaderAdapter.setTextSize(10);
+				simpleTableHeaderAdapter.setPaddings(10, 10, 0, 10);
+			}else{
+				simpleTableHeaderAdapter.setTextSize(15);
+				simpleTableHeaderAdapter.setPaddings(10, 15, 0, 15);
+			}
             tableView.setHeaderAdapter(simpleTableHeaderAdapter);
 
             tableView.setColumnCount(3);                                                                          //Set the number of column
@@ -169,8 +184,6 @@ public class DisplayVocabularyActivity extends Fragment {
             final SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter
                     (getActivity().getApplicationContext(), "");             //Set table header column
             simpleTableHeaderAdapter.setTextColor(getResources().getColor(R.color.table_header_text));           //Set table header column text color
-			simpleTableHeaderAdapter.setPaddings(10, 15, 0, 15);
-			simpleTableHeaderAdapter.setTextSize(17);
             tableView.setHeaderAdapter(simpleTableHeaderAdapter);
 
             tableView.setColumnCount(0);                                                                          //Set the number of column

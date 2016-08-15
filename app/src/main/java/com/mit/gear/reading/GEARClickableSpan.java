@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.mattmellor.gear.R;
 import com.mit.gear.activities.LiteNewsFragment;
+import com.mit.gear.activities.MainActivity;
 import com.mit.gear.activities.StoriesSelectionActivity;
 import com.mit.gear.data.DataStorage;
 import com.mit.gear.words.GEARGlobal;
@@ -321,9 +322,15 @@ public class GEARClickableSpan extends ClickableSpan {
 	 * This will show only once in the application.
 	 */
 	private void showUserManual(){
+		int padding;
+		if(MainActivity.ScreenSize.equals("Normal")){
+			padding = 70;
+		}else{
+			padding = 96;
+		}
 		new MaterialShowcaseView.Builder(readArticleActivity)
 				.setTarget(ReadArticleActivity.UndoView)
-				.setShapePadding(96)
+				.setShapePadding(padding)
                 .setTitleText(readArticleActivity.getResources().getString(R.string.UserManualTitle))
                 .setDismissText(readArticleActivity.getResources().getString(R.string.UserManualDismissText))
                 .setContentText(readArticleActivity.getResources().getString(R.string.UserManualUndoContent))
